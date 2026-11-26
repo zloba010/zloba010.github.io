@@ -60,6 +60,14 @@
             overflow: hidden;
             position: relative;
         }
+        /* ===== РЕЖИМ ПРОДУКТИВНОСТИ: разрешаем скролл ===== */
+        body.productivity-mode {
+            overflow-x: hidden;
+            overflow-y: auto;
+            justify-content: flex-start;
+            padding-top: 90px;
+            padding-bottom: 60px;
+        }
         body[data-theme="glass"] {
             background: 
                 radial-gradient(circle at 20% 30%, #ffffff 0%, transparent 40%),
@@ -68,6 +76,9 @@
                 linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
             background-size: 150% 150%;
             animation: glassBG 20s ease-in-out infinite alternate;
+        }
+        body.productivity-mode[data-theme="glass"] {
+            background-attachment: fixed;
         }
         @keyframes glassBG {
             0% { background-position: 0% 0%; }
@@ -120,6 +131,9 @@
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             z-index: 100; min-width: 140px;
         }
+        body.productivity-mode .dynamic-island {
+            position: fixed;
+        }
         body[data-theme="dark"] .dynamic-island {
             border: 2px solid rgba(230, 213, 195, 0.3);
             box-shadow: 0 4px 15px var(--shadow-color);
@@ -163,7 +177,6 @@
         .weather-icon { font-size: 1rem; line-height: 1; }
         .weather-temp { font-weight: 800; }
 
-        /* ===== Расширенная погода (только в режиме productivity) ===== */
         .weather-extended {
             display: grid;
             grid-template-columns: auto 1fr;
@@ -208,7 +221,6 @@
             opacity: 0 !important; max-height: 0 !important; margin: 0 !important;
         }
 
-        /* ===== Кнопка темы с кольцом прогресса ===== */
         .theme-toggle {
             position: absolute; top: 20px; right: 20px;
             background: var(--panel-bg); color: var(--text-color);
@@ -223,6 +235,9 @@
             user-select: none;
             -webkit-user-select: none;
             touch-action: manipulation;
+        }
+        body.productivity-mode .theme-toggle {
+            position: fixed;
         }
         .theme-toggle:hover { box-shadow: 0 0 20px var(--accent-color); border-color: var(--accent-color); }
         .theme-toggle .press-ring {
@@ -341,7 +356,6 @@
         }
         body[data-theme="glass"] .search-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
-        /* ===== Inline-закладки (режим productivity) ===== */
         .inline-bookmarks {
             width: 100%;
             max-height: 0;
@@ -351,7 +365,7 @@
             transition: all 0.4s ease;
         }
         body.productivity-mode .inline-bookmarks {
-            max-height: 500px;
+            max-height: 2000px;
             opacity: 1;
             margin-top: 24px;
         }
@@ -404,7 +418,6 @@
             font-size: 0.9rem;
         }
 
-        /* ===== Быстрая заметка для режима продуктивности (Scratchpad) ===== */
         .scratchpad {
             width: 100%;
             max-height: 0;
@@ -414,7 +427,7 @@
             transition: all 0.4s ease;
         }
         body.productivity-mode .scratchpad {
-            max-height: 500px;
+            max-height: 1000px;
             opacity: 1;
             margin-top: 20px;
         }
@@ -731,6 +744,11 @@
             text-decoration: none; transition: all 0.3s ease;
             color: var(--text-color); opacity: 0.7;
         }
+        body.productivity-mode .footer-credit {
+            position: absolute;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
         .footer-credit:hover { color: var(--accent-color); opacity: 1; text-shadow: 0 0 8px var(--accent-color); }
 
         body.zen-mode .logo,
@@ -739,7 +757,9 @@
         body.zen-mode .theme-toggle,
         body.zen-mode .footer-credit,
         body.zen-mode .flashlight,
-        body.zen-mode .toast-notification {
+        body.zen-mode .toast-notification,
+        body.zen-mode .inline-bookmarks,
+        body.zen-mode .scratchpad {
             opacity: 0 !important;
             pointer-events: none !important;
             transform: translateY(-15px) scale(0.98) !important;
@@ -866,12 +886,10 @@
             </button>
         </div>
 
-        <!-- Inline-закладки (видны только в режиме productivity) -->
         <div class="inline-bookmarks">
             <div class="inline-bookmarks-grid" id="inlineBookmarksGrid"></div>
         </div>
 
-        <!-- Быстрая заметка (видна только в режиме productivity) -->
         <div class="scratchpad">
             <div class="scratchpad-card">
                 <div class="scratchpad-header">
@@ -1190,7 +1208,6 @@
                 weatherIcon.textContent = wmoToEmoji(code);
             }
 
-            // Обновляем расширенные данные, если они есть
             if (extra) {
                 document.getElementById('wxFeelsLike').textContent = 
                     extra.apparent !== null && extra.apparent !== undefined ? `${Math.round(extra.apparent)}°` : '—';
@@ -1314,7 +1331,6 @@
             applyWeather('Не определено', '--', null);
         }
 
-        // ===== РЕЖИМ ПРОДУКТИВНОСТИ (Long-press на кнопке темы) =====
         const PRESS_DURATION = 700;
         let pressTimer = null;
         let isLongPress = false;
@@ -1375,7 +1391,6 @@
             applyTheme();
         });
 
-        // ===== INLINE-ЗАКЛАДКИ =====
         const inlineBookmarksGrid = document.getElementById('inlineBookmarksGrid');
 
         function renderInlineBookmarks() {
@@ -1414,7 +1429,6 @@
             });
         }
 
-        // ===== БЫСТРАЯ ЗАМЕТКА (SCRATCHPAD) =====
         const scratchpadText = document.getElementById('scratchpadText');
         const scratchpadStatus = document.getElementById('scratchpadStatus');
         const scratchpadCount = document.getElementById('scratchpadCount');
@@ -1452,7 +1466,6 @@
             }
         });
 
-        // ===== ТЕМЫ =====
         function applyTheme() {
             const theme = themes[currentThemeIndex];
             document.body.setAttribute('data-theme', theme);
@@ -1574,14 +1587,14 @@
             if (editingIndex === -1) bookmarks.push(data); else bookmarks[editingIndex] = data;
             localStorage.setItem('troubleTabBookmarks', JSON.stringify(bookmarks));
             showListView();
-            renderInlineBookmarks(); // Обновляем inline-закладки
+            renderInlineBookmarks();
         });
         deleteBtn.addEventListener('click', () => {
             if (confirm('Удалить эту вкладку?')) {
                 bookmarks.splice(editingIndex, 1);
                 localStorage.setItem('troubleTabBookmarks', JSON.stringify(bookmarks));
                 showListView();
-                renderInlineBookmarks(); // Обновляем inline-закладки
+                renderInlineBookmarks();
             }
         });
 
@@ -2037,7 +2050,6 @@
             resizeDustCanvas();
             applyTheme();
             
-            // Восстанавливаем режим продуктивности
             if (localStorage.getItem('troubleTabMode') === 'productivity') {
                 applyProductivityMode(true);
             }
