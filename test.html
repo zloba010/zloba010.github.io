@@ -152,12 +152,8 @@
             margin-bottom: 6px;
         }
         .weather-city { 
-            opacity: 0.8; 
-            max-width: 90px; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            cursor: pointer; /* Добавлено: показывает, что можно нажать */
-            border-bottom: 1px dashed transparent;
+            opacity: 0.8; max-width: 90px; overflow: hidden; text-overflow: ellipsis; 
+            cursor: pointer; border-bottom: 1px dashed transparent;
             transition: border-color 0.2s, opacity 0.2s;
         }
         .weather-city:hover {
@@ -166,6 +162,37 @@
         }
         .weather-icon { font-size: 1rem; line-height: 1; }
         .weather-temp { font-weight: 800; }
+
+        /* ===== Расширенная погода (только в режиме productivity) ===== */
+        .weather-extended {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 3px 12px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 0;
+            width: 100%;
+            padding: 0 4px;
+            white-space: nowrap;
+        }
+        body.productivity-mode .dynamic-island:hover .weather-extended {
+            opacity: 0.9;
+            max-height: 150px;
+            margin-top: 8px;
+        }
+        .weather-extended .wx-label { opacity: 0.6; text-align: right; }
+        .weather-extended .wx-value { font-weight: 600; text-align: left; }
+        .weather-extended .wx-divider {
+            grid-column: 1 / -1;
+            height: 1px;
+            background: currentColor;
+            opacity: 0.15;
+            margin: 4px 0;
+        }
 
         .time-display { font-size: 1.2rem; font-weight: 600; letter-spacing: 1px; }
         .date-display {
@@ -176,10 +203,12 @@
         .dynamic-island:hover .date-display { opacity: 0.8; max-height: 20px; margin-top: 4px; }
         
         .dynamic-island.is-tyk .date-display,
-        .dynamic-island.is-tyk .weather-display { 
+        .dynamic-island.is-tyk .weather-display,
+        .dynamic-island.is-tyk .weather-extended { 
             opacity: 0 !important; max-height: 0 !important; margin: 0 !important;
         }
 
+        /* ===== Кнопка темы с кольцом прогресса ===== */
         .theme-toggle {
             position: absolute; top: 20px; right: 20px;
             background: var(--panel-bg); color: var(--text-color);
@@ -191,8 +220,43 @@
             -webkit-backdrop-filter: var(--glass-blur);
             box-shadow: 0 4px 15px var(--shadow-color);
             font-size: 1.2rem; z-index: 100;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
         }
         .theme-toggle:hover { box-shadow: 0 0 20px var(--accent-color); border-color: var(--accent-color); }
+        .theme-toggle .press-ring {
+            position: absolute;
+            inset: -4px;
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
+            pointer-events: none;
+            transform: rotate(-90deg);
+        }
+        .theme-toggle .press-ring circle {
+            fill: none;
+            stroke: var(--accent-color);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-dasharray: 144.5;
+            stroke-dashoffset: 144.5;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+        .theme-toggle.pressing .press-ring circle {
+            opacity: 1;
+            animation: pressFill 700ms linear forwards;
+        }
+        @keyframes pressFill {
+            from { stroke-dashoffset: 144.5; }
+            to { stroke-dashoffset: 0; }
+        }
+        .theme-toggle.mode-active {
+            background: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
 
         .toast-notification {
             position: fixed;
@@ -213,7 +277,6 @@
             align-items: center;
             gap: 10px;
             z-index: 2000;
-            
             opacity: 0;
             transform: translateX(50px) scale(0.95);
             pointer-events: none;
@@ -278,6 +341,153 @@
         }
         body[data-theme="glass"] .search-btn:hover { background: rgba(255, 255, 255, 0.2); }
 
+        /* ===== Inline-закладки (режим productivity) ===== */
+        .inline-bookmarks {
+            width: 100%;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            margin-top: 0;
+            transition: all 0.4s ease;
+        }
+        body.productivity-mode .inline-bookmarks {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 24px;
+        }
+        .inline-bookmarks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+        }
+        .inline-bookmark-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 8px;
+            background: var(--panel-bg);
+            border: var(--glass-border);
+            border-radius: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-color);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            transition: all 0.2s;
+            position: relative;
+        }
+        .inline-bookmark-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-color);
+            box-shadow: 0 8px 20px var(--shadow-color);
+        }
+        .inline-bookmark-icon {
+            width: 30px; height: 30px; margin-bottom: 6px;
+            border-radius: 8px; object-fit: cover;
+        }
+        .inline-bookmark-title {
+            font-size: 0.72rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            font-weight: 600;
+        }
+        .inline-bookmarks-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            opacity: 0.5;
+            font-size: 0.9rem;
+        }
+
+        /* ===== Быстрая заметка (Scratchpad) ===== */
+        .scratchpad {
+            width: 100%;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            margin-top: 0;
+            transition: all 0.4s ease;
+        }
+        body.productivity-mode .scratchpad {
+            max-height: 500px;
+            opacity: 1;
+            margin-top: 20px;
+        }
+        .scratchpad-card {
+            background: var(--panel-bg);
+            border: var(--glass-border);
+            border-radius: 20px;
+            padding: 16px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 8px 32px var(--shadow-color);
+        }
+        .scratchpad-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+        .scratchpad-status {
+            font-size: 0.7rem;
+            font-weight: 500;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        .scratchpad-status.saving {
+            opacity: 1;
+            color: var(--accent-color);
+        }
+        .scratchpad-textarea {
+            width: 100%;
+            min-height: 100px;
+            max-height: 220px;
+            background: var(--input-bg);
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 12px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            font-family: inherit;
+            line-height: 1.5;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .scratchpad-textarea:focus { border-color: var(--accent-color); }
+        .scratchpad-textarea::placeholder { color: var(--text-color); opacity: 0.4; }
+        .scratchpad-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+        .scratchpad-clear {
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 0.7rem;
+            opacity: 0.7;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .scratchpad-clear:hover {
+            opacity: 1;
+            background: rgba(255, 0, 0, 0.1);
+            color: var(--accent-color);
+        }
+        
         .actions-row {
             display: flex;
             gap: 12px;
@@ -545,7 +755,7 @@
             .search-input { width: 100%; text-align: center; }
             .engine-select { width: 100%; text-align: center; border-bottom: 1px solid var(--border-color); }
             .search-btn { width: 100%; border-radius: 10px; }
-            .bookmarks-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+            .bookmarks-grid, .inline-bookmarks-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
             .footer-credit { bottom: 10px; font-size: 0.75rem; }
             
             .toast-notification { 
@@ -615,9 +825,27 @@
         </div>
         <div class="time-display" id="timeDisplay">00:00</div>
         <div class="date-display" id="dateDisplay">1 января 2024</div>
+        <div class="weather-extended" id="weatherExtended">
+            <span class="wx-label">Ощущается:</span>
+            <span class="wx-value" id="wxFeelsLike">—</span>
+            <span class="wx-label">Влажность:</span>
+            <span class="wx-value" id="wxHumidity">—</span>
+            <span class="wx-label">Ветер:</span>
+            <span class="wx-value" id="wxWind">—</span>
+            <div class="wx-divider"></div>
+            <span class="wx-label">Восход:</span>
+            <span class="wx-value" id="wxSunrise">—</span>
+            <span class="wx-label">Закат:</span>
+            <span class="wx-value" id="wxSunset">—</span>
+        </div>
     </div>
 
-    <button class="theme-toggle" id="themeToggle" title="Сменить тему">☀️</button>
+    <button class="theme-toggle" id="themeToggle" title="Клик — смена темы · Удержание — режим продуктивности">
+        <span id="themeIcon">☀️</span>
+        <svg class="press-ring" viewBox="0 0 50 50">
+            <circle cx="25" cy="25" r="23"/>
+        </svg>
+    </button>
 
     <div class="main-container">
         <h1 class="logo">
@@ -636,6 +864,30 @@
             <button class="search-btn" id="searchBtn" title="Найти">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             </button>
+        </div>
+
+        <!-- Inline-закладки (видны только в режиме productivity) -->
+        <div class="inline-bookmarks">
+            <div class="inline-bookmarks-grid" id="inlineBookmarksGrid"></div>
+        </div>
+
+        <!-- Быстрая заметка (видна только в режиме productivity) -->
+        <div class="scratchpad">
+            <div class="scratchpad-card">
+                <div class="scratchpad-header">
+                    <span>📝 Быстрая заметка</span>
+                    <span class="scratchpad-status" id="scratchpadStatus">Сохранено</span>
+                </div>
+                <textarea 
+                    class="scratchpad-textarea" 
+                    id="scratchpadText"
+                    placeholder="Запишите идею, ссылку, задачу... Всё автоматически сохранится в браузере."
+                ></textarea>
+                <div class="scratchpad-footer">
+                    <span id="scratchpadCount">0 символов</span>
+                    <button class="scratchpad-clear" id="scratchpadClear">Очистить</button>
+                </div>
+            </div>
         </div>
 
         <div class="actions-row">
@@ -774,6 +1026,7 @@
         const themes = ['light', 'dark', 'glass'];
         const themeIcons = ['☀️', '🌙', '💎'];
         const themeToggleBtn = document.getElementById('themeToggle');
+        const themeIconEl = document.getElementById('themeIcon');
         let savedTheme = localStorage.getItem('troubleTabTheme') || 'light';
         let currentThemeIndex = themes.indexOf(savedTheme);
         if (currentThemeIndex === -1) currentThemeIndex = 0;
@@ -859,9 +1112,7 @@
             dateDisplay.textContent = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         }
         clockWidget.addEventListener('click', (e) => {
-            // Предотвращаем срабатывание, если кликнули по городу
             if (e.target.closest('.weather-city')) return;
-            
             if (isAnimating) return;
             isAnimating = true;
             clockWidget.classList.add('is-tyk');
@@ -874,9 +1125,8 @@
             }, 1000);
         });
 
-        // ================= НОВОЕ: Ручное изменение города =================
         weatherCity.addEventListener('click', (e) => {
-            e.stopPropagation(); // Чтобы не срабатывал клик по часам
+            e.stopPropagation();
             const current = localStorage.getItem('troubleTabManualCity') || weatherCity.textContent;
             const newCity = prompt('Введите ваш город (например: Казань, Екатеринбург):', current === 'Загрузка...' ? '' : current);
             
@@ -884,11 +1134,10 @@
                 const trimmed = newCity.trim();
                 if (trimmed) {
                     localStorage.setItem('troubleTabManualCity', trimmed);
-                    localStorage.removeItem('troubleTabWeather'); // Сброс кэша для немедленного обновления
+                    localStorage.removeItem('troubleTabWeather');
                     weatherCity.textContent = 'Обновление...';
                     initWeather();
                 } else {
-                    // Если пользователь стёр всё и нажал ОК, сбрасываем на автоопределение
                     localStorage.removeItem('troubleTabManualCity');
                     localStorage.removeItem('troubleTabWeather');
                     initWeather();
@@ -931,7 +1180,7 @@
             }
         }
 
-        function applyWeather(city, temp, code) {
+        function applyWeather(city, temp, code, extra = null) {
             weatherCity.textContent = city || '—';
             if (temp === '--' || temp === null || temp === undefined || isNaN(temp)) {
                 weatherTemp.textContent = '--°';
@@ -940,57 +1189,84 @@
                 weatherTemp.textContent = `${temp}°`;
                 weatherIcon.textContent = wmoToEmoji(code);
             }
+
+            // Обновляем расширенные данные, если они есть
+            if (extra) {
+                document.getElementById('wxFeelsLike').textContent = 
+                    extra.apparent !== null && extra.apparent !== undefined ? `${Math.round(extra.apparent)}°` : '—';
+                document.getElementById('wxHumidity').textContent = 
+                    extra.humidity !== null && extra.humidity !== undefined ? `${extra.humidity}%` : '—';
+                document.getElementById('wxWind').textContent = 
+                    extra.wind !== null && extra.wind !== undefined ? `${extra.wind.toFixed(1)} м/с` : '—';
+                document.getElementById('wxSunrise').textContent = extra.sunrise || '—';
+                document.getElementById('wxSunset').textContent = extra.sunset || '—';
+            }
         }
 
         function loadWeatherCache() {
             try {
                 const c = JSON.parse(localStorage.getItem('troubleTabWeather') || 'null');
                 if (c && (Date.now() - c.ts < 60 * 60 * 1000)) {
-                    applyWeather(c.city, c.temp, c.code);
+                    applyWeather(c.city, c.temp, c.code, c.extra);
                     return true;
                 }
             } catch(e) {}
             return false;
         }
 
-        function saveWeatherCache(city, temp, code) {
+        function saveWeatherCache(city, temp, code, extra) {
             try {
-                localStorage.setItem('troubleTabWeather', JSON.stringify({ city, temp, code, ts: Date.now() }));
+                localStorage.setItem('troubleTabWeather', JSON.stringify({ city, temp, code, extra, ts: Date.now() }));
             } catch(e) {}
+        }
+
+        function formatTime(isoStr) {
+            if (!isoStr) return '—';
+            try {
+                const d = new Date(isoStr);
+                return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            } catch(e) { return '—'; }
+        }
+
+        async function fetchWeatherByCoords(lat, lon, cityName) {
+            const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code&daily=sunrise,sunset&timezone=auto`;
+            const wData = await fetchJSON(wUrl);
+            if (wData && wData.current) {
+                const temp = Math.round(wData.current.temperature_2m);
+                const code = wData.current.weather_code;
+                const extra = {
+                    apparent: wData.current.apparent_temperature,
+                    humidity: wData.current.relative_humidity_2m,
+                    wind: wData.current.wind_speed_10m,
+                    sunrise: wData.daily && wData.daily.sunrise ? formatTime(wData.daily.sunrise[0]) : null,
+                    sunset: wData.daily && wData.daily.sunset ? formatTime(wData.daily.sunset[0]) : null
+                };
+                applyWeather(cityName, temp, code, extra);
+                saveWeatherCache(cityName, temp, code, extra);
+                return true;
+            }
+            return false;
         }
 
         async function fetchWeatherByCityName(cityName) {
             const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=ru&format=json`;
             const geoData = await fetchJSON(geoUrl);
-            
             if (geoData && geoData.results && geoData.results.length > 0) {
                 const loc = geoData.results[0];
-                const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code&timezone=auto`;
-                const wData = await fetchJSON(wUrl);
-                if (wData && wData.current) {
-                    const temp = Math.round(wData.current.temperature_2m);
-                    const code = wData.current.weather_code;
-                    applyWeather(loc.name, temp, code);
-                    saveWeatherCache(loc.name, temp, code);
-                    return true;
-                }
+                return await fetchWeatherByCoords(loc.latitude, loc.longitude, loc.name);
             }
             return false;
         }
 
         async function initWeather() {
-            // 1. Проверяем кэш (1 час)
             if (loadWeatherCache()) return;
 
-            // 2. ПРОВЕРКА: Задал ли пользователь город вручную? (Наивысший приоритет)
             const manualCity = localStorage.getItem('troubleTabManualCity');
             if (manualCity) {
                 const success = await fetchWeatherByCityName(manualCity);
                 if (success) return;
-                // Если не удалось найти, продолжаем попытки автоопределения
             }
 
-            // 3. Попытка получить координаты через браузер (Geolocation API)
             try {
                 const geo = await new Promise((resolve, reject) => {
                     if (!navigator.geolocation) return reject(new Error('Geolocation not supported'));
@@ -1011,39 +1287,22 @@
                     }
                 } catch(e) {}
 
-                const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,weather_code&timezone=auto`;
-                const wData = await fetchJSON(wUrl);
-                
-                if (wData && wData.current) {
-                    const temp = Math.round(wData.current.temperature_2m);
-                    const code = wData.current.weather_code;
-                    applyWeather(cityName, temp, code);
-                    saveWeatherCache(cityName, temp, code);
-                    return;
-                }
+                const success = await fetchWeatherByCoords(geo.lat, geo.lon, cityName);
+                if (success) return;
             } catch (e) {
                 console.log('Geolocation weather failed, falling back', e);
             }
 
-            // 4. Фоллбэк: определение по IP (более надёжный, чем часовой пояс)
             try {
                 const ipData = await fetchJSON('https://ipwho.is/');
                 if (ipData && ipData.city && ipData.latitude && ipData.longitude) {
-                    const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${ipData.latitude}&longitude=${ipData.longitude}&current=temperature_2m,weather_code&timezone=auto`;
-                    const wData = await fetchJSON(wUrl);
-                    if (wData && wData.current) {
-                        const temp = Math.round(wData.current.temperature_2m);
-                        const code = wData.current.weather_code;
-                        applyWeather(ipData.city, temp, code);
-                        saveWeatherCache(ipData.city, temp, code);
-                        return;
-                    }
+                    const success = await fetchWeatherByCoords(ipData.latitude, ipData.longitude, ipData.city);
+                    if (success) return;
                 }
             } catch(e) {
                 console.log('IP weather fallback failed', e);
             }
 
-            // 5. Фоллбэк: определение по часовому поясу (самый неточный)
             try {
                 const tzCity = getCityFromTimezone();
                 const success = await fetchWeatherByCityName(tzCity);
@@ -1052,14 +1311,152 @@
                 console.log('Timezone weather fallback failed', e);
             }
 
-            // 6. Если ничего не сработало
             applyWeather('Не определено', '--', null);
         }
 
+        // ===== РЕЖИМ ПРОДУКТИВНОСТИ (Long-press на кнопке темы) =====
+        const PRESS_DURATION = 700;
+        let pressTimer = null;
+        let isLongPress = false;
+
+        function applyProductivityMode(isActive) {
+            document.body.classList.toggle('productivity-mode', isActive);
+            themeToggleBtn.classList.toggle('mode-active', isActive);
+            localStorage.setItem('troubleTabMode', isActive ? 'productivity' : 'normal');
+            if (isActive) {
+                renderInlineBookmarks();
+            }
+        }
+
+        function toggleProductivityMode() {
+            const isActive = !document.body.classList.contains('productivity-mode');
+            applyProductivityMode(isActive);
+            showGreetingToast(isActive ? '📊 Режим продуктивности включён' : '✨ Обычный режим');
+        }
+
+        function startPress(e) {
+            if (e.type === 'touchstart') e.preventDefault();
+            isLongPress = false;
+            themeToggleBtn.classList.add('pressing');
+            pressTimer = setTimeout(() => {
+                isLongPress = true;
+                themeToggleBtn.classList.remove('pressing');
+                toggleProductivityMode();
+                if (navigator.vibrate) navigator.vibrate(30);
+            }, PRESS_DURATION);
+        }
+
+        function endPress() {
+            clearTimeout(pressTimer);
+            themeToggleBtn.classList.remove('pressing');
+        }
+
+        function cancelPress() {
+            clearTimeout(pressTimer);
+            themeToggleBtn.classList.remove('pressing');
+        }
+
+        themeToggleBtn.addEventListener('mousedown', startPress);
+        themeToggleBtn.addEventListener('touchstart', startPress, { passive: false });
+        themeToggleBtn.addEventListener('mouseup', endPress);
+        themeToggleBtn.addEventListener('mouseleave', cancelPress);
+        themeToggleBtn.addEventListener('touchend', endPress);
+        themeToggleBtn.addEventListener('touchcancel', cancelPress);
+        themeToggleBtn.addEventListener('contextmenu', (e) => e.preventDefault());
+
+        themeToggleBtn.addEventListener('click', (e) => {
+            if (isLongPress) {
+                e.preventDefault();
+                e.stopPropagation();
+                isLongPress = false;
+                return;
+            }
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            applyTheme();
+        });
+
+        // ===== INLINE-ЗАКЛАДКИ =====
+        const inlineBookmarksGrid = document.getElementById('inlineBookmarksGrid');
+
+        function renderInlineBookmarks() {
+            inlineBookmarksGrid.innerHTML = '';
+            if (bookmarks.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'inline-bookmarks-empty';
+                empty.textContent = 'Добавьте вкладки через Экспресс-панель';
+                inlineBookmarksGrid.appendChild(empty);
+                return;
+            }
+            bookmarks.forEach(bm => {
+                const a = document.createElement('a');
+                a.href = bm.url;
+                a.className = 'inline-bookmark-item';
+                a.target = '_blank';
+
+                const img = document.createElement('img');
+                img.className = 'inline-bookmark-icon';
+                if (bm.isCustomIcon && bm.iconUrl) img.src = bm.iconUrl;
+                else {
+                    try {
+                        const d = new URL(bm.url).hostname;
+                        img.src = `https://www.google.com/s2/favicons?domain=${d}&sz=64`;
+                    } catch(e) { img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="gray" fill="none"/></svg>'; }
+                }
+                img.onerror = () => { img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="gray" fill="none"/></svg>'; };
+
+                const s = document.createElement('span');
+                s.className = 'inline-bookmark-title';
+                s.textContent = bm.name;
+
+                a.appendChild(img);
+                a.appendChild(s);
+                inlineBookmarksGrid.appendChild(a);
+            });
+        }
+
+        // ===== БЫСТРАЯ ЗАМЕТКА (SCRATCHPAD) =====
+        const scratchpadText = document.getElementById('scratchpadText');
+        const scratchpadStatus = document.getElementById('scratchpadStatus');
+        const scratchpadCount = document.getElementById('scratchpadCount');
+        const scratchpadClear = document.getElementById('scratchpadClear');
+
+        scratchpadText.value = localStorage.getItem('troubleTabScratchpad') || '';
+        updateScratchpadCount();
+
+        let saveTimeout;
+        scratchpadText.addEventListener('input', () => {
+            scratchpadStatus.textContent = 'Сохранение...';
+            scratchpadStatus.classList.add('saving');
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                localStorage.setItem('troubleTabScratchpad', scratchpadText.value);
+                scratchpadStatus.textContent = 'Сохранено ✓';
+                scratchpadStatus.classList.remove('saving');
+            }, 500);
+            updateScratchpadCount();
+        });
+
+        function updateScratchpadCount() {
+            const len = scratchpadText.value.length;
+            const word = len === 1 ? 'символ' : (len >= 2 && len <= 4) ? 'символа' : 'символов';
+            scratchpadCount.textContent = `${len} ${word}`;
+        }
+
+        scratchpadClear.addEventListener('click', () => {
+            if (scratchpadText.value.trim() === '' || confirm('Очистить заметку?')) {
+                scratchpadText.value = '';
+                localStorage.removeItem('troubleTabScratchpad');
+                updateScratchpadCount();
+                scratchpadStatus.textContent = 'Очищено';
+                setTimeout(() => { scratchpadStatus.textContent = 'Сохранено ✓'; }, 1500);
+            }
+        });
+
+        // ===== ТЕМЫ =====
         function applyTheme() {
             const theme = themes[currentThemeIndex];
             document.body.setAttribute('data-theme', theme);
-            themeToggleBtn.textContent = themeIcons[currentThemeIndex];
+            themeIconEl.textContent = themeIcons[currentThemeIndex];
             localStorage.setItem('troubleTabTheme', theme);
 
             if (theme !== 'dark') {
@@ -1076,10 +1473,6 @@
             if (theme === 'light') startBubbles();
             if (theme === 'dark') startDust();
         }
-        themeToggleBtn.addEventListener('click', () => {
-            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
-            applyTheme();
-        });
 
         function performSearch() {
             const q = searchInput.value.trim();
@@ -1181,12 +1574,14 @@
             if (editingIndex === -1) bookmarks.push(data); else bookmarks[editingIndex] = data;
             localStorage.setItem('troubleTabBookmarks', JSON.stringify(bookmarks));
             showListView();
+            renderInlineBookmarks(); // Обновляем inline-закладки
         });
         deleteBtn.addEventListener('click', () => {
             if (confirm('Удалить эту вкладку?')) {
                 bookmarks.splice(editingIndex, 1);
                 localStorage.setItem('troubleTabBookmarks', JSON.stringify(bookmarks));
                 showListView();
+                renderInlineBookmarks(); // Обновляем inline-закладки
             }
         });
 
@@ -1203,15 +1598,13 @@
         servicesOverlay.addEventListener('click', e => { if (e.target === servicesOverlay) closeServices(); });
 
         let zenTimer;
-        const ZEN_TIMEOUT = 300000; // 5 минут
+        const ZEN_TIMEOUT = 300000;
 
         function resetZenTimer() {
             if (document.body.classList.contains('zen-mode')) {
                 document.body.classList.remove('zen-mode');
             }
-            
             clearTimeout(zenTimer);
-            
             if (modalOverlay.classList.contains('active')) return;
             if (servicesOverlay.classList.contains('active')) return;
 
@@ -1225,7 +1618,6 @@
         ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'wheel'].forEach(evt => {
             window.addEventListener(evt, resetZenTimer, { passive: true });
         });
-        
         searchInput.addEventListener('input', resetZenTimer);
         searchInput.addEventListener('focus', resetZenTimer);
 
@@ -1644,6 +2036,11 @@
             resizeLightCanvases();
             resizeDustCanvas();
             applyTheme();
+            
+            // Восстанавливаем режим продуктивности
+            if (localStorage.getItem('troubleTabMode') === 'productivity') {
+                applyProductivityMode(true);
+            }
             
             initWeather();
             setInterval(initWeather, 30 * 60 * 1000);
