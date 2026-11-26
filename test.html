@@ -151,7 +151,19 @@
             max-height: 30px;
             margin-bottom: 6px;
         }
-        .weather-city { opacity: 0.8; max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+        .weather-city { 
+            opacity: 0.8; 
+            max-width: 90px; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            cursor: pointer; /* Добавлено: показывает, что можно нажать */
+            border-bottom: 1px dashed transparent;
+            transition: border-color 0.2s, opacity 0.2s;
+        }
+        .weather-city:hover {
+            opacity: 1;
+            border-bottom-color: var(--accent-color);
+        }
         .weather-icon { font-size: 1rem; line-height: 1; }
         .weather-temp { font-weight: 800; }
 
@@ -511,7 +523,6 @@
         }
         .footer-credit:hover { color: var(--accent-color); opacity: 1; text-shadow: 0 0 8px var(--accent-color); }
 
-        /* ================= ZEN ================= */
         body.zen-mode .logo,
         body.zen-mode .dynamic-island,
         body.zen-mode .actions-row,
@@ -596,9 +607,9 @@
         <span id="greetingText"></span>
     </div>
 
-    <div class="dynamic-island" id="clockWidget" title="Нажмите для смены формата">
+    <div class="dynamic-island" id="clockWidget" title="Нажмите для смены формата времени">
         <div class="weather-display" id="weatherDisplay">
-            <span class="weather-city" id="weatherCity">Загрузка...</span>
+            <span class="weather-city" id="weatherCity" title="Нажмите, чтобы изменить город">Загрузка...</span>
             <span class="weather-icon" id="weatherIcon">⏳</span>
             <span class="weather-temp" id="weatherTemp">--°</span>
         </div>
@@ -641,7 +652,6 @@
 
     <a href="https://github.com/zloba010" target="_blank" rel="noopener noreferrer" class="footer-credit">проект был написан kizamia</a>
 
-    <!-- ЭКСПРЕСС-ПАНЕЛЬ -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
@@ -848,7 +858,10 @@
             timeDisplay.textContent = s;
             dateDisplay.textContent = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
         }
-        clockWidget.addEventListener('click', () => {
+        clockWidget.addEventListener('click', (e) => {
+            // Предотвращаем срабатывание, если кликнули по городу
+            if (e.target.closest('.weather-city')) return;
+            
             if (isAnimating) return;
             isAnimating = true;
             clockWidget.classList.add('is-tyk');
@@ -859,6 +872,28 @@
                 clockWidget.classList.remove('is-tyk');
                 updateClock();
             }, 1000);
+        });
+
+        // ================= НОВОЕ: Ручное изменение города =================
+        weatherCity.addEventListener('click', (e) => {
+            e.stopPropagation(); // Чтобы не срабатывал клик по часам
+            const current = localStorage.getItem('troubleTabManualCity') || weatherCity.textContent;
+            const newCity = prompt('Введите ваш город (например: Казань, Екатеринбург):', current === 'Загрузка...' ? '' : current);
+            
+            if (newCity !== null) {
+                const trimmed = newCity.trim();
+                if (trimmed) {
+                    localStorage.setItem('troubleTabManualCity', trimmed);
+                    localStorage.removeItem('troubleTabWeather'); // Сброс кэша для немедленного обновления
+                    weatherCity.textContent = 'Обновление...';
+                    initWeather();
+                } else {
+                    // Если пользователь стёр всё и нажал ОК, сбрасываем на автоопределение
+                    localStorage.removeItem('troubleTabManualCity');
+                    localStorage.removeItem('troubleTabWeather');
+                    initWeather();
+                }
+            }
         });
 
         function getCityFromTimezone() {
@@ -924,23 +959,48 @@
             } catch(e) {}
         }
 
+        async function fetchWeatherByCityName(cityName) {
+            const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=ru&format=json`;
+            const geoData = await fetchJSON(geoUrl);
+            
+            if (geoData && geoData.results && geoData.results.length > 0) {
+                const loc = geoData.results[0];
+                const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code&timezone=auto`;
+                const wData = await fetchJSON(wUrl);
+                if (wData && wData.current) {
+                    const temp = Math.round(wData.current.temperature_2m);
+                    const code = wData.current.weather_code;
+                    applyWeather(loc.name, temp, code);
+                    saveWeatherCache(loc.name, temp, code);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         async function initWeather() {
             // 1. Проверяем кэш (1 час)
             if (loadWeatherCache()) return;
 
-            // 2. Попытка получить координаты через браузер (Geolocation API)
-            // Работает только на HTTPS или localhost
+            // 2. ПРОВЕРКА: Задал ли пользователь город вручную? (Наивысший приоритет)
+            const manualCity = localStorage.getItem('troubleTabManualCity');
+            if (manualCity) {
+                const success = await fetchWeatherByCityName(manualCity);
+                if (success) return;
+                // Если не удалось найти, продолжаем попытки автоопределения
+            }
+
+            // 3. Попытка получить координаты через браузер (Geolocation API)
             try {
                 const geo = await new Promise((resolve, reject) => {
                     if (!navigator.geolocation) return reject(new Error('Geolocation not supported'));
                     navigator.geolocation.getCurrentPosition(
                         (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
                         (err) => reject(err),
-                        { timeout: 6000, maximumAge: 600000 } // 10 минут кэш геолокации
+                        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
                     );
                 });
 
-                // Обратное геокодирование через Nominatim (OpenStreetMap) для получения названия города
                 let cityName = 'Мой город';
                 try {
                     const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${geo.lat}&lon=${geo.lon}&accept-language=ru&zoom=10`;
@@ -951,7 +1011,6 @@
                     }
                 } catch(e) {}
 
-                // Получение погоды через Open-Meteo по координатам
                 const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,weather_code&timezone=auto`;
                 const wData = await fetchJSON(wUrl);
                 
@@ -966,29 +1025,7 @@
                 console.log('Geolocation weather failed, falling back', e);
             }
 
-            // 3. Фоллбэк: определение по часовому поясу + Open-Meteo Geocoding
-            try {
-                const tzCity = getCityFromTimezone();
-                const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(tzCity)}&count=1&language=ru&format=json`;
-                const geoData = await fetchJSON(geoUrl);
-                
-                if (geoData && geoData.results && geoData.results.length > 0) {
-                    const loc = geoData.results[0];
-                    const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code&timezone=auto`;
-                    const wData = await fetchJSON(wUrl);
-                    if (wData && wData.current) {
-                        const temp = Math.round(wData.current.temperature_2m);
-                        const code = wData.current.weather_code;
-                        applyWeather(loc.name, temp, code);
-                        saveWeatherCache(loc.name, temp, code);
-                        return;
-                    }
-                }
-            } catch(e) {
-                console.log('Timezone weather fallback failed', e);
-            }
-
-            // 4. Фоллбэк: определение по IP (если геолокация и часовой пояс не сработали)
+            // 4. Фоллбэк: определение по IP (более надёжный, чем часовой пояс)
             try {
                 const ipData = await fetchJSON('https://ipwho.is/');
                 if (ipData && ipData.city && ipData.latitude && ipData.longitude) {
@@ -1006,7 +1043,16 @@
                 console.log('IP weather fallback failed', e);
             }
 
-            // 5. Если ничего не сработало
+            // 5. Фоллбэк: определение по часовому поясу (самый неточный)
+            try {
+                const tzCity = getCityFromTimezone();
+                const success = await fetchWeatherByCityName(tzCity);
+                if (success) return;
+            } catch(e) {
+                console.log('Timezone weather fallback failed', e);
+            }
+
+            // 6. Если ничего не сработало
             applyWeather('Не определено', '--', null);
         }
 
