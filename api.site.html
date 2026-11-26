@@ -1,151 +1,1419 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kizamia API — документация</title>
-  <style>
-    body {
-      background: #0f1115; color: #e6e9ef;
-      font-family: system-ui, sans-serif;
-      line-height: 1.6; margin: 0; padding: 40px 24px 80px;
-    }
-    .wrap { max-width: 860px; margin: 0 auto; }
-    h1 { font-size: 1.8rem; margin-bottom: 6px; }
-    .sub { color: #8b93a3; margin-bottom: 36px; }
-    h2 { font-size: 1.25rem; margin: 36px 0 14px; color: #7aa2ff; }
-    h3 { font-size: 1rem; margin: 22px 0 8px; }
-    code {
-      background: #1e232d; color: #c7d5ff;
-      padding: 2px 6px; border-radius: 6px; font-size: 0.9em;
-    }
-    pre {
-      background: #12151b; border: 1px solid #2a2f3a;
-      border-radius: 10px; padding: 16px; overflow-x: auto;
-      font-size: 0.85rem; line-height: 1.5;
-    }
-    pre code { background: none; padding: 0; color: inherit; }
-    .method {
-      border: 1px solid #2a2f3a; border-radius: 10px;
-      padding: 14px 18px; margin-bottom: 12px; background: #171a21;
-    }
-    .sig { font-family: ui-monospace, monospace; font-size: 0.88rem; color: #4ade80; }
-    .desc { color: #8b93a3; font-size: 0.9rem; margin-top: 6px; }
-    .back { display: inline-block; margin-bottom: 24px; color: #7aa2ff; text-decoration: none; }
-    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88rem; }
-    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #2a2f3a; }
-    th { color: #8b93a3; font-weight: 500; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kizamia Dev Hub</title>
+<style>
+:root {
+  --bg: #0f1115; --surface: #171a21; --border: #2a2f3a;
+  --text: #e6e9ef; --muted: #8b93a3; --accent: #7aa2ff;
+  --green: #4ade80; --radius: 14px; --maxw: 1040px;
+}
+[data-theme="light"] {
+  --bg: #f5f7fb; --surface: #ffffff; --border: #e1e5ec;
+  --text: #1a1d24; --muted: #667085; --accent: #4f6ef7; --green: #16a34a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55; padding-bottom: 60px;
+  transition: background .3s, color .3s;
+}
+code { background: #1e232d; color: #c7d5ff; padding: 2px 6px; border-radius: 6px; font-size: 0.9em; }
+[data-theme="light"] code { background: #eef1f7; color: #3345b8; }
+
+.hub-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid var(--border);
+  background: rgba(15,17,21,.85); backdrop-filter: blur(10px);
+  position: sticky; top: 0; z-index: 10; flex-wrap: wrap; gap: 10px;
+}
+[data-theme="light"] .hub-header { background: rgba(245,247,251,.85); }
+.hub-logo { font-weight: 800; font-size: 1.15rem; letter-spacing: .4px; }
+.hub-logo span { color: var(--accent); font-weight: 500; }
+.hub-nav { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.hub-nav a, .hub-nav button {
+  color: var(--muted); text-decoration: none; font-size: .9rem;
+  background: none; border: none; cursor: pointer; font: inherit;
+}
+.hub-nav a:hover, .hub-nav button:hover { color: var(--text); }
+.nav-docs { color: var(--accent) !important; font-weight: 600; }
+
+.hub-main { max-width: var(--maxw); margin: 0 auto; padding: 40px 24px; }
+.hub-intro { margin-bottom: 36px; }
+.hub-intro h1 { font-size: clamp(1.6rem, 3vw, 2.3rem); margin-bottom: 10px; }
+.hub-intro p { color: var(--muted); max-width: 640px; }
+
+.hub-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 26px 28px; margin-bottom: 26px;
+}
+.card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px; gap: 10px; flex-wrap: wrap;
+}
+.card-head h2 { font-size: 1.15rem; }
+.badge { font-size: .75rem; padding: 3px 10px; border-radius: 999px; font-weight: 600; }
+.badge-green { background: rgba(74,222,128,.12); color: var(--green); }
+.card-desc { color: var(--muted); margin-bottom: 18px; max-width: 720px; }
+.card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 16px; }
+.card-detail {
+  background: #12151b; border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+}
+[data-theme="light"] .card-detail { background: #f9fafd; }
+.card-detail strong { display: block; margin-bottom: 8px; font-size: .88rem; color: var(--accent); }
+.card-detail ul { list-style: none; padding: 0; }
+.card-detail li { font-size: .86rem; color: var(--muted); padding: 3px 0 3px 16px; position: relative; }
+.card-detail li::before { content: "–"; position: absolute; left: 0; color: var(--border); }
+.api-preview { font-size: .85rem; color: var(--muted); border-top: 1px dashed var(--border); padding-top: 14px; }
+.api-preview code { margin: 0 2px; }
+
+.hub-footer {
+  max-width: var(--maxw); margin: 0 auto; padding: 20px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  color: var(--muted); font-size: .82rem;
+  border-top: 1px solid var(--border); gap: 12px; flex-wrap: wrap;
+}
+.btn-ghost {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--muted); padding: 8px 14px; border-radius: 8px;
+  cursor: pointer; font-size: .82rem;
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+.universal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.uni-item {
+  background: #12151b; border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 3px;
+}
+[data-theme="light"] .uni-item { background: #f9fafd; }
+.uni-item strong { font-size: .92rem; color: var(--accent); }
+.uni-item span { font-size: .82rem; color: var(--muted); line-height: 1.4; }
+
+.playground-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+.pg-item {
+  background: #12151b; border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px;
+  display: flex; flex-direction: column; gap: 10px; min-height: 120px;
+}
+[data-theme="light"] .pg-item { background: #f9fafd; }
+.pg-item h3 { font-size: .86rem; color: var(--muted); font-weight: 500; }
+.pg-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.pg-btn {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text); padding: 7px 12px; border-radius: 8px;
+  cursor: pointer; font-size: .82rem; transition: all .15s;
+}
+.pg-btn:hover { border-color: var(--accent); color: var(--accent); }
+.pg-btn:active { transform: scale(.97); }
+.pg-count { font-size: 2rem; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.pg-img-row { display: flex; gap: 10px; align-items: center; }
+.pg-img-row img { border-radius: 8px; }
+.pg-img-row span { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.pg-type { min-height: 1.6em; color: var(--muted); font-size: .9rem; line-height: 1.4; }
+
+/* DOCS */
+#docs-view { display: none; }
+#docs-view .wrap { max-width: 860px; margin: 0 auto; }
+#docs-view h1 { font-size: 1.8rem; margin-bottom: 6px; }
+#docs-view .sub { color: var(--muted); margin-bottom: 36px; }
+#docs-view h2 { font-size: 1.25rem; margin: 36px 0 14px; color: var(--accent); }
+#docs-view h3 { font-size: 1rem; margin: 22px 0 8px; }
+#docs-view pre {
+  background: #12151b; border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px; overflow-x: auto;
+  font-size: .85rem; line-height: 1.5;
+}
+[data-theme="light"] #docs-view pre { background: #f4f6fb; }
+#docs-view pre code { background: none; padding: 0; color: inherit; }
+#docs-view .method {
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 18px; margin-bottom: 12px; background: var(--surface);
+}
+#docs-view .sig { font-family: ui-monospace, monospace; font-size: .88rem; color: var(--green); }
+#docs-view .desc { color: var(--muted); font-size: .9rem; margin-top: 6px; }
+#docs-view table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: .88rem; }
+#docs-view th, #docs-view td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+#docs-view th { color: var(--muted); font-weight: 500; }
+.back-btn {
+  display: inline-block; margin-bottom: 24px; color: var(--accent);
+  text-decoration: none; background: none; border: none; cursor: pointer;
+  font-size: .95rem; font-family: inherit;
+}
+
+/* ANIMATIONS */
+@keyframes kz-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+@keyframes kz-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+@keyframes kz-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes kz-confetti { to { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+@keyframes kz-toast-in  { from{transform:translateX(120%);opacity:0} to{transform:translateX(0);opacity:1} }
+@keyframes kz-toast-out { to  {transform:translateX(120%);opacity:0} }
+
+.kz-toast-wrap {
+  position: fixed; top: 20px; right: 20px; z-index: 10000;
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.kz-toast {
+  background: #171a21; color: #e6e9ef; padding: 12px 16px;
+  border-radius: 10px; border: 1px solid #2a2f3a;
+  box-shadow: 0 10px 30px rgba(0,0,0,.4); font-size: .9rem;
+  pointer-events: auto; display: flex; align-items: center; gap: 10px;
+  min-width: 220px; max-width: 360px; animation: kz-toast-in .3s ease;
+}
+[data-theme="light"] .kz-toast { background: #fff; color: #1a1d24; border-color: #e1e5ec; }
+.kz-toast.kz-out { animation: kz-toast-out .3s ease forwards; }
+.kz-toast::before { content: ''; width: 4px; align-self: stretch; border-radius: 4px; background: #7aa2ff; }
+.kz-toast.kz-success::before { background: #4ade80; }
+.kz-toast.kz-warning::before { background: #fbbf24; }
+.kz-toast.kz-error::before   { background: #f87171; }
+.kz-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.kz-dot.kz-online  { background: #4ade80; box-shadow: 0 0 8px #4ade80; }
+.kz-dot.kz-offline { background: #f87171; }
+.kz-dot.kz-busy    { background: #fbbf24; animation: kz-pulse 1s infinite; }
+
+@media (max-width: 700px) {
+  .card-grid { grid-template-columns: 1fr; }
+  .hub-nav { gap: 10px; }
+  .hub-nav a, .hub-nav button { font-size: .8rem; }
+  .hub-card { padding: 20px; }
+}
+</style>
 </head>
 <body>
-<div class="wrap">
-  <a class="back" href="../index.html">← Назад на главную</a>
-  <h1>Kizamia Unified API</h1>
-  <p class="sub">Версия 1.0.0 · все методы возвращают Promise · хранилище: localStorage + IndexedDB</p>
 
-  <p>
-    API подключается одним файлом <code>js/kizamia-api.js</code> и доступен
-    глобально как <code>KizamiaAPI</code>. Подходит для любых будущих проектов
-    без сборщиков и зависимостей.
-  </p>
+<header class="hub-header">
+  <div class="hub-logo">Kizamia <span>Dev Hub</span></div>
+  <nav class="hub-nav">
+    <a href="#reader">Reader</a>
+    <a href="#troubletab">TroubleTab</a>
+    <a href="#notes">Notes</a>
+    <a href="#upscale">Upscale</a>
+    <a href="#universal">Универсальные API</a>
+    <a href="#playground">Песочница</a>
+    <button id="docs-toggle" class="nav-docs">Документация →</button>
+  </nav>
+</header>
 
-  <pre><code>&lt;script src="js/kizamia-api.js"&gt;&lt;/script&gt;
-&lt;script&gt;
-  // Пример: создать заметку
-  const note = await KizamiaAPI.Notes.create({
-    title: 'Идея',
-    body: 'Сделать что-то полезное'
-  });
-&lt;/script&gt;</code></pre>
+<main class="hub-main">
 
-  <!-- READER -->
-  <h2>📖 Reader</h2>
+  <!-- ==================== ГЛАВНЫЙ РАЗДЕЛ ==================== -->
+  <div id="main-view">
+    <section class="hub-intro">
+      <h1>Все наработки Kizamia в одном месте</h1>
+      <p>Приватная сводка: как устроен каждый проект, что уже готово и как использовать единый API в следующих разработках.</p>
+    </section>
 
-  <div class="method">
-    <div class="sig">KizamiaAPI.Reader.saveBook({ id, name, type, arrayBuffer, progress })</div>
-    <div class="desc">Сохраняет книгу в IndexedDB. Возвращает запись книги.</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.Reader.getAllBooks()</div>
-    <div class="desc">Возвращает все книги, отсортированные по дате добавления (новые сверху).</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.Reader.updateProgress(id, progress)</div>
-    <div class="desc">Обновляет прогресс чтения (0–100).</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.Reader.setBookmark(bookId, page) / getBookmark(bookId)</div>
-    <div class="desc">Сохраняет и читает закладку для книги.</div>
+    <section id="reader" class="hub-card">
+      <div class="card-head">
+        <h2>📖 Kizami Free Web Reader</h2>
+        <span class="badge badge-green">Готово</span>
+      </div>
+      <p class="card-desc">Полноценная читалка в браузере. Поддерживает TXT, FB2, EPUB и PDF. Прогресс и библиотека хранятся в <code>IndexedDB</code> и <code>localStorage</code> — данные не покидают устройство.</p>
+      <div class="card-grid">
+        <div class="card-detail">
+          <strong>Ключевые функции</strong>
+          <ul>
+            <li>Библиотека книг без регистрации</li>
+            <li>Продолжение с последнего места</li>
+            <li>Закладки</li>
+            <li>Чтение вслух (системные голоса + Piper офлайн)</li>
+          </ul>
+        </div>
+        <div class="card-detail">
+          <strong>Технологии</strong>
+          <ul>
+            <li>IndexedDB (книги, файлы)</li>
+            <li>localStorage (прогресс, закладки)</li>
+            <li>Web Speech API</li>
+            <li>Piper TTS (опционально)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="api-preview">
+        <strong>API-модуль:</strong>
+        <code>KizamiaAPI.Reader.saveBook()</code>,
+        <code>getAllBooks()</code>, <code>updateProgress()</code>
+      </div>
+    </section>
+
+    <section id="troubletab" class="hub-card">
+      <div class="card-head">
+        <h2>🚀 TroubleTab — экспресс-панель</h2>
+        <span class="badge badge-green">Готово</span>
+      </div>
+      <p class="card-desc">Кастомная новая вкладка браузера: быстрый доступ к поисковикам, погоде, сервисам Kizamia. Все настройки хранятся локально.</p>
+      <div class="card-grid">
+        <div class="card-detail">
+          <strong>Ключевые функции</strong>
+          <ul>
+            <li>Поисковики (Google, Yandex, DuckDuckGo, Bing)</li>
+            <li>Погода и приветствие по времени суток</li>
+            <li>Добавление своих вкладок с иконками</li>
+            <li>Быстрые ссылки на другие сервисы</li>
+          </ul>
+        </div>
+        <div class="card-detail">
+          <strong>Технологии</strong>
+          <ul>
+            <li>localStorage (вкладки, настройки)</li>
+            <li>Fetch API (погода)</li>
+            <li>Чистый JS / CSS</li>
+          </ul>
+        </div>
+      </div>
+      <div class="api-preview">
+        <strong>API-модуль:</strong>
+        <code>KizamiaAPI.TroubleTab.getTabs()</code>,
+        <code>addTab()</code>, <code>getWeatherConfig()</code>
+      </div>
+    </section>
+
+    <section id="notes" class="hub-card">
+      <div class="card-head">
+        <h2>📝 Kizamia Notes</h2>
+        <span class="badge badge-green">Готово</span>
+      </div>
+      <p class="card-desc">Быстрые заметки с папками, списками, шаблонами и дневником. Поддерживает обратные ссылки, закрепление, цвета и озвучивание.</p>
+      <div class="card-grid">
+        <div class="card-detail">
+          <strong>Ключевые функции</strong>
+          <ul>
+            <li>Текст, списки, шаблоны, дневник</li>
+            <li>Папки и перемещение заметок</li>
+            <li>Обратные ссылки <code>[[Заметка]]</code></li>
+            <li>Закрепление и цветовые метки</li>
+            <li>TTS-озвучка заметок</li>
+          </ul>
+        </div>
+        <div class="card-detail">
+          <strong>Технологии</strong>
+          <ul>
+            <li>localStorage (все заметки)</li>
+            <li>Web Speech API</li>
+            <li>Чистый JS / CSS</li>
+          </ul>
+        </div>
+      </div>
+      <div class="api-preview">
+        <strong>API-модуль:</strong>
+        <code>KizamiaAPI.Notes.create()</code>,
+        <code>update()</code>, <code>getBacklinks()</code>
+      </div>
+    </section>
+
+    <section id="upscale" class="hub-card">
+      <div class="card-head">
+        <h2>🖼️ Kizamia Upscale Image</h2>
+        <span class="badge badge-green">Готово</span>
+      </div>
+      <p class="card-desc">Полностью офлайн-апскейл изображений. Файл не покидает устройство. Поддерживает PNG, JPG, WEBP, BMP, GIF, AVIF. Есть сравнение «до/после».</p>
+      <div class="card-grid">
+        <div class="card-detail">
+          <strong>Ключевые функции</strong>
+          <ul>
+            <li>Drag & drop + вставка из буфера</li>
+            <li>Сравнение до/после</li>
+            <li>Без лимита итогового разрешения</li>
+            <li>Работает без интернета</li>
+          </ul>
+        </div>
+        <div class="card-detail">
+          <strong>Технологии</strong>
+          <ul>
+            <li>Canvas / OffscreenCanvas</li>
+            <li>Web Workers (для тяжёлых изображений)</li>
+            <li>IndexedDB (кэш результатов)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="api-preview">
+        <strong>API-модуль:</strong>
+        <code>KizamiaAPI.Upscale.upscaleImage()</code>,
+        <code>saveResult()</code>, <code>getAllResults()</code>
+      </div>
+    </section>
+
+    <section id="universal" class="hub-card">
+      <div class="card-head">
+        <h2>🧰 Универсальные API</h2>
+        <span class="badge badge-green">v1.1.0</span>
+      </div>
+      <p class="card-desc">13 переиспользуемых модулей для любых будущих проектов. Работают без зависимостей и сборщиков — подключаются одним тегом <code>&lt;script&gt;</code>.</p>
+      <div class="universal-grid">
+        <div class="uni-item"><strong>Util</strong><span>uuid, sleep, debounce, throttle, random, copy</span></div>
+        <div class="uni-item"><strong>Anim</strong><span>fade, pulse, shake, typewriter, countUp, confetti</span></div>
+        <div class="uni-item"><strong>Progress</strong><span>bar, ring, numeric</span></div>
+        <div class="uni-item"><strong>Status</strong><span>toast, badge, dot (online/offline/busy)</span></div>
+        <div class="uni-item"><strong>Theme</strong><span>dark / light / auto</span></div>
+        <div class="uni-item"><strong>NumberImage</strong><span>SVG из числа + placeholder</span></div>
+        <div class="uni-item"><strong>Network</strong><span>isOnline, watch, fetchRetry</span></div>
+        <div class="uni-item"><strong>Events</strong><span>pub/sub: on, off, once, emit</span></div>
+        <div class="uni-item"><strong>Sound</strong><span>beep, click, success, error</span></div>
+        <div class="uni-item"><strong>Download</strong><span>blob, text, json</span></div>
+        <div class="uni-item"><strong>Scroll</strong><span>to, revealOnScroll</span></div>
+        <div class="uni-item"><strong>Storage</strong><span>key-value с TTL</span></div>
+        <div class="uni-item"><strong>Idle</strong><span>детект неактивности</span></div>
+      </div>
+    </section>
+
+    <section id="playground" class="hub-card">
+      <div class="card-head">
+        <h2>🎮 Живая песочница</h2>
+        <span class="badge badge-green">Интерактив</span>
+      </div>
+      <p class="card-desc">Все новые API можно потрогать прямо здесь.</p>
+      <div class="playground-grid">
+        <div class="pg-item">
+          <h3>Progress bar</h3>
+          <div id="pg-bar"></div>
+          <button class="pg-btn" data-demo="bar">Анимировать</button>
+        </div>
+        <div class="pg-item">
+          <h3>Circular progress</h3>
+          <div id="pg-ring"></div>
+          <button class="pg-btn" data-demo="ring">Анимировать</button>
+        </div>
+        <div class="pg-item">
+          <h3>Count up</h3>
+          <div id="pg-count" class="pg-count">0</div>
+          <button class="pg-btn" data-demo="count">Запустить</button>
+        </div>
+        <div class="pg-item">
+          <h3>NumberImage</h3>
+          <div id="pg-img" class="pg-img-row"></div>
+          <button class="pg-btn" data-demo="img">Новое число</button>
+        </div>
+        <div class="pg-item">
+          <h3>Toast</h3>
+          <div class="pg-row">
+            <button class="pg-btn" data-demo="toast">Info</button>
+            <button class="pg-btn" data-demo="toast-success">Success</button>
+            <button class="pg-btn" data-demo="toast-error">Error</button>
+          </div>
+        </div>
+        <div class="pg-item">
+          <h3>Confetti</h3>
+          <button class="pg-btn" data-demo="confetti">Запустить 🎉</button>
+        </div>
+        <div class="pg-item">
+          <h3>Sound</h3>
+          <div class="pg-row">
+            <button class="pg-btn" data-demo="beep">Beep</button>
+            <button class="pg-btn" data-demo="sound-success">Success</button>
+            <button class="pg-btn" data-demo="sound-error">Error</button>
+          </div>
+        </div>
+        <div class="pg-item">
+          <h3>Theme</h3>
+          <button class="pg-btn" data-demo="theme">Переключить</button>
+        </div>
+        <div class="pg-item">
+          <h3>Typewriter</h3>
+          <div id="pg-type" class="pg-type"></div>
+          <button class="pg-btn" data-demo="type">Напечатать</button>
+        </div>
+        <div class="pg-item">
+          <h3>Status badge</h3>
+          <div id="pg-badge">Сервер</div>
+          <button class="pg-btn" data-demo="badge">Добавить</button>
+        </div>
+      </div>
+    </section>
   </div>
 
-  <!-- TROUBLETAB -->
-  <h2>🚀 TroubleTab</h2>
+  <!-- ==================== ДОКУМЕНТАЦИЯ ==================== -->
+  <div id="docs-view">
+    <div class="wrap">
+      <button class="back-btn" id="docs-back">← Назад на главную</button>
+      <h1>Kizamia Unified API</h1>
+      <p class="sub">Версия 1.1.0 · методы возвращают Promise или значение · хранилище: localStorage + IndexedDB</p>
 
-  <div class="method">
-    <div class="sig">KizamiaAPI.TroubleTab.getTabs()</div>
-    <div class="desc">Возвращает массив вкладок. По умолчанию — 4 поисковика.</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.TroubleTab.addTab({ title, url, icon })</div>
-    <div class="desc">Добавляет новую вкладку и сохраняет в localStorage.</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.TroubleTab.removeTab(index)</div>
-    <div class="desc">Удаляет вкладку по индексу.</div>
-  </div>
+      <p>API встроен в этот файл и доступен глобально как <code>KizamiaAPI</code>.</p>
 
-  <!-- NOTES -->
-  <h2>📝 Notes</h2>
+      <h2>📖 Reader</h2>
+      <div class="method"><div class="sig">KizamiaAPI.Reader.saveBook({ id, name, type, arrayBuffer, progress })</div><div class="desc">Сохраняет книгу в IndexedDB.</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.Reader.getAllBooks()</div><div class="desc">Все книги, отсортированные по дате добавления.</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.Reader.updateProgress(id, progress)</div><div class="desc">Обновляет прогресс (0–100).</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.Reader.setBookmark(bookId, page) / getBookmark(bookId)</div><div class="desc">Закладки.</div></div>
 
-  <div class="method">
-    <div class="sig">KizamiaAPI.Notes.create({ title, body, type, folder, color })</div>
-    <div class="desc">Создаёт заметку. <code>type</code>: <code>text</code> | <code>list</code> | <code>template</code> | <code>diary</code>.</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.Notes.update(id, patch)</div>
-    <div class="desc">Обновляет поля заметки. Автоматически обновляет <code>updatedAt</code>.</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.Notes.getBacklinks(noteTitle)</div>
-    <div class="desc">Возвращает заметки, содержащие <code>[[noteTitle]]</code> в теле.</div>
-  </div>
+      <h2>🚀 TroubleTab</h2>
+      <div class="method"><div class="sig">KizamiaAPI.TroubleTab.getTabs()</div><div class="desc">Возвращает массив вкладок (по умолчанию 4 поисковика).</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.TroubleTab.addTab({ title, url, icon })</div><div class="desc">Добавляет вкладку.</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.TroubleTab.removeTab(index)</div><div class="desc">Удаляет вкладку по индексу.</div></div>
 
-  <!-- UPSCALE -->
-  <h2>🖼️ Upscale</h2>
+      <h2>📝 Notes</h2>
+      <div class="method"><div class="sig">KizamiaAPI.Notes.create({ title, body, type, folder, color })</div><div class="desc">Создаёт заметку. type: text | list | template | diary.</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.Notes.update(id, patch)</div><div class="desc">Обновляет поля.</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.Notes.getBacklinks(noteTitle)</div><div class="desc">Заметки с [[noteTitle]].</div></div>
 
-  <div class="method">
-    <div class="sig">KizamiaAPI.Upscale.upscaleImage(file, scale = 2)</div>
-    <div class="desc">
-      Апскейлит изображение через <code>OffscreenCanvas</code>.
-      Возвращает <code>{ blob, width, height }</code>.
-      Для продакшена можно заменить на Web Worker + нейросетевую модель.
+      <h2>🖼️ Upscale</h2>
+      <div class="method"><div class="sig">KizamiaAPI.Upscale.upscaleImage(file, scale = 2)</div><div class="desc">Апскейл через OffscreenCanvas. Возвращает { blob, width, height }.</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.Upscale.saveResult({ id, originalName, width, height, scale, blob })</div><div class="desc">Сохраняет результат в IndexedDB.</div></div>
+
+      <h2>🧰 Универсальные модули</h2>
+
+      <h3>Util</h3>
+      <pre><code>KizamiaAPI.Util.uuid()
+KizamiaAPI.Util.sleep(1000)
+const fn = KizamiaAPI.Util.debounce(cb, 300);
+KizamiaAPI.Util.formatBytes(1536) // '1.5 KB'
+KizamiaAPI.Util.randomInt(1, 100)
+KizamiaAPI.Util.shuffle([1,2,3])
+await KizamiaAPI.Util.copy('текст')</code></pre>
+
+      <h3>Anim</h3>
+      <pre><code>await KizamiaAPI.Anim.fadeIn(el);
+KizamiaAPI.Anim.shake(el);
+KizamiaAPI.Anim.confetti({ count: 100 });
+await KizamiaAPI.Anim.typewriter(el, 'Привет', 50);
+await KizamiaAPI.Anim.countUp(el, 0, 1000, 800);
+KizamiaAPI.Anim.revealOnScroll('.card');</code></pre>
+
+      <h3>Progress</h3>
+      <pre><code>KizamiaAPI.Progress.bar(el, 45);
+KizamiaAPI.Progress.ring(el, 60);
+KizamiaAPI.Progress.setBar(el, 80);
+await KizamiaAPI.Progress.numeric(el, 0, 12345, 1200);</code></pre>
+
+      <h3>Status</h3>
+      <pre><code>KizamiaAPI.Status.toast('Сохранено', 'success', 2500);
+KizamiaAPI.Status.badge(el, 'NEW', 'info');
+KizamiaAPI.Status.dot(el, 'online'); // online | offline | busy</code></pre>
+
+      <h3>Theme</h3>
+      <pre><code>KizamiaAPI.Theme.set('light'); // 'dark' | 'light' | 'auto'
+KizamiaAPI.Theme.toggle();
+KizamiaAPI.Theme.resolved();
+KizamiaAPI.Theme.onChange(mode =&gt; console.log(mode));</code></pre>
+
+      <h3>NumberImage</h3>
+      <pre><code>const svg     = KizamiaAPI.NumberImage.generate(42, { size: 200 });
+const dataUrl = KizamiaAPI.NumberImage.dataUrl(42, { size: 64 });
+const ph      = KizamiaAPI.NumberImage.placeholder(400, 300, 'demo');</code></pre>
+
+      <h3>Network</h3>
+      <pre><code>KizamiaAPI.Network.isOnline();
+const stop = KizamiaAPI.Network.watch(online =&gt; console.log(online));
+const res = await KizamiaAPI.Network.fetchRetry(url, {}, 3);</code></pre>
+
+      <h3>Events</h3>
+      <pre><code>const off = KizamiaAPI.Events.on('save', data =&gt; console.log(data));
+KizamiaAPI.Events.emit('save', { id: 1 });
+off();</code></pre>
+
+      <h3>Sound</h3>
+      <pre><code>KizamiaAPI.Sound.beep(440, 100);
+KizamiaAPI.Sound.click();
+KizamiaAPI.Sound.success();
+KizamiaAPI.Sound.error();</code></pre>
+
+      <h3>Download</h3>
+      <pre><code>KizamiaAPI.Download.json('data.json', { foo: 1 });
+KizamiaAPI.Download.text('readme.txt', 'Hello');
+KizamiaAPI.Download.blob('file.png', blob);</code></pre>
+
+      <h3>Scroll</h3>
+      <pre><code>KizamiaAPI.Scroll.to('#section');
+KizamiaAPI.Scroll.reveal('.card', { threshold: 0.2 });</code></pre>
+
+      <h3>Storage (с TTL)</h3>
+      <pre><code>KizamiaAPI.Storage.set('token', 'abc', 60000);
+KizamiaAPI.Storage.get('token');
+KizamiaAPI.Storage.clear();</code></pre>
+
+      <h3>Idle</h3>
+      <pre><code>KizamiaAPI.Idle.watch(() =&gt; console.log('неактивен'), 60000);
+KizamiaAPI.Idle.stop();</code></pre>
+
+      <h2>⚙️ Общие методы</h2>
+      <div class="method"><div class="sig">KizamiaAPI.exportAll()</div><div class="desc">JSON со всеми данными (localStorage + IndexedDB).</div></div>
+      <div class="method"><div class="sig">KizamiaAPI.clearAll()</div><div class="desc">Полная очистка данных.</div></div>
+
+      <h2>Хранение данных</h2>
+      <table>
+        <tr><th>Модуль</th><th>Хранилище</th><th>Ключи / Store</th></tr>
+        <tr><td>Reader</td><td>IndexedDB + localStorage</td><td><code>books</code>, <code>kizamia_reader_last</code>, <code>kizamia_reader_marks</code></td></tr>
+        <tr><td>TroubleTab</td><td>localStorage</td><td><code>kizamia_troubletab_tabs</code>, <code>kizamia_troubletab_weather</code></td></tr>
+        <tr><td>Notes</td><td>localStorage</td><td><code>kizamia_notes</code>, <code>kizamia_note_folders</code></td></tr>
+        <tr><td>Upscale</td><td>IndexedDB</td><td><code>images</code></td></tr>
+        <tr><td>Storage</td><td>localStorage</td><td><code>kz_*</code></td></tr>
+        <tr><td>Theme</td><td>localStorage</td><td><code>kizamia_theme</code></td></tr>
+      </table>
     </div>
   </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.Upscale.saveResult({ id, originalName, width, height, scale, blob })</div>
-    <div class="desc">Сохраняет результат апскейла в IndexedDB.</div>
-  </div>
 
-  <!-- ОБЩИЕ -->
-  <h2>⚙️ Общие методы</h2>
+</main>
 
-  <div class="method">
-    <div class="sig">KizamiaAPI.exportAll()</div>
-    <div class="desc">Возвращает JSON со всеми данными (localStorage + IndexedDB) для бэкапа.</div>
-  </div>
-  <div class="method">
-    <div class="sig">KizamiaAPI.clearAll()</div>
-    <div class="desc">Полностью очищает localStorage и IndexedDB. Использовать с осторожностью.</div>
-  </div>
+<footer class="hub-footer">
+  <span>Kizamia Dev Hub · приватная сборка · API v1.1.0</span>
+  <button id="export-btn" class="btn-ghost">Экспорт всех данных</button>
+</footer>
 
-  <h2>Хранение данных</h2>
-  <table>
-    <tr><th>Модуль</th><th>Хранилище</th><th>Ключи / Store</th></tr>
-    <tr><td>Reader</td><td>IndexedDB + localStorage</td><td><code>books</code>, <code>kizamia_reader_last</code>, <code>kizamia_reader_marks</code></td></tr>
-    <tr><td>TroubleTab</td><td>localStorage</td><td><code>kizamia_troubletab_tabs</code>, <code>kizamia_troubletab_weather</code></td></tr>
-    <tr><td>Notes</td><td>localStorage</td><td><code>kizamia_notes</code>, <code>kizamia_note_folders</code></td></tr>
-    <tr><td>Upscale</td><td>IndexedDB</td><td><code>images</code></td></tr>
-  </table>
-</div>
+<script>
+/* ============================================================
+   Kizamia Unified API v1.1.0
+   ============================================================ */
+const KizamiaAPI = (() => {
+  'use strict';
+
+  /* ---------- IndexedDB ---------- */
+  const DB_NAME = 'kizamia_hub_db', DB_VERSION = 1;
+  let dbPromise = null;
+  function openDB() {
+    if (dbPromise) return dbPromise;
+    dbPromise = new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, DB_VERSION);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains('books')) db.createObjectStore('books', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('images')) db.createObjectStore('images', { keyPath: 'id' });
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+    return dbPromise;
+  }
+  async function idbGet(store, key) {
+    const db = await openDB();
+    return new Promise((res, rej) => {
+      const req = db.transaction(store, 'readonly').objectStore(store).get(key);
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+  }
+  async function idbPut(store, value) {
+    const db = await openDB();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).put(value);
+      tx.oncomplete = () => res(true);
+      tx.onerror = () => rej(tx.error);
+    });
+  }
+  async function idbDelete(store, key) {
+    const db = await openDB();
+    return new Promise((res, rej) => {
+      const tx = db.transaction(store, 'readwrite');
+      tx.objectStore(store).delete(key);
+      tx.oncomplete = () => res(true);
+      tx.onerror = () => rej(tx.error);
+    });
+  }
+  async function idbGetAll(store) {
+    const db = await openDB();
+    return new Promise((res, rej) => {
+      const req = db.transaction(store, 'readonly').objectStore(store).getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => rej(req.error);
+    });
+  }
+  const lsGet = (key, fallback = null) => {
+    try { const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; }
+    catch { return fallback; }
+  };
+  const lsSet = (key, value) => { localStorage.setItem(key, JSON.stringify(value)); return true; };
+
+  /* ---------- 1. Reader ---------- */
+  const Reader = {
+    async saveBook({ id, name, type, arrayBuffer, progress = 0 }) {
+      const record = { id, name, type, arrayBuffer, progress, addedAt: Date.now() };
+      await idbPut('books', record);
+      lsSet('kizamia_reader_last', { id, name });
+      return record;
+    },
+    async getBook(id) { return idbGet('books', id); },
+    async getAllBooks() {
+      const books = await idbGetAll('books');
+      return books.sort((a, b) => b.addedAt - a.addedAt);
+    },
+    async deleteBook(id) { await idbDelete('books', id); return true; },
+    async updateProgress(id, progress) {
+      const book = await idbGet('books', id);
+      if (!book) throw new Error('Книга не найдена');
+      book.progress = Math.max(0, Math.min(100, progress));
+      await idbPut('books', book);
+      return book;
+    },
+    getLastBook() { return lsGet('kizamia_reader_last'); },
+    setBookmark(bookId, page) {
+      const marks = lsGet('kizamia_reader_marks', {});
+      marks[bookId] = page;
+      lsSet('kizamia_reader_marks', marks);
+      return marks;
+    },
+    getBookmark(bookId) {
+      const marks = lsGet('kizamia_reader_marks', {});
+      return marks[bookId] ?? null;
+    }
+  };
+
+  /* ---------- 2. TroubleTab ---------- */
+  const TroubleTab = {
+    getTabs() {
+      return lsGet('kizamia_troubletab_tabs', [
+        { title: 'Google', url: 'https://google.com', icon: '' },
+        { title: 'Yandex', url: 'https://yandex.ru', icon: '' },
+        { title: 'DuckDuckGo', url: 'https://duckduckgo.com', icon: '' },
+        { title: 'Bing', url: 'https://bing.com', icon: '' }
+      ]);
+    },
+    saveTabs(tabs) { return lsSet('kizamia_troubletab_tabs', tabs); },
+    addTab({ title, url, icon = '' }) {
+      const tabs = this.getTabs();
+      tabs.push({ title, url, icon });
+      return this.saveTabs(tabs);
+    },
+    removeTab(index) {
+      const tabs = this.getTabs();
+      tabs.splice(index, 1);
+      return this.saveTabs(tabs);
+    },
+    getWeatherConfig() {
+      return lsGet('kizamia_troubletab_weather', { city: 'Singapore', lat: null, lon: null });
+    },
+    setWeatherConfig(config) { return lsSet('kizamia_troubletab_weather', config); }
+  };
+
+  /* ---------- 3. Notes ---------- */
+  const Notes = {
+    getAll() { return lsGet('kizamia_notes', []); },
+    _saveAll(notes) { return lsSet('kizamia_notes', notes); },
+    create({ title = '', body = '', type = 'text', folder = null, color = null }) {
+      const notes = this.getAll();
+      const note = {
+        id: `n_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        title, body, type, folder, color,
+        pinned: false, createdAt: Date.now(), updatedAt: Date.now()
+      };
+      notes.push(note);
+      this._saveAll(notes);
+      return note;
+    },
+    update(id, patch) {
+      const notes = this.getAll();
+      const idx = notes.findIndex(n => n.id === id);
+      if (idx === -1) throw new Error('Заметка не найдена');
+      notes[idx] = { ...notes[idx], ...patch, updatedAt: Date.now() };
+      this._saveAll(notes);
+      return notes[idx];
+    },
+    remove(id) {
+      this._saveAll(this.getAll().filter(n => n.id !== id));
+      return true;
+    },
+    getFolders() { return lsGet('kizamia_note_folders', []); },
+    createFolder(name) {
+      const folders = this.getFolders();
+      if (!folders.includes(name)) folders.push(name);
+      lsSet('kizamia_note_folders', folders);
+      return folders;
+    },
+    getBacklinks(noteTitle) {
+      const notes = this.getAll();
+      const pattern = new RegExp(`\\[\\[${noteTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]\\]`, 'i');
+      return notes.filter(n => pattern.test(n.body));
+    }
+  };
+
+  /* ---------- 4. Upscale ---------- */
+  const Upscale = {
+    async saveResult({ id, originalName, width, height, scale, blob }) {
+      const record = { id, originalName, width, height, scale, blob, createdAt: Date.now() };
+      await idbPut('images', record);
+      return record;
+    },
+    async getResult(id) { return idbGet('images', id); },
+    async getAllResults() { return idbGetAll('images'); },
+    async deleteResult(id) { await idbDelete('images', id); return true; },
+    async upscaleImage(file, scale = 2) {
+      const bitmap = await createImageBitmap(file);
+      const canvas = new OffscreenCanvas(bitmap.width * scale, bitmap.height * scale);
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      const blob = await canvas.convertToBlob({ type: 'image/png' });
+      return { blob, width: canvas.width, height: canvas.height };
+    }
+  };
+
+  /* ---------- 5. Util ---------- */
+  const Util = {
+    uuid() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
+    },
+    sleep(ms) { return new Promise(r => setTimeout(r, ms)); },
+    debounce(fn, ms = 200) {
+      let t;
+      return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+    },
+    throttle(fn, ms = 100) {
+      let last = 0, to;
+      return (...args) => {
+        const now = Date.now(), wait = ms - (now - last);
+        if (wait <= 0) { clearTimeout(to); last = now; fn(...args); }
+        else if (!to) to = setTimeout(() => { last = Date.now(); to = null; fn(...args); }, wait);
+      };
+    },
+    clamp(n, min, max) { return Math.max(min, Math.min(max, n)); },
+    formatBytes(b) {
+      if (b === 0) return '0 B';
+      const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      const i = Math.floor(Math.log(b) / Math.log(1024));
+      return `${(b / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
+    },
+    randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; },
+    randomFloat(min, max) { return Math.random() * (max - min) + min; },
+    randomHex(len = 6) {
+      let s = '';
+      for (let i = 0; i < len; i++) s += '0123456789abcdef'[Math.floor(Math.random() * 16)];
+      return s;
+    },
+    randomColor() { return `#${this.randomHex(6)}`; },
+    pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
+    shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    },
+    capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); },
+    async copy(text) {
+      try { await navigator.clipboard.writeText(text); return true; }
+      catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        return true;
+      }
+    },
+    escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+    }
+  };
+
+  /* ---------- 6. Anim ---------- */
+  const Anim = {
+    fadeIn(el, d = 300) {
+      el.style.opacity = 0; el.style.display = '';
+      return new Promise(r => {
+        el.style.transition = `opacity ${d}ms`;
+        requestAnimationFrame(() => {
+          el.style.opacity = 1;
+          setTimeout(() => { el.style.transition = ''; r(); }, d);
+        });
+      });
+    },
+    fadeOut(el, d = 300) {
+      return new Promise(r => {
+        el.style.transition = `opacity ${d}ms`;
+        el.style.opacity = 0;
+        setTimeout(() => { el.style.display = 'none'; el.style.transition = ''; r(); }, d);
+      });
+    },
+    pulse(el, count = 3, d = 400) {
+      el.style.animation = `kz-pulse ${d}ms ease ${count}`;
+      return new Promise(r => setTimeout(() => { el.style.animation = ''; r(); }, d * count));
+    },
+    shake(el, d = 400) {
+      el.style.animation = `kz-shake ${d}ms ease`;
+      setTimeout(() => { el.style.animation = ''; }, d);
+    },
+    bounce(el, count = 2, d = 500) {
+      el.style.animation = `kz-bounce ${d}ms ease ${count}`;
+      setTimeout(() => { el.style.animation = ''; }, d * count);
+    },
+    async typewriter(el, text, speed = 50) {
+      el.textContent = '';
+      for (let i = 0; i < text.length; i++) {
+        el.textContent += text[i];
+        await Util.sleep(speed);
+      }
+      return el;
+    },
+    countUp(el, from, to, duration = 1000, format = true) {
+      return new Promise(r => {
+        const start = performance.now(), diff = to - from;
+        function step(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const v = Math.round(from + diff * eased);
+          el.textContent = format ? v.toLocaleString() : v;
+          if (t < 1) requestAnimationFrame(step);
+          else r(el);
+        }
+        requestAnimationFrame(step);
+      });
+    },
+    confetti({ count = 80, duration = 2500,
+               colors = ['#7aa2ff','#4ade80','#fbbf24','#f87171','#a78bfa'] } = {}) {
+      const w = document.createElement('div');
+      w.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden';
+      document.body.appendChild(w);
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        const s = Util.randomInt(6, 12);
+        p.style.cssText = `position:absolute;left:${Util.randomInt(0,100)}%;top:-20px;
+          width:${s}px;height:${s}px;background:${Util.pick(colors)};
+          border-radius:${Math.random()>0.5?'50%':'2px'};
+          animation:kz-confetti ${Util.randomInt(1500, duration)}ms ease-out ${Util.randomInt(0,500)}ms forwards`;
+        w.appendChild(p);
+      }
+      setTimeout(() => w.remove(), duration + 800);
+    },
+    revealOnScroll(selector, { threshold = 0.15 } = {}) {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.style.opacity = 1;
+            e.target.style.transform = 'translateY(0)';
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold });
+      document.querySelectorAll(selector).forEach(el => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity .6s ease, transform .6s ease';
+        io.observe(el);
+      });
+      return io;
+    }
+  };
+
+  /* ---------- 7. Progress ---------- */
+  const Progress = {
+    bar(container, value = 0, { height = 8, color = 'var(--accent, #7aa2ff)', bg = '#2a2f3a', showLabel = true } = {}) {
+      container.innerHTML = '';
+      container.style.cssText = 'display:flex;align-items:center;gap:10px';
+      const track = document.createElement('div');
+      track.style.cssText = `flex:1;height:${height}px;background:${bg};border-radius:${height}px;overflow:hidden`;
+      const fill = document.createElement('div');
+      fill.style.cssText = `height:100%;width:${value}%;background:${color};border-radius:${height}px;transition:width .4s ease`;
+      track.appendChild(fill);
+      container.appendChild(track);
+      let label;
+      if (showLabel) {
+        label = document.createElement('span');
+        label.style.cssText = 'font-size:.85rem;color:var(--muted,#8b93a3);min-width:42px;text-align:right;font-variant-numeric:tabular-nums';
+        label.textContent = `${Math.round(value)}%`;
+        container.appendChild(label);
+      }
+      container._kzBar = { fill, label };
+      return this;
+    },
+    setBar(container, value) {
+      const { fill, label } = container._kzBar || {};
+      if (!fill) return;
+      const v = Util.clamp(value, 0, 100);
+      fill.style.width = `${v}%`;
+      if (label) label.textContent = `${Math.round(v)}%`;
+    },
+    ring(container, value = 0, { size = 80, stroke = 8, color = 'var(--accent,#7aa2ff)', bg = '#2a2f3a', showValue = true } = {}) {
+      container.innerHTML = '';
+      container.style.cssText = `position:relative;width:${size}px;height:${size}px;display:inline-block`;
+      const r = (size - stroke) / 2, c = 2 * Math.PI * r;
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', size); svg.setAttribute('height', size);
+      svg.style.transform = 'rotate(-90deg)';
+      const mkCircle = (strokeColor) => {
+        const el = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        el.setAttribute('cx', size / 2); el.setAttribute('cy', size / 2);
+        el.setAttribute('r', r); el.setAttribute('fill', 'none');
+        el.setAttribute('stroke', strokeColor);
+        el.setAttribute('stroke-width', stroke);
+        return el;
+      };
+      svg.appendChild(mkCircle(bg));
+      const fg = mkCircle(color);
+      fg.setAttribute('stroke-linecap', 'round');
+      fg.setAttribute('stroke-dasharray', c);
+      fg.setAttribute('stroke-dashoffset', c);
+      fg.style.transition = 'stroke-dashoffset .4s ease';
+      svg.appendChild(fg);
+      container.appendChild(svg);
+      let label = null;
+      if (showValue) {
+        label = document.createElement('div');
+        label.style.cssText = `position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:${size / 5}px;font-weight:600;font-variant-numeric:tabular-nums`;
+        label.textContent = '0%';
+        container.appendChild(label);
+      }
+      container._kzRing = { fg, label, c };
+      this.setRing(container, value);
+      return this;
+    },
+    setRing(container, value) {
+      const { fg, label, c } = container._kzRing || {};
+      if (!fg) return;
+      const v = Util.clamp(value, 0, 100);
+      fg.setAttribute('stroke-dashoffset', c - (c * v / 100));
+      if (label) label.textContent = `${Math.round(v)}%`;
+    },
+    numeric(container, from, to, duration = 1000, { prefix = '', suffix = '' } = {}) {
+      return new Promise(r => {
+        const start = performance.now(), diff = to - from;
+        function step(now) {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const v = Math.round(from + diff * eased);
+          container.textContent = prefix + v.toLocaleString() + suffix;
+          if (t < 1) requestAnimationFrame(step);
+          else r(container);
+        }
+        requestAnimationFrame(step);
+      });
+    }
+  };
+
+  /* ---------- 8. Status ---------- */
+  const Status = (() => {
+    function getWrap() {
+      let w = document.querySelector('.kz-toast-wrap');
+      if (!w) { w = document.createElement('div'); w.className = 'kz-toast-wrap'; document.body.appendChild(w); }
+      return w;
+    }
+    return {
+      toast(message, type = 'info', duration = 3000) {
+        const t = document.createElement('div');
+        t.className = `kz-toast kz-${type}`;
+        t.textContent = message;
+        getWrap().appendChild(t);
+        const remove = () => {
+          t.classList.add('kz-out');
+          setTimeout(() => t.remove(), 300);
+        };
+        if (duration > 0) setTimeout(remove, duration);
+        t.addEventListener('click', remove);
+        return { remove };
+      },
+      badge(el, text, type = 'info') {
+        const c = {
+          info: ['#7aa2ff', 'rgba(122,162,255,0.12)'],
+          success: ['#4ade80', 'rgba(74,222,128,0.12)'],
+          warning: ['#fbbf24', 'rgba(251,191,36,0.12)'],
+          error: ['#f87171', 'rgba(248,113,113,0.12)']
+        }[type] || ['#7aa2ff', 'rgba(122,162,255,0.12)'];
+        const b = document.createElement('span');
+        b.textContent = text;
+        b.style.cssText = `display:inline-block;font-size:.75rem;padding:3px 10px;
+          border-radius:999px;font-weight:600;background:${c[1]};color:${c[0]};margin-left:6px`;
+        el.appendChild(b);
+        return b;
+      },
+      dot(el, status = 'online') {
+        const d = document.createElement('span');
+        d.className = `kz-dot kz-${status}`;
+        el.prepend(d);
+        return d;
+      }
+    };
+  })();
+
+  /* ---------- 9. Theme ---------- */
+  const Theme = (() => {
+    const listeners = new Set();
+    const mql = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+    let current = 'dark';
+    const resolve = m => m === 'auto' ? (mql && mql.matches ? 'dark' : 'light') : m;
+    const apply = m => {
+      const r = resolve(m);
+      document.documentElement.dataset.theme = r;
+      listeners.forEach(cb => { try { cb(r, m); } catch (e) { console.error(e); } });
+    };
+    try { current = localStorage.getItem('kizamia_theme') || 'dark'; } catch (e) {}
+    apply(current);
+    if (mql && mql.addEventListener) mql.addEventListener('change', () => { if (current === 'auto') apply('auto'); });
+    return {
+      set(mode) {
+        current = mode;
+        try { localStorage.setItem('kizamia_theme', mode); } catch (e) {}
+        apply(mode);
+      },
+      get() { return current; },
+      resolved() { return resolve(current); },
+      toggle() { this.set(resolve(current) === 'dark' ? 'light' : 'dark'); },
+      onChange(cb) { listeners.add(cb); return () => listeners.delete(cb); }
+    };
+  })();
+
+  /* ---------- 10. NumberImage ---------- */
+  const NumberImage = {
+    colorFromNumber(n) {
+      const h = (n * 2654435761) % 360;
+      return `hsl(${h}, 70%, 55%)`;
+    },
+    generate(number, { size = 200, label = true } = {}) {
+      const n = Math.abs(Number(number) || 0);
+      const hue = (n * 2654435761) % 360;
+      const hue2 = (hue + 60) % 360;
+      const digits = String(n).split('').map(Number);
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 100 100">`;
+      svg += `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">`;
+      svg += `<stop offset="0%" stop-color="hsl(${hue},70%,55%)"/>`;
+      svg += `<stop offset="100%" stop-color="hsl(${hue2},70%,45%)"/>`;
+      svg += `</linearGradient></defs>`;
+      svg += `<rect width="100" height="100" fill="url(#g)"/>`;
+      for (let i = 0; i < Math.min(digits.length, 6); i++) {
+        const r = 8 + digits[i] * 3;
+        svg += `<circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,${0.12 + i * 0.08})" stroke-width="1.5"/>`;
+      }
+      if (label) {
+        const letter = String.fromCharCode(65 + (n % 26));
+        svg += `<text x="50" y="58" font-family="system-ui,sans-serif" font-size="38" font-weight="700" fill="white" text-anchor="middle">${letter}</text>`;
+      }
+      svg += `</svg>`;
+      return svg;
+    },
+    dataUrl(number, options) {
+      return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(this.generate(number, options))));
+    },
+    placeholder(width, height, label = '') {
+      const hue = (width * 31 + height * 17) % 360;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+        <rect width="100%" height="100%" fill="hsl(${hue},30%,25%)"/>
+        <text x="50%" y="50%" fill="hsl(${hue},50%,75%)" font-family="system-ui"
+              font-size="${Math.min(width, height) / 6}" text-anchor="middle"
+              dominant-baseline="middle">${label || `${width}×${height}`}</text>
+      </svg>`;
+      return 'data:image/svg+xml;base64,' + btoa(svg);
+    }
+  };
+
+  /* ---------- 11. Network ---------- */
+  const Network = {
+    isOnline() { return navigator.onLine; },
+    watch(cb) {
+      const on = () => cb(true), off = () => cb(false);
+      window.addEventListener('online', on);
+      window.addEventListener('offline', off);
+      return () => {
+        window.removeEventListener('online', on);
+        window.removeEventListener('offline', off);
+      };
+    },
+    async fetchRetry(url, options = {}, retries = 3, delay = 500) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          const res = await fetch(url, options);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res;
+        } catch (e) {
+          if (i === retries - 1) throw e;
+          await Util.sleep(delay * Math.pow(2, i));
+        }
+      }
+    }
+  };
+
+  /* ---------- 12. Events ---------- */
+  const Events = (() => {
+    const map = new Map();
+    return {
+      on(event, cb) {
+        if (!map.has(event)) map.set(event, new Set());
+        map.get(event).add(cb);
+        return () => this.off(event, cb);
+      },
+      off(event, cb) { const s = map.get(event); if (s) s.delete(cb); },
+      once(event, cb) {
+        const unsub = this.on(event, data => { unsub(); cb(data); });
+      },
+      emit(event, data) {
+        const s = map.get(event);
+        if (s) s.forEach(cb => { try { cb(data); } catch (e) { console.error(e); } });
+      },
+      clear(event) { event ? map.delete(event) : map.clear(); }
+    };
+  })();
+
+  /* ---------- 13. Sound ---------- */
+  const Sound = (() => {
+    let ctx = null;
+    const getCtx = () => ctx || (ctx = new (window.AudioContext || window.webkitAudioContext)());
+    function tone(freq, duration, type = 'sine', volume = 0.1) {
+      const c = getCtx();
+      const osc = c.createOscillator(), gain = c.createGain();
+      osc.type = type; osc.frequency.value = freq;
+      gain.gain.setValueAtTime(volume, c.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + duration / 1000);
+      osc.connect(gain); gain.connect(c.destination);
+      osc.start(); osc.stop(c.currentTime + duration / 1000);
+    }
+    return {
+      beep(freq = 440, duration = 100, volume = 0.1) { tone(freq, duration, 'sine', volume); },
+      click() { tone(1200, 40, 'square', 0.05); },
+      success() {
+        tone(523, 100);
+        setTimeout(() => tone(659, 100), 100);
+        setTimeout(() => tone(784, 150), 200);
+      },
+      error() {
+        tone(300, 150, 'sawtooth', 0.08);
+        setTimeout(() => tone(200, 200, 'sawtooth', 0.08), 100);
+      }
+    };
+  })();
+
+  /* ---------- 14. Download ---------- */
+  const Download = {
+    blob(filename, blob) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    },
+    text(filename, text, type = 'text/plain') {
+      this.blob(filename, new Blob([text], { type }));
+    },
+    json(filename, data) {
+      this.text(filename, JSON.stringify(data, null, 2), 'application/json');
+    }
+  };
+
+  /* ---------- 15. Scroll ---------- */
+  const Scroll = {
+    to(el, offset = 0) {
+      const target = typeof el === 'string' ? document.querySelector(el) : el;
+      if (!target) return;
+      const y = target.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    },
+    reveal(selector, opts) { return Anim.revealOnScroll(selector, opts); }
+  };
+
+  /* ---------- 16. Storage (TTL) ---------- */
+  const Storage = {
+    set(key, value, ttl = null) {
+      const record = { value, expires: ttl ? Date.now() + ttl : null };
+      try { localStorage.setItem(`kz_${key}`, JSON.stringify(record)); return true; }
+      catch (e) { return false; }
+    },
+    get(key, fallback = null) {
+      try {
+        const raw = localStorage.getItem(`kz_${key}`);
+        if (!raw) return fallback;
+        const r = JSON.parse(raw);
+        if (r.expires && Date.now() > r.expires) {
+          localStorage.removeItem(`kz_${key}`);
+          return fallback;
+        }
+        return r.value;
+      } catch (e) { return fallback; }
+    },
+    has(key) { return this.get(key) !== null; },
+    remove(key) { localStorage.removeItem(`kz_${key}`); },
+    clear() {
+      Object.keys(localStorage).filter(k => k.startsWith('kz_'))
+        .forEach(k => localStorage.removeItem(k));
+    }
+  };
+
+  /* ---------- 17. Idle ---------- */
+  const Idle = (() => {
+    let stopFn = null;
+    return {
+      watch(cb, timeout = 60000) {
+        this.stop();
+        let t = null;
+        const reset = () => {
+          clearTimeout(t);
+          t = setTimeout(() => cb(), timeout);
+        };
+        const events = ['mousemove', 'keydown', 'scroll', 'touchstart', 'click'];
+        events.forEach(e => window.addEventListener(e, reset, { passive: true }));
+        reset();
+        stopFn = () => {
+          clearTimeout(t);
+          events.forEach(e => window.removeEventListener(e, reset));
+        };
+      },
+      stop() { if (stopFn) { stopFn(); stopFn = null; } }
+    };
+  })();
+
+  /* ---------- Публичный интерфейс ---------- */
+  return {
+    version: '1.1.0',
+    Reader, TroubleTab, Notes, Upscale,
+    Util, Anim, Progress, Status, Theme,
+    NumberImage, Network, Events, Sound,
+    Download, Scroll, Storage, Idle,
+    async clearAll() {
+      localStorage.clear();
+      const db = await openDB();
+      await Promise.all(['books', 'images'].map(store =>
+        new Promise((res, rej) => {
+          const tx = db.transaction(store, 'readwrite');
+          tx.objectStore(store).clear();
+          tx.oncomplete = res;
+          tx.onerror = rej;
+        })
+      ));
+      return true;
+    },
+    async exportAll() {
+      const [books, images] = await Promise.all([
+        idbGetAll('books'), idbGetAll('images')
+      ]);
+      return {
+        version: this.version,
+        exportedAt: new Date().toISOString(),
+        localStorage: { ...localStorage },
+        indexedDB: { books, images }
+      };
+    }
+  };
+})();
+
+/* ============================================================
+   Логика сайта
+   ============================================================ */
+(function () {
+  'use strict';
+  const K = KizamiaAPI;
+
+  /* ---- Переключение разделов ---- */
+  const mainView = document.getElementById('main-view');
+  const docsView = document.getElementById('docs-view');
+  document.getElementById('docs-toggle').addEventListener('click', () => {
+    mainView.style.display = 'none';
+    docsView.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+  document.getElementById('docs-back').addEventListener('click', () => {
+    docsView.style.display = 'none';
+    mainView.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ---- Экспорт данных ---- */
+  document.getElementById('export-btn').addEventListener('click', async () => {
+    try {
+      const data = await K.exportAll();
+      K.Download.json(`kizamia-backup-${new Date().toISOString().slice(0, 10)}.json`, data);
+      K.Status.toast('Данные экспортированы', 'success');
+    } catch (err) {
+      console.error(err);
+      K.Status.toast('Ошибка экспорта: ' + err.message, 'error');
+    }
+  });
+
+  /* ---- Плавный скролл по якорям ---- */
+  document.querySelectorAll('.hub-nav a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const id = link.getAttribute('href').slice(1);
+      const target = document.getElementById(id);
+      if (target) {
+        e.preventDefault();
+        if (docsView.style.display === 'block') {
+          docsView.style.display = 'none';
+          mainView.style.display = 'block';
+        }
+        K.Scroll.to(target, 70);
+      }
+    });
+  });
+
+  /* ---- Playground ---- */
+  const barEl   = document.getElementById('pg-bar');
+  const ringEl  = document.getElementById('pg-ring');
+  const countEl = document.getElementById('pg-count');
+  const imgEl   = document.getElementById('pg-img');
+  const typeEl  = document.getElementById('pg-type');
+  const badgeEl = document.getElementById('pg-badge');
+
+  if (barEl)  K.Progress.bar(barEl, 0);
+  if (ringEl) K.Progress.ring(ringEl, 0, { size: 80 });
+
+  function renderNumberImage(n) {
+    if (!imgEl) return;
+    imgEl.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = K.NumberImage.dataUrl(n, { size: 64 });
+    img.width = 64; img.height = 64;
+    img.alt = `#${n}`;
+    imgEl.appendChild(img);
+    const label = document.createElement('span');
+    label.textContent = `#${n}`;
+    imgEl.appendChild(label);
+  }
+  if (imgEl) renderNumberImage(K.Util.randomInt(1, 999999));
+
+  document.querySelectorAll('[data-demo]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      K.Sound.click();
+      const demo = btn.dataset.demo;
+      switch (demo) {
+        case 'bar': {
+          const v = K.Util.randomInt(20, 100);
+          K.Progress.setBar(barEl, v);
+          K.Status.toast(`Прогресс: ${v}%`, 'info', 1500);
+          break;
+        }
+        case 'ring': {
+          const v = K.Util.randomInt(20, 100);
+          K.Progress.setRing(ringEl, v);
+          K.Status.toast(`Кольцо: ${v}%`, 'success', 1500);
+          break;
+        }
+        case 'count':
+          await K.Progress.numeric(countEl, 0, K.Util.randomInt(100, 99999), 1200);
+          break;
+        case 'img':
+          renderNumberImage(K.Util.randomInt(1, 999999));
+          break;
+        case 'toast':         K.Status.toast('Привет! Это info-уведомление.', 'info'); break;
+        case 'toast-success': K.Status.toast('Успех! Всё сохранилось.', 'success'); break;
+        case 'toast-error':   K.Status.toast('Ошибка! Что-то не так.', 'error'); break;
+        case 'confetti':
+          K.Anim.confetti({ count: 100 });
+          K.Status.toast('🎉 Ура!', 'success', 2000);
+          break;
+        case 'beep':          K.Sound.beep(660, 120); break;
+        case 'sound-success': K.Sound.success(); break;
+        case 'sound-error':   K.Sound.error(); break;
+        case 'theme':
+          K.Theme.toggle();
+          K.Status.toast(`Тема: ${K.Theme.resolved()}`, 'info', 1500);
+          break;
+        case 'type':
+          typeEl.textContent = '';
+          await K.Anim.typewriter(typeEl, 'Kizamia API — быстро, офлайн, без зависимостей.', 40);
+          break;
+        case 'badge': {
+          const types = ['info', 'success', 'warning', 'error'];
+          K.Status.badge(badgeEl, K.Util.pick(types), K.Util.pick(types));
+          break;
+        }
+      }
+    });
+  });
+
+  /* ---- Индикатор сети в футере ---- */
+  const footer = document.querySelector('.hub-footer span');
+  if (footer) {
+    footer.dataset.base = footer.textContent;
+    const update = online => {
+      footer.textContent = `${footer.dataset.base} · ${online ? '🟢 онлайн' : '🔴 офлайн'}`;
+    };
+    update(K.Network.isOnline());
+    K.Network.watch(update);
+  }
+})();
+</script>
 </body>
 </html>
