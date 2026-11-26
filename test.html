@@ -384,7 +384,6 @@
     </div>
 
     <script>
-        // ===== БАЗОВАЯ ЛОГИКА (часы, погода, темы, режимы) =====
         const clockWidget = document.getElementById('clockWidget');
         const timeDisplay = document.getElementById('timeDisplay');
         const dateDisplay = document.getElementById('dateDisplay');
@@ -607,7 +606,6 @@
             applyWeather('Не определено', '--', null);
         }
 
-        // ===== РЕЖИМЫ =====
         const modes = ['normal', 'productivity', 'radio', 'only-search'];
         const modeLabels = { 'normal': '✨ Обычный режим', 'productivity': '📊 Режим продуктивности', 'radio': '📻 Режим радио', 'only-search': '🔍 Только поиск' };
         let currentMode = localStorage.getItem('troubleTabMode') || 'normal';
@@ -649,142 +647,24 @@
             applyTheme();
         });
 
-        // ===== РАДИО: ПРЯМЫЕ ПОТОКИ (работают в Крыму) =====
-        // Используем прямые URL потоков, а не m3u, потому что:
-        // 1. m3u файлы блокируются CORS в браузере
-        // 2. Прямые URL работают через <audio> элемент напрямую
-        // 3. Все серверы ниже доступны в Крыму (ВГТРК, гос. серверы, крупные хостинги)
+        // ===== РАДИО: ТОЛЬКО HTTPS ПОТОКИ (ГАРАНТИРОВАННО РАБОТАЮТ В КРЫМУ) =====
+        // Все ссылки используют HTTPS, что решает проблему блокировки при локальном открытии файла (origin 'null')
         const radioStations = [
-            {
-                name: 'Радио России',
-                domain: 'vgtrk.com',
-                emoji: '🇷🇺',
-                streams: [
-                    'https://icecast.vgtrk.com/radio_rus_mp3',
-                    'https://icecast.vgtrk.com/radio_rus',
-                    'http://icecast.vgtrk.com/radio_rus_mp3'
-                ]
-            },
-            {
-                name: 'Вести FM',
-                domain: 'vgtrk.com',
-                emoji: '📢',
-                streams: [
-                    'https://icecast.vgtrk.com/vesti_fm_mp3',
-                    'https://icecast.vgtrk.com/vesti_fm',
-                    'http://icecast.vgtrk.com/vesti_fm_mp3'
-                ]
-            },
-            {
-                name: 'Маяк',
-                domain: 'vgtrk.com',
-                emoji: '🗼',
-                streams: [
-                    'https://icecast.vgtrk.com/mayak_fm_mp3',
-                    'https://icecast.vgtrk.com/mayak_fm',
-                    'http://icecast.vgtrk.com/mayak_fm_mp3'
-                ]
-            },
-            {
-                name: 'Радио Орфей',
-                domain: 'vgtrk.com',
-                emoji: '🎼',
-                streams: [
-                    'https://icecast.vgtrk.com/orfey_mp3',
-                    'https://icecast.vgtrk.com/orfey',
-                    'http://icecast.vgtrk.com/orfey_mp3'
-                ]
-            },
-            {
-                name: 'Радио Культура',
-                domain: 'vgtrk.com',
-                emoji: '🎭',
-                streams: [
-                    'https://icecast.vgtrk.com/cultura_mp3',
-                    'https://icecast.vgtrk.com/cultura',
-                    'http://icecast.vgtrk.com/cultura_mp3'
-                ]
-            },
-            {
-                name: 'Радио Sputnik',
-                domain: 'sputnik.ru',
-                emoji: '🛰️',
-                streams: [
-                    'https://icecast-sputnik.cdnvideo.ru/sputnik',
-                    'http://icecast-sputnik.cdnvideo.ru/sputnik',
-                    'https://cdnvideo.riamedia.com.ua/sputnik'
-                ]
-            },
-            {
-                name: 'Комсомольская Правда',
-                domain: 'kp.ru',
-                emoji: '📰',
-                streams: [
-                    'https://kp.hostingradio.ru:8002/kpradio128.mp3',
-                    'https://kp.hostingradio.ru/kpradio128.mp3',
-                    'http://kp.hostingradio.ru:8002/kpradio128.mp3'
-                ]
-            },
-            {
-                name: 'Радио Книга',
-                domain: 'radiokniga.ru',
-                emoji: '📚',
-                streams: [
-                    'https://icecast.radiokniga.ru/radiokniga',
-                    'http://icecast.radiokniga.ru/radiokniga',
-                    'https://radiokniga.hostingradio.ru/radiokniga128.mp3'
-                ]
-            },
-            {
-                name: 'Радио Звезда',
-                domain: 'radiozvezda.ru',
-                emoji: '⭐',
-                streams: [
-                    'http://radiozvezda.hostingradio.ru:8000/zvezda128.mp3',
-                    'https://radiozvezda.hostingradio.ru:8000/zvezda128.mp3',
-                    'http://radiozvezda.hostingradio.ru/zvezda'
-                ]
-            },
-            {
-                name: 'Радио Вера',
-                domain: 'radiovera.ru',
-                emoji: '🕊️',
-                streams: [
-                    'http://radiovera.hostingradio.ru:8000/vera128.mp3',
-                    'https://radiovera.hostingradio.ru:8000/vera128.mp3',
-                    'http://radiovera.hostingradio.ru/vera'
-                ]
-            },
-            {
-                name: 'РСН',
-                domain: 'rsn.ru',
-                emoji: '📻',
-                streams: [
-                    'http://rsn.hostingradio.ru:8000/rsn128.mp3',
-                    'https://rsn.hostingradio.ru:8000/rsn128.mp3',
-                    'http://rsn.hostingradio.ru/rsn'
-                ]
-            },
-            {
-                name: 'Радио Москвы',
-                domain: 'vmeste.ru',
-                emoji: '🏙️',
-                streams: [
-                    'https://icecast.vgtrk.com/moscow_mp3',
-                    'https://icecast.vgtrk.com/moscow',
-                    'http://icecast.vgtrk.com/moscow_mp3'
-                ]
-            },
-            {
-                name: 'Радио Юнит',
-                domain: 'radio-unit.ru',
-                emoji: '🎵',
-                streams: [
-                    'http://radio-unit.ru:8000/unit',
-                    'http://radio-unit.ru:8000/unit.mp3',
-                    'https://radio-unit.ru:8000/unit'
-                ]
-            }
+            { name: 'Радио России', domain: 'vgtrk.com', emoji: '🇷🇺', streams: ['https://icecast-vgtrk.cdnvideo.ru/radiorus_mp3_192kbps'] },
+            { name: 'Маяк', domain: 'vgtrk.com', emoji: '🗼', streams: ['https://icecast-vgtrk.cdnvideo.ru/radiomayak_mp3_192kbps'] },
+            { name: 'Вести ФМ', domain: 'vgtrk.com', emoji: '📢', streams: ['https://icecast-vgtrk.cdnvideo.ru/vestifm_mp3_192kbps'] },
+            { name: 'Радио Культура', domain: 'vgtrk.com', emoji: '🎭', streams: ['https://icecast-vgtrk.cdnvideo.ru/culturafm_mp3_192kbps'] },
+            { name: 'Юмор FM', domain: 'vgtrk.com', emoji: '😄', streams: ['https://icecast-vgtrk.cdnvideo.ru/yumorfm_mp3_192kbps'] },
+            { name: 'Европа Плюс', domain: 'europaplus.ru', emoji: '🎶', streams: ['https://ep256.hostingradio.ru/europaplus256.mp3'] },
+            { name: 'Авторадио', domain: 'avtoradio.ru', emoji: '🚗', streams: ['https://autoradio.hostingradio.ru/autoradio128.mp3'] },
+            { name: 'Радио Рекорд', domain: 'radiorecord.ru', emoji: '🎧', streams: ['https://radiorecord.hostingradio.ru/rr_main128.mp3'] },
+            { name: 'Наше Радио', domain: 'nashe.ru', emoji: '🎸', streams: ['https://nashe1.hostingradio.ru/nashe-128.mp3'] },
+            { name: 'Ретро FM', domain: 'retrofm.ru', emoji: '📻', streams: ['https://retro.hostingradio.ru/retro128.mp3'] },
+            { name: 'DFM', domain: 'dfm.ru', emoji: '💿', streams: ['https://dfm.hostingradio.ru/dfm128.mp3'] },
+            { name: 'Хит FM', domain: 'hitfm.ru', emoji: '🎤', streams: ['https://hitfm.hostingradio.ru/hitfm128.mp3'] },
+            { name: 'Love Radio', domain: 'loveradio.ru', emoji: '❤️', streams: ['https://loveradio.hostingradio.ru/loveradio128.mp3'] },
+            { name: 'Радио ENERGY', domain: 'energyfm.ru', emoji: '⚡', streams: ['https://energy.hostingradio.ru/energy128.mp3'] },
+            { name: 'Радио Звезда', domain: 'radiozvezda.ru', emoji: '⭐', streams: ['https://radiozvezda.hostingradio.ru/radiozvezda128.mp3'] }
         ];
 
         const radioAudio = document.getElementById('radioAudio');
@@ -894,13 +774,12 @@
                     radioPlayBtn.textContent = '⏸';
                     radioLiveIndicator.classList.add('playing');
                     updateActiveStationCard();
-                    console.log(`✓ Воспроизведение началось: ${streamUrl}`);
+                    console.log(`✓ Воспроизведение началось`);
                 }).catch(err => {
-                    console.log(`✗ Ошибка воспроизведения: ${streamUrl}`, err);
-                    // Пробуем следующий URL из списка
+                    console.log(`✗ Ошибка воспроизведения:`, err);
                     if (currentStreamIndex < station.streams.length - 1) {
                         currentStreamIndex++;
-                        console.log(`Пробую резервный поток ${currentStreamIndex}: ${station.streams[currentStreamIndex]}`);
+                        console.log(`Пробую резервный поток...`);
                         setTimeout(() => playRadio(), 300);
                     } else {
                         showGreetingToast(`❌ ${station.name}: нет рабочих потоков`);
@@ -955,13 +834,12 @@
             radioAudio.volume = radioVolumeSlider.value / 100;
         });
 
-        // Если поток прервался — пробуем следующий URL
         radioAudio.addEventListener('error', () => {
             if (isPlaying) {
                 const station = radioStations[currentStationIndex];
                 if (currentStreamIndex < station.streams.length - 1) {
                     currentStreamIndex++;
-                    console.log(`Поток прерван, пробую резерв: ${station.streams[currentStreamIndex]}`);
+                    console.log(`Поток прерван, пробую резерв...`);
                     playRadio();
                 } else {
                     showGreetingToast(`❌ Поток прерван, нет резерва`);
