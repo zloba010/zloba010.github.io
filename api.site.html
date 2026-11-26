@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kizamia API — документация</title>
+  <style>
+    body {
+      background: #0f1115; color: #e6e9ef;
+      font-family: system-ui, sans-serif;
+      line-height: 1.6; margin: 0; padding: 40px 24px 80px;
+    }
+    .wrap { max-width: 860px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin-bottom: 6px; }
+    .sub { color: #8b93a3; margin-bottom: 36px; }
+    h2 { font-size: 1.25rem; margin: 36px 0 14px; color: #7aa2ff; }
+    h3 { font-size: 1rem; margin: 22px 0 8px; }
+    code {
+      background: #1e232d; color: #c7d5ff;
+      padding: 2px 6px; border-radius: 6px; font-size: 0.9em;
+    }
+    pre {
+      background: #12151b; border: 1px solid #2a2f3a;
+      border-radius: 10px; padding: 16px; overflow-x: auto;
+      font-size: 0.85rem; line-height: 1.5;
+    }
+    pre code { background: none; padding: 0; color: inherit; }
+    .method {
+      border: 1px solid #2a2f3a; border-radius: 10px;
+      padding: 14px 18px; margin-bottom: 12px; background: #171a21;
+    }
+    .sig { font-family: ui-monospace, monospace; font-size: 0.88rem; color: #4ade80; }
+    .desc { color: #8b93a3; font-size: 0.9rem; margin-top: 6px; }
+    .back { display: inline-block; margin-bottom: 24px; color: #7aa2ff; text-decoration: none; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88rem; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #2a2f3a; }
+    th { color: #8b93a3; font-weight: 500; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← Назад на главную</a>
+  <h1>Kizamia Unified API</h1>
+  <p class="sub">Версия 1.0.0 · все методы возвращают Promise · хранилище: localStorage + IndexedDB</p>
+
+  <p>
+    API подключается одним файлом <code>js/kizamia-api.js</code> и доступен
+    глобально как <code>KizamiaAPI</code>. Подходит для любых будущих проектов
+    без сборщиков и зависимостей.
+  </p>
+
+  <pre><code>&lt;script src="js/kizamia-api.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  // Пример: создать заметку
+  const note = await KizamiaAPI.Notes.create({
+    title: 'Идея',
+    body: 'Сделать что-то полезное'
+  });
+&lt;/script&gt;</code></pre>
+
+  <!-- READER -->
+  <h2>📖 Reader</h2>
+
+  <div class="method">
+    <div class="sig">KizamiaAPI.Reader.saveBook({ id, name, type, arrayBuffer, progress })</div>
+    <div class="desc">Сохраняет книгу в IndexedDB. Возвращает запись книги.</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.Reader.getAllBooks()</div>
+    <div class="desc">Возвращает все книги, отсортированные по дате добавления (новые сверху).</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.Reader.updateProgress(id, progress)</div>
+    <div class="desc">Обновляет прогресс чтения (0–100).</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.Reader.setBookmark(bookId, page) / getBookmark(bookId)</div>
+    <div class="desc">Сохраняет и читает закладку для книги.</div>
+  </div>
+
+  <!-- TROUBLETAB -->
+  <h2>🚀 TroubleTab</h2>
+
+  <div class="method">
+    <div class="sig">KizamiaAPI.TroubleTab.getTabs()</div>
+    <div class="desc">Возвращает массив вкладок. По умолчанию — 4 поисковика.</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.TroubleTab.addTab({ title, url, icon })</div>
+    <div class="desc">Добавляет новую вкладку и сохраняет в localStorage.</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.TroubleTab.removeTab(index)</div>
+    <div class="desc">Удаляет вкладку по индексу.</div>
+  </div>
+
+  <!-- NOTES -->
+  <h2>📝 Notes</h2>
+
+  <div class="method">
+    <div class="sig">KizamiaAPI.Notes.create({ title, body, type, folder, color })</div>
+    <div class="desc">Создаёт заметку. <code>type</code>: <code>text</code> | <code>list</code> | <code>template</code> | <code>diary</code>.</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.Notes.update(id, patch)</div>
+    <div class="desc">Обновляет поля заметки. Автоматически обновляет <code>updatedAt</code>.</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.Notes.getBacklinks(noteTitle)</div>
+    <div class="desc">Возвращает заметки, содержащие <code>[[noteTitle]]</code> в теле.</div>
+  </div>
+
+  <!-- UPSCALE -->
+  <h2>🖼️ Upscale</h2>
+
+  <div class="method">
+    <div class="sig">KizamiaAPI.Upscale.upscaleImage(file, scale = 2)</div>
+    <div class="desc">
+      Апскейлит изображение через <code>OffscreenCanvas</code>.
+      Возвращает <code>{ blob, width, height }</code>.
+      Для продакшена можно заменить на Web Worker + нейросетевую модель.
+    </div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.Upscale.saveResult({ id, originalName, width, height, scale, blob })</div>
+    <div class="desc">Сохраняет результат апскейла в IndexedDB.</div>
+  </div>
+
+  <!-- ОБЩИЕ -->
+  <h2>⚙️ Общие методы</h2>
+
+  <div class="method">
+    <div class="sig">KizamiaAPI.exportAll()</div>
+    <div class="desc">Возвращает JSON со всеми данными (localStorage + IndexedDB) для бэкапа.</div>
+  </div>
+  <div class="method">
+    <div class="sig">KizamiaAPI.clearAll()</div>
+    <div class="desc">Полностью очищает localStorage и IndexedDB. Использовать с осторожностью.</div>
+  </div>
+
+  <h2>Хранение данных</h2>
+  <table>
+    <tr><th>Модуль</th><th>Хранилище</th><th>Ключи / Store</th></tr>
+    <tr><td>Reader</td><td>IndexedDB + localStorage</td><td><code>books</code>, <code>kizamia_reader_last</code>, <code>kizamia_reader_marks</code></td></tr>
+    <tr><td>TroubleTab</td><td>localStorage</td><td><code>kizamia_troubletab_tabs</code>, <code>kizamia_troubletab_weather</code></td></tr>
+    <tr><td>Notes</td><td>localStorage</td><td><code>kizamia_notes</code>, <code>kizamia_note_folders</code></td></tr>
+    <tr><td>Upscale</td><td>IndexedDB</td><td><code>images</code></td></tr>
+  </table>
+</div>
+</body>
+</html>
