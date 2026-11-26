@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="yandex-verification" content="d141a4f33921e812" />
+    <title>TroubleTab</title>
+    <style>
+        :root {
+            --bg-color: #f4ebd9;
+            --text-color: #3e2723;
+            --primary-color: #3e2723;
+            --accent-color: #ff1744;
+            --panel-bg: rgba(244, 235, 217, 0.95);
+            --input-bg: rgba(255, 255, 255, 0.5);
+            --border-color: #3e2723;
+            --glass-blur: none;
+            --glass-border: 2px solid transparent;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+        [data-theme="dark"] {
+            --bg-color: #2c1e16;
+            --text-color: #e6d5c3;
+            --primary-color: #e6d5c3;
+            --accent-color: #ffeb3b;
+            --panel-bg: rgba(44, 30, 22, 0.95);
+            --input-bg: rgba(0, 0, 0, 0.3);
+            --border-color: #e6d5c3;
+            --glass-blur: none;
+            --glass-border: 2px solid transparent;
+            --shadow-color: rgba(0,0,0,0.4);
+        }
+        [data-theme="glass"] {
+            --bg-color: #e2e8f0;
+            --text-color: #2d3748;
+            --primary-color: #2d3748;
+            --accent-color: #4299e1;
+            --panel-bg: rgba(255, 255, 255, 0.15);
+            --input-bg: transparent;
+            --border-color: rgba(255, 255, 255, 0.9);
+            --glass-blur: blur(25px);
+            --glass-border: 1.5px solid rgba(255, 255, 255, 0.8);
+            --shadow-color: rgba(0, 0, 0, 0.08);
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s, opacity 0.5s ease, transform 0.5s ease;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        body[data-theme="glass"] {
+            background: 
+                radial-gradient(circle at 20% 30%, #ffffff 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, #b8d4e3 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, #f0f4f8 0%, transparent 60%),
+                linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            background-size: 150% 150%;
+            animation: glassBG 20s ease-in-out infinite alternate;
+        }
+        @keyframes glassBG {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        #lightCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5; pointer-events: none; display: none;
+        }
+        body[data-theme="dark"] #lightCanvas { display: block; }
+        #bubbleCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1; pointer-events: auto; display: none;
+        }
+        body[data-theme="light"] #bubbleCanvas { display: block; }
+        #dustCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 6; pointer-events: none; display: none;
+        }
+        body[data-theme="dark"] #dustCanvas { display: block; }
+
+        .flashlight {
+            position: fixed; width: 32px; height: 72px; z-index: 90;
+            cursor: pointer; display: none; transform-origin: 50% 0%;
+            transition: filter 0.3s, opacity 0.5s ease, transform 0.5s ease;
+        }
+        #flashlightLeft { top: -12px; left: -25px; }
+        .flash-body { transition: fill 0.3s; }
+        .flash-lens { fill: #1a1a1a; transition: fill 0.3s; }
+        .flashlight.active .flash-lens {
+            fill: #fff9c4;
+            filter: drop-shadow(0 0 6px #ffeb3b) drop-shadow(0 0 14px rgba(255,235,59,0.6));
+        }
+        .flashlight.active { filter: drop-shadow(0 0 12px rgba(255, 235, 59, 0.55)); }
+        body[data-theme="dark"] .flashlight { display: block; }
+
+        .dynamic-island {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            border-radius: 40px;
+            padding: 12px 32px;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: var(--glass-border);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 100; min-width: 140px;
+        }
+        body[data-theme="dark"] .dynamic-island {
+            border: 2px solid rgba(230, 213, 195, 0.3);
+            box-shadow: 0 4px 15px var(--shadow-color);
+        }
+        body[data-theme="glass"] .time-display {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #1a202c;
+        }
+        .dynamic-island:hover { padding-bottom: 20px; padding-top: 16px; border-radius: 25px; }
+
+        .weather-display {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+        .dynamic-island:hover .weather-display {
+            opacity: 1;
+            max-height: 30px;
+            margin-bottom: 6px;
+        }
+        .weather-city { opacity: 0.8; max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+        .weather-icon { font-size: 1rem; line-height: 1; }
+        .weather-temp { font-weight: 800; }
+
+        .time-display { font-size: 1.2rem; font-weight: 600; letter-spacing: 1px; }
+        .date-display {
+            font-size: 0.85rem;
+            opacity: 0; max-height: 0; overflow: hidden;
+            transition: all 0.3s ease; margin-top: 0;
+        }
+        .dynamic-island:hover .date-display { opacity: 0.8; max-height: 20px; margin-top: 4px; }
+        
+        .dynamic-island.is-tyk .date-display,
+        .dynamic-island.is-tyk .weather-display { 
+            opacity: 0 !important; max-height: 0 !important; margin: 0 !important;
+        }
+
+        .theme-toggle {
+            position: absolute; top: 20px; right: 20px;
+            background: var(--panel-bg); color: var(--text-color);
+            border: var(--glass-border); border-radius: 50%;
+            width: 45px; height: 45px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 4px 15px var(--shadow-color);
+            font-size: 1.2rem; z-index: 100;
+        }
+        .theme-toggle:hover { box-shadow: 0 0 20px var(--accent-color); border-color: var(--accent-color); }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--panel-bg);
+            color: var(--text-color);
+            padding: 14px 24px;
+            border-radius: 16px;
+            border: var(--glass-border);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 10px 30px var(--shadow-color);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 2000;
+            
+            opacity: 0;
+            transform: translateX(50px) scale(0.95);
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .main-container {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; max-width: 800px; padding: 20px;
+            z-index: 10; position: relative;
+        }
+        .logo {
+            font-size: 3.5rem; font-weight: 800; margin-bottom: 30px;
+            letter-spacing: -1px; color: var(--text-color); display: flex;
+        }
+        body[data-theme="glass"] .logo { text-shadow: 0 4px 10px rgba(255,255,255,0.5); }
+        .logo span { display: inline-block; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+
+        .search-wrapper {
+            width: 100%; display: flex; align-items: center;
+            background: var(--input-bg);
+            border: var(--glass-border);
+            border-radius: 40px; padding: 8px 15px;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: all 0.3s ease;
+            z-index: 20;
+        }
+        .search-wrapper:focus-within { border-color: var(--accent-color); box-shadow: 0 0 20px var(--accent-color); }
+        .engine-select {
+            background: transparent; border: none; color: var(--text-color);
+            font-size: 1rem; padding: 10px; cursor: pointer; outline: none;
+            font-weight: 600; appearance: none;
+        }
+        .engine-select option { background: var(--bg-color); color: var(--text-color); }
+        body[data-theme="glass"] .engine-select option { background: #ffffff; color: #1a202c; }
+        .search-input {
+            flex: 1; background: transparent; border: none; color: var(--text-color);
+            font-size: 1.1rem; padding: 10px; outline: none;
+        }
+        .search-input::placeholder { color: var(--text-color); opacity: 0.5; }
+        .search-btn {
+            background: transparent;
+            border: 1.5px solid var(--text-color);
+            color: var(--text-color);
+            border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .search-btn:hover { background: var(--accent-color); border-color: var(--accent-color); color: #fff; transform: scale(1.05); }
+        body[data-theme="glass"] .search-btn {
+            background: transparent;
+            border: 1.5px solid rgba(255, 255, 255, 0.9);
+            color: #1a202c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        body[data-theme="glass"] .search-btn:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+        .pill-btn {
+            background: var(--panel-bg); color: var(--text-color);
+            border: var(--glass-border); padding: 12px 24px;
+            border-radius: 25px; font-size: 1rem; font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            display: flex; align-items: center; gap: 10px;
+            transition: all 0.2s;
+        }
+        .pill-btn:hover {
+            box-shadow: 0 0 20px var(--accent-color);
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        .pill-btn svg { flex-shrink: 0; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.2); backdrop-filter: blur(10px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal {
+            background: var(--panel-bg);
+            border: var(--glass-border);
+            border-radius: 30px; width: 90%; max-width: 600px; max-height: 85vh;
+            display: flex; flex-direction: column;
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            transform: scale(0.9); transition: transform 0.3s; overflow: hidden;
+        }
+        .modal-overlay.active .modal { transform: scale(1); }
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; border-bottom: 1.5px solid var(--border-color);
+        }
+        .modal-header h2 { font-size: 1.5rem; }
+        .close-btn { background: transparent; border: none; color: var(--text-color); font-size: 1.5rem; cursor: pointer; }
+        .close-btn:hover { color: var(--accent-color); }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+
+        .bookmarks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; }
+        .bookmark-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 15px 10px; 
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            cursor: pointer; text-decoration: none; color: var(--text-color);
+            border: 1px solid transparent; transition: all 0.2s;
+            position: relative;
+        }
+        body[data-theme="glass"] .bookmark-item {
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .bookmark-item:hover { border-color: var(--accent-color); transform: translateY(-3px); box-shadow: 0 5px 15px var(--shadow-color); }
+
+        .bookmark-edit-btn {
+            position: absolute; top: 6px; right: 6px;
+            width: 24px; height: 24px;
+            background: var(--panel-bg); border: 1px solid var(--border-color);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-color);
+            opacity: 0; pointer-events: none;
+            transition: all 0.2s ease; z-index: 2;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .bookmark-item:hover .bookmark-edit-btn { opacity: 1; pointer-events: auto; }
+        .bookmark-edit-btn:hover { background: var(--accent-color); color: #fff; border-color: var(--accent-color); transform: scale(1.1); }
+
+        .bookmark-icon { width: 32px; height: 32px; margin-bottom: 8px; border-radius: 8px; object-fit: cover; }
+        .bookmark-title { font-size: 0.8rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; font-weight: 600; }
+
+        .bookmark-form { display: none; flex-direction: column; gap: 15px; }
+        .bookmark-form.active { display: flex; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.9rem; font-weight: 600; }
+        .form-group input[type="text"], .form-group input[type="url"] {
+            padding: 12px; border-radius: 12px; border: 1px solid var(--border-color);
+            background: transparent; color: var(--text-color); outline: none;
+        }
+        .form-group input:focus { border-color: var(--accent-color); }
+        .switch-group { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.2); transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-color); }
+        input:checked + .slider:before { transform: translateX(22px); }
+        .form-actions { display: flex; justify-content: space-between; margin-top: 10px; }
+        .btn { padding: 10px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; font-size: 1rem; }
+        .btn-primary { background: var(--primary-color); color: var(--bg-color); }
+        body[data-theme="glass"] .btn-primary { background: rgba(255,255,255,0.4); color: #1a202c; border: 1px solid rgba(255,255,255,0.6); }
+        .btn-primary:hover { background: var(--accent-color); color: #fff; }
+        .btn-danger { background: #ff4d4d; color: white; }
+        .btn-danger:hover { background: #cc0000; }
+        .btn-add { width: 100%; margin-bottom: 20px; background: transparent; border: 2px dashed var(--border-color); color: var(--text-color); }
+        .btn-add:hover { border-color: var(--accent-color); color: var(--accent-color); }
+
+        .services-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .service-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            text-decoration: none;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .service-card[hidden] { display: none; }
+        body[data-theme="glass"] .service-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.10) 100%);
+            border: 1px solid rgba(255,255,255,0.55);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+        }
+        .service-card:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-color);
+        }
+        .service-card:active { transform: scale(.99); }
+        .service-card-icon {
+            width: 44px; height: 44px;
+            display: grid; place-items: center;
+            font-size: 1.8rem; line-height: 1;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: rgba(128, 128, 128, 0.12);
+        }
+        body[data-theme="dark"] .service-card-icon {
+            background: rgba(255, 255, 255, 0.06);
+        }
+        body[data-theme="glass"] .service-card-icon {
+            background: rgba(255, 255, 255, 0.45);
+        }
+        .service-card-info { flex: 1; min-width: 0; }
+        .service-card-name {
+            font-size: 15px; font-weight: 700; color: var(--text-color);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .service-card-desc {
+            font-size: 12px; color: var(--text-color); opacity: 0.6;
+            margin-top: 2px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .service-card-arrow {
+            flex: 0 0 auto;
+            font-size: 22px; line-height: 1;
+            color: var(--text-color); opacity: 0.5;
+        }
+
+        .continue-reading {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            color: var(--text-color);
+            text-decoration: none;
+        }
+        body[data-theme="glass"] .continue-reading {
+            background: linear-gradient(135deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.10) 100%);
+            border: 1px solid rgba(255,255,255,0.55);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+        }
+        .continue-reading[hidden] { display: none; }
+        .continue-reading:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-color);
+        }
+        .continue-reading:active { transform: scale(.99); }
+        .continue-reading-cover {
+            width: 44px; height: 58px; border-radius: 8px;
+            display: grid; place-items: center;
+            background: var(--primary-color); color: var(--bg-color);
+            font-weight: 700; font-size: 20px;
+            flex: 0 0 auto;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,.15);
+            text-transform: uppercase;
+        }
+        .continue-reading-info { flex: 1; min-width: 0; }
+        .continue-reading-label {
+            font-size: 10px; font-weight: 700; letter-spacing: .8px;
+            text-transform: uppercase; color: var(--text-color); opacity: .6;
+            margin-bottom: 3px;
+        }
+        .continue-reading-title {
+            font-size: 15px; font-weight: 700; line-height: 1.25;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            color: var(--text-color);
+        }
+        .continue-reading-meta {
+            font-size: 12px; color: var(--text-color); opacity: .7;
+            margin-top: 3px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .continue-reading-arrow {
+            flex: 0 0 auto; font-size: 26px; line-height: 1;
+            color: var(--text-color); opacity: .55;
+        }
+        .continue-reading-progress {
+            position: absolute; left: 0; bottom: 0;
+            height: 3px; border-radius: 0 3px 3px 0;
+            background: var(--accent-color);
+            transition: width .35s ease;
+        }
+
+        .footer-credit {
+            position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%);
+            z-index: 100; font-size: 0.85rem; font-weight: 500;
+            text-decoration: none; transition: all 0.3s ease;
+            color: var(--text-color); opacity: 0.7;
+        }
+        .footer-credit:hover { color: var(--accent-color); opacity: 1; text-shadow: 0 0 8px var(--accent-color); }
+
+        /* ================= ZEN ================= */
+        body.zen-mode .logo,
+        body.zen-mode .dynamic-island,
+        body.zen-mode .actions-row,
+        body.zen-mode .theme-toggle,
+        body.zen-mode .footer-credit,
+        body.zen-mode .flashlight,
+        body.zen-mode .toast-notification {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(-15px) scale(0.98) !important;
+        }
+
+        body.zen-mode .search-wrapper {
+            box-shadow: 0 0 40px var(--shadow-color), 0 0 0 1px transparent;
+        }
+
+        @media (max-width: 600px) {
+            .logo { font-size: 2.5rem; }
+            .search-wrapper { flex-direction: column; border-radius: 20px; padding: 10px; gap: 10px; }
+            .search-input { width: 100%; text-align: center; }
+            .engine-select { width: 100%; text-align: center; border-bottom: 1px solid var(--border-color); }
+            .search-btn { width: 100%; border-radius: 10px; }
+            .bookmarks-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+            .footer-credit { bottom: 10px; font-size: 0.75rem; }
+            
+            .toast-notification { 
+                bottom: 50px; right: auto; left: 50%; 
+                transform: translateX(-50%) translateY(20px) scale(0.95); 
+            }
+            .toast-notification.show { 
+                transform: translateX(-50%) translateY(0) scale(1); 
+            }
+
+            .actions-row {
+                margin-top: 24px;
+                gap: 10px;
+            }
+            .pill-btn {
+                padding: 10px 18px;
+                font-size: 0.92rem;
+                gap: 8px;
+            }
+            .pill-btn svg { width: 18px; height: 18px; }
+
+            .modal { border-radius: 24px; max-height: 90vh; }
+            .modal-header { padding: 16px; }
+            .modal-header h2 { font-size: 1.25rem; }
+            .modal-body { padding: 16px; }
+
+            .service-card { padding: 12px 14px; gap: 12px; }
+            .service-card-icon { width: 40px; height: 40px; font-size: 1.5rem; }
+            .service-card-name { font-size: 14px; }
+            .service-card-desc { font-size: 11px; }
+
+            .continue-reading { padding: 10px 14px 12px; gap: 12px; }
+            .continue-reading-cover { width: 38px; height: 50px; font-size: 17px; }
+            .continue-reading-title { font-size: 14px; }
+            .continue-reading-meta { font-size: 11px; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <canvas id="bubbleCanvas"></canvas>
+    <canvas id="lightCanvas"></canvas>
+    <canvas id="dustCanvas"></canvas>
+
+    <svg class="flashlight" id="flashlightLeft" viewBox="0 0 40 90" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="fgLeft" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#8d6e63"/>
+                <stop offset="50%" stop-color="#5d4037"/>
+                <stop offset="100%" stop-color="#2c1e16"/>
+            </linearGradient>
+        </defs>
+        <path class="flash-body" d="M 11 6 Q 11 1 16 1 L 24 1 Q 29 1 29 6 L 37 78 Q 38 86 31 86 L 9 86 Q 2 86 3 78 Z" fill="url(#fgLeft)" stroke="#a1887f" stroke-width="0.6"/>
+        <rect x="6" y="78" width="28" height="3" rx="1" fill="#a1887f" opacity="0.6"/>
+        <rect class="flash-lens" x="6" y="82" width="28" height="5" rx="2"/>
+    </svg>
+
+    <div class="toast-notification" id="greetingToast">
+        <span id="greetingText"></span>
+    </div>
+
+    <div class="dynamic-island" id="clockWidget" title="Нажмите для смены формата">
+        <div class="weather-display" id="weatherDisplay">
+            <span class="weather-city" id="weatherCity">Загрузка...</span>
+            <span class="weather-icon" id="weatherIcon">⏳</span>
+            <span class="weather-temp" id="weatherTemp">--°</span>
+        </div>
+        <div class="time-display" id="timeDisplay">00:00</div>
+        <div class="date-display" id="dateDisplay">1 января 2024</div>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" title="Сменить тему">☀️</button>
+
+    <div class="main-container">
+        <h1 class="logo">
+            <span>T</span><span>r</span><span>o</span><span>u</span><span>b</span><span>l</span><span>e</span><span>T</span><span>a</span><span>b</span>
+        </h1>
+
+        <div class="search-wrapper">
+            <select class="engine-select" id="searchEngine">
+                <option value="https://www.google.com/search?q=">Google</option>
+                <option value="https://yandex.ru/search/?text=">Yandex</option>
+                <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+                <option value="https://www.bing.com/search?q=">Bing</option>
+                <option value="https://otvet.mail.ru/search/new/">ответы Mail.ru</option>
+            </select>
+            <input type="text" class="search-input" id="searchInput" placeholder="что будем искать?" autocomplete="off">
+            <button class="search-btn" id="searchBtn" title="Найти">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </button>
+        </div>
+
+        <div class="actions-row">
+            <button class="pill-btn" id="openModalBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                Экспресс-панель
+            </button>
+            <button class="pill-btn" id="openServicesBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                Сервисы
+            </button>
+        </div>
+    </div>
+
+    <a href="https://github.com/zloba010" target="_blank" rel="noopener noreferrer" class="footer-credit">проект был написан kizamia</a>
+
+    <!-- ЭКСПРЕСС-ПАНЕЛЬ -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Экспресс-панель</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="bookmarksList">
+                    <button class="btn btn-add" id="addNewBtn">+ Добавить вкладку</button>
+                    <div class="bookmarks-grid" id="bookmarksGrid"></div>
+                </div>
+                <div class="bookmark-form" id="bookmarkForm">
+                    <div class="form-group">
+                        <label for="bmName">Название</label>
+                        <input type="text" id="bmName" placeholder="Например: YouTube">
+                    </div>
+                    <div class="form-group">
+                        <label for="bmUrl">URL ссылка</label>
+                        <input type="url" id="bmUrl" placeholder="https://youtube.com">
+                    </div>
+                    <div class="switch-group">
+                        <label>Своя иконка</label>
+                        <label class="switch">
+                            <input type="checkbox" id="bmCustomIconToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="form-group" id="customIconGroup" style="display: none;">
+                        <label for="bmIconUrl">URL иконки (изображения)</label>
+                        <input type="url" id="bmIconUrl" placeholder="https://example.com/icon.png">
+                    </div>
+                    <div class="form-actions">
+                        <button class="btn btn-danger" id="deleteBtn" style="display: none;">Удалить</button>
+                        <button class="btn btn-primary" id="saveBtn">Сохранить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="servicesOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Сервисы</h2>
+                <button class="close-btn" id="closeServicesBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="services-list" id="servicesList">
+                    <a class="service-card" id="serviceTile" href="/KFWR---Kizami-Free-Web-Reader/" aria-label="Открыть Kizamia Читалка">
+                        <div class="service-card-icon" aria-hidden="true">📖</div>
+                        <div class="service-card-info">
+                            <div class="service-card-name">Kizamia Читалка</div>
+                            <div class="service-card-desc">Читайте книги прямо в браузере</div>
+                        </div>
+                        <div class="service-card-arrow">›</div>
+                    </a>
+                    
+                    <div class="continue-reading" id="continueReading" hidden>
+                        <div class="continue-reading-cover" id="crCover">?</div>
+                        <div class="continue-reading-info">
+                            <div class="continue-reading-label">Продолжить чтение</div>
+                            <div class="continue-reading-title" id="crTitle"></div>
+                            <div class="continue-reading-meta" id="crMeta"></div>
+                        </div>
+                        <div class="continue-reading-arrow">›</div>
+                        <div class="continue-reading-progress" id="crProgress" style="width:0%"></div>
+                    </div>
+                
+                    <a class="service-card" href="https://zloba010.github.io/kizamianotes/" target="_blank" rel="noopener noreferrer" aria-label="Открыть Kizamia Заметки">
+                        <div class="service-card-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="3" width="16" height="18" rx="2.2"/>
+                                <path d="M8.5 3v18"/>
+                                <path d="M12.5 8h4.5M12.5 12h4.5M12.5 16h3"/>
+                                <circle cx="6.2" cy="7" r=".55" fill="currentColor" stroke="none"/>
+                                <circle cx="6.2" cy="12" r=".55" fill="currentColor" stroke="none"/>
+                                <circle cx="6.2" cy="17" r=".55" fill="currentColor" stroke="none"/>
+                            </svg>
+                        </div>
+                        <div class="service-card-info">
+                            <div class="service-card-name">Kizamia Заметки</div>
+                            <div class="service-card-desc">Быстрые заметки прямо в браузере</div>
+                        </div>
+                        <div class="service-card-arrow">›</div>
+                    </a>
+                   <a class="service-card" href="https://zloba010.github.io/KizamiaUpscaleImage/" target="_blank" rel="noopener noreferrer" aria-label="Открыть Kizamia Upscale Image">
+                        <div class="service-card-icon" aria-hidden="true">
+                            <svg width="32" height="32" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M42 5H37.4142C36.5233 5 36.0771 6.07714 36.7071 6.70711L41.2929 11.2929C41.9229 11.9229 43 11.4767 43 10.5858V6C43 5.44772 42.5523 5 42 5Z" fill="#000000"/>
+<path d="M8 43H12.5858C13.4767 43 13.9229 41.9229 13.2929 41.2929L8.70711 36.7071C8.07714 36.0771 7 36.5233 7 37.4142L7 42C7 42.5523 7.44772 43 8 43Z" fill="#000000"/>
+<path d="M14 4V32C14 33.1046 14.8954 34 16 34H44" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M21 13H35V27" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M14 13H6" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+<path d="M36 42V34" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+</svg>
+                        </div>
+                        <div class="service-card-info">
+                            <div class="service-card-name">Kizamia Upscale Image</div>
+                            <div class="service-card-desc">Бесплатный сервис улучшения изображений</div>
+                        </div>
+                        <div class="service-card-arrow">›</div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const clockWidget = document.getElementById('clockWidget');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const dateDisplay = document.getElementById('dateDisplay');
+        const weatherCity = document.getElementById('weatherCity');
+        const weatherIcon = document.getElementById('weatherIcon');
+        const weatherTemp = document.getElementById('weatherTemp');
+        const greetingToast = document.getElementById('greetingToast');
+        const greetingText = document.getElementById('greetingText');
+
+        let is24Hour = true, isAnimating = false;
+
+        const themes = ['light', 'dark', 'glass'];
+        const themeIcons = ['☀️', '🌙', '💎'];
+        const themeToggleBtn = document.getElementById('themeToggle');
+        let savedTheme = localStorage.getItem('troubleTabTheme') || 'light';
+        let currentThemeIndex = themes.indexOf(savedTheme);
+        if (currentThemeIndex === -1) currentThemeIndex = 0;
+
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchEngine = document.getElementById('searchEngine');
+
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const bookmarksList = document.getElementById('bookmarksList');
+        const bookmarksGrid = document.getElementById('bookmarksGrid');
+        const bookmarkForm = document.getElementById('bookmarkForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const addNewBtn = document.getElementById('addNewBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const bmName = document.getElementById('bmName');
+        const bmUrl = document.getElementById('bmUrl');
+        const bmCustomIconToggle = document.getElementById('bmCustomIconToggle');
+        const customIconGroup = document.getElementById('customIconGroup');
+        const bmIconUrl = document.getElementById('bmIconUrl');
+        let bookmarks = [];
+        try { const sb = localStorage.getItem('troubleTabBookmarks'); if (sb) bookmarks = JSON.parse(sb); } catch(e) {}
+        let editingIndex = -1;
+
+        const openServicesBtn = document.getElementById('openServicesBtn');
+        const closeServicesBtn = document.getElementById('closeServicesBtn');
+        const servicesOverlay = document.getElementById('servicesOverlay');
+
+        const canvas = document.getElementById('bubbleCanvas');
+        const ctx = canvas.getContext('2d');
+        let bubbles = [], animationId, isBubbleAnimating = false;
+
+        const lightCanvas = document.getElementById('lightCanvas');
+        const lightCtx = lightCanvas.getContext('2d');
+        const beamCanvas = document.createElement('canvas');
+        const beamCtx = beamCanvas.getContext('2d');
+        const shadowCanvas = document.createElement('canvas');
+        const shadowCtx = shadowCanvas.getContext('2d');
+        const fLeft = document.getElementById('flashlightLeft');
+        let leftLightOn = false;
+        let activeBeams = [];
+
+        const dustCanvas = document.getElementById('dustCanvas');
+        const dustCtx = dustCanvas.getContext('2d');
+        let dust = [], dustAnimId, isDustAnimating = false;
+        const mouse = { x: -1000, y: -1000, active: false };
+ 
+        let toastTimeout;
+        function showGreetingToast(text) {
+            greetingText.textContent = text;
+            greetingToast.classList.remove('show');
+            setTimeout(() => { greetingToast.classList.add('show'); }, 50);
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => { greetingToast.classList.remove('show'); }, 5000);
+        }
+
+        function updateGreeting(forceShow = false) {
+            const hour = new Date().getHours();
+            let period, greeting;
+            
+            if (hour >= 5 && hour < 12) { period = "morning"; greeting = "Доброе утро ☀️"; }
+            else if (hour >= 12 && hour < 18) { period = "day"; greeting = "Добрый день 🌤️"; }
+            else if (hour >= 18 && hour < 23) { period = "evening"; greeting = "Добрый вечер 🌆"; }
+            else { period = "night"; greeting = "Доброй ночи 🌙"; }
+
+            const lastPeriod = sessionStorage.getItem('greetingPeriod');
+            if (forceShow || lastPeriod !== period) {
+                sessionStorage.setItem('greetingPeriod', period);
+                showGreetingToast(greeting);
+            }
+        }
+
+        function updateClock() {
+            if (isAnimating) return;
+            const now = new Date();
+            let h = now.getHours(), m = now.getMinutes().toString().padStart(2, '0'), s;
+            if (is24Hour) s = `${h.toString().padStart(2,'0')}:${m}`;
+            else { const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12 || 12; s = `${h}:${m} ${ap}`; }
+            timeDisplay.textContent = s;
+            dateDisplay.textContent = now.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        clockWidget.addEventListener('click', () => {
+            if (isAnimating) return;
+            isAnimating = true;
+            clockWidget.classList.add('is-tyk');
+            timeDisplay.textContent = 'тык';
+            setTimeout(() => {
+                isAnimating = false;
+                is24Hour = !is24Hour;
+                clockWidget.classList.remove('is-tyk');
+                updateClock();
+            }, 1000);
+        });
+
+        function getCityFromTimezone() {
+            try {
+                const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+                const parts = tz.split('/');
+                let city = parts[parts.length - 1] || 'Moscow';
+                return city.replace(/_/g, ' ').trim();
+            } catch(e) { return 'Moscow'; }
+        }
+
+        function wmoToEmoji(code) {
+            if (code === 0) return '☀️';
+            if (code >= 1 && code <= 3) return '🌤️';
+            if (code === 45 || code === 48) return '🌫️';
+            if ((code >= 51 && code <= 57) || (code >= 61 && code <= 67)) return '🌧️';
+            if ((code >= 71 && code <= 77) || (code >= 85 && code <= 86)) return '❄️';
+            if (code >= 80 && code <= 82) return '🌦️';
+            if (code >= 95) return '⛈️';
+            return '🌡️';
+        }
+
+        async function fetchJSON(url, timeoutMs = 6000) {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeoutMs);
+            try {
+                const res = await fetch(url, { signal: controller.signal, cache: 'no-store' });
+                clearTimeout(timer);
+                if (!res.ok) return null;
+                const text = await res.text();
+                try { return JSON.parse(text); } catch(e) { return null; }
+            } catch(e) {
+                clearTimeout(timer);
+                return null;
+            }
+        }
+
+        function applyWeather(city, temp, code) {
+            weatherCity.textContent = city || '—';
+            if (temp === '--' || temp === null || temp === undefined || isNaN(temp)) {
+                weatherTemp.textContent = '--°';
+                weatherIcon.textContent = '🌡️';
+            } else {
+                weatherTemp.textContent = `${temp}°`;
+                weatherIcon.textContent = wmoToEmoji(code);
+            }
+        }
+
+        function loadWeatherCache() {
+            try {
+                const c = JSON.parse(localStorage.getItem('troubleTabWeather') || 'null');
+                if (c && (Date.now() - c.ts < 60 * 60 * 1000)) {
+                    applyWeather(c.city, c.temp, c.code);
+                    return true;
+                }
+            } catch(e) {}
+            return false;
+        }
+
+        function saveWeatherCache(city, temp, code) {
+            try {
+                localStorage.setItem('troubleTabWeather', JSON.stringify({ city, temp, code, ts: Date.now() }));
+            } catch(e) {}
+        }
+
+        async function initWeather() {
+            // 1. Проверяем кэш (1 час)
+            if (loadWeatherCache()) return;
+
+            // 2. Попытка получить координаты через браузер (Geolocation API)
+            // Работает только на HTTPS или localhost
+            try {
+                const geo = await new Promise((resolve, reject) => {
+                    if (!navigator.geolocation) return reject(new Error('Geolocation not supported'));
+                    navigator.geolocation.getCurrentPosition(
+                        (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+                        (err) => reject(err),
+                        { timeout: 6000, maximumAge: 600000 } // 10 минут кэш геолокации
+                    );
+                });
+
+                // Обратное геокодирование через Nominatim (OpenStreetMap) для получения названия города
+                let cityName = 'Мой город';
+                try {
+                    const nominatimUrl = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${geo.lat}&lon=${geo.lon}&accept-language=ru&zoom=10`;
+                    const nomData = await fetchJSON(nominatimUrl);
+                    if (nomData && nomData.address) {
+                        const addr = nomData.address;
+                        cityName = addr.city || addr.town || addr.village || addr.state || 'Мой город';
+                    }
+                } catch(e) {}
+
+                // Получение погоды через Open-Meteo по координатам
+                const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,weather_code&timezone=auto`;
+                const wData = await fetchJSON(wUrl);
+                
+                if (wData && wData.current) {
+                    const temp = Math.round(wData.current.temperature_2m);
+                    const code = wData.current.weather_code;
+                    applyWeather(cityName, temp, code);
+                    saveWeatherCache(cityName, temp, code);
+                    return;
+                }
+            } catch (e) {
+                console.log('Geolocation weather failed, falling back', e);
+            }
+
+            // 3. Фоллбэк: определение по часовому поясу + Open-Meteo Geocoding
+            try {
+                const tzCity = getCityFromTimezone();
+                const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(tzCity)}&count=1&language=ru&format=json`;
+                const geoData = await fetchJSON(geoUrl);
+                
+                if (geoData && geoData.results && geoData.results.length > 0) {
+                    const loc = geoData.results[0];
+                    const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${loc.latitude}&longitude=${loc.longitude}&current=temperature_2m,weather_code&timezone=auto`;
+                    const wData = await fetchJSON(wUrl);
+                    if (wData && wData.current) {
+                        const temp = Math.round(wData.current.temperature_2m);
+                        const code = wData.current.weather_code;
+                        applyWeather(loc.name, temp, code);
+                        saveWeatherCache(loc.name, temp, code);
+                        return;
+                    }
+                }
+            } catch(e) {
+                console.log('Timezone weather fallback failed', e);
+            }
+
+            // 4. Фоллбэк: определение по IP (если геолокация и часовой пояс не сработали)
+            try {
+                const ipData = await fetchJSON('https://ipwho.is/');
+                if (ipData && ipData.city && ipData.latitude && ipData.longitude) {
+                    const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${ipData.latitude}&longitude=${ipData.longitude}&current=temperature_2m,weather_code&timezone=auto`;
+                    const wData = await fetchJSON(wUrl);
+                    if (wData && wData.current) {
+                        const temp = Math.round(wData.current.temperature_2m);
+                        const code = wData.current.weather_code;
+                        applyWeather(ipData.city, temp, code);
+                        saveWeatherCache(ipData.city, temp, code);
+                        return;
+                    }
+                }
+            } catch(e) {
+                console.log('IP weather fallback failed', e);
+            }
+
+            // 5. Если ничего не сработало
+            applyWeather('Не определено', '--', null);
+        }
+
+        function applyTheme() {
+            const theme = themes[currentThemeIndex];
+            document.body.setAttribute('data-theme', theme);
+            themeToggleBtn.textContent = themeIcons[currentThemeIndex];
+            localStorage.setItem('troubleTabTheme', theme);
+
+            if (theme !== 'dark') {
+                leftLightOn = false;
+                fLeft.classList.remove('active');
+                activeBeams = [];
+                if (lightCanvas.width) lightCtx.clearRect(0, 0, lightCanvas.width, lightCanvas.height);
+            } else {
+                setTimeout(refreshLighting, 100);
+            }
+
+            stopBubbles();
+            stopDust();
+            if (theme === 'light') startBubbles();
+            if (theme === 'dark') startDust();
+        }
+        themeToggleBtn.addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            applyTheme();
+        });
+
+        function performSearch() {
+            const q = searchInput.value.trim();
+            if (!q) return;
+
+            const urlPattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/\S*)?$/i;
+            const isLocalhost = /^(https?:\/\/)?localhost(:\d+)?(\/\S*)?$/i.test(q);
+
+            if (urlPattern.test(q) || isLocalhost) {
+                let url = q;
+                if (!/^https?:\/\//i.test(url)) {
+                    url = 'https://' + url;
+                }
+                window.location.href = url;
+            } else {
+                window.location.href = searchEngine.value + encodeURIComponent(q);
+            }
+        }
+
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') performSearch(); });
+        searchEngine.addEventListener('change', () => localStorage.setItem('troubleTabEngine', searchEngine.value));
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => searchInput.focus(), 300);
+        }
+        function showListView() {
+            bookmarksList.style.display = 'block';
+            bookmarkForm.classList.remove('active');
+            modalTitle.textContent = 'Экспресс-панель';
+            renderBookmarks();
+        }
+        function showFormView(index = -1) {
+            bookmarksList.style.display = 'none';
+            bookmarkForm.classList.add('active');
+            editingIndex = index;
+            if (index === -1) {
+                modalTitle.textContent = 'Новая вкладка';
+                bmName.value = ''; bmUrl.value = '';
+                bmCustomIconToggle.checked = false; bmIconUrl.value = '';
+                customIconGroup.style.display = 'none';
+                deleteBtn.style.display = 'none';
+            } else {
+                modalTitle.textContent = 'Редактировать вкладку';
+                const bm = bookmarks[index];
+                bmName.value = bm.name; bmUrl.value = bm.url;
+                bmCustomIconToggle.checked = bm.isCustomIcon;
+                bmIconUrl.value = bm.iconUrl || '';
+                customIconGroup.style.display = bm.isCustomIcon ? 'flex' : 'none';
+                deleteBtn.style.display = 'block';
+            }
+        }
+        
+        function renderBookmarks() {
+            bookmarksGrid.innerHTML = '';
+            bookmarks.forEach((bm, i) => {
+                const a = document.createElement('a');
+                a.href = bm.url; a.className = 'bookmark-item'; a.target = '_blank';
+                a.addEventListener('contextmenu', e => { e.preventDefault(); showFormView(i); });
+
+                const editBtn = document.createElement('div');
+                editBtn.className = 'bookmark-edit-btn';
+                editBtn.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>`;
+                editBtn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); showFormView(i); });
+
+                const img = document.createElement('img');
+                img.className = 'bookmark-icon';
+                if (bm.isCustomIcon && bm.iconUrl) img.src = bm.iconUrl;
+                else {
+                    try {
+                        const d = new URL(bm.url).hostname;
+                        img.src = `https://www.google.com/s2/favicons?domain=${d}&sz=64`;
+                    } catch(e) { img.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="gray" fill="none"/></svg>'; }
+                }
+                
+                const s = document.createElement('span');
+                s.className = 'bookmark-title'; s.textContent = bm.name;
+                
+                a.appendChild(editBtn);
+                a.appendChild(img); 
+                a.appendChild(s);
+                bookmarksGrid.appendChild(a);
+            });
+        }
+
+        openModalBtn.addEventListener('click', () => { modalOverlay.classList.add('active'); showListView(); });
+        closeModalBtn.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+        addNewBtn.addEventListener('click', () => showFormView(-1));
+        bmCustomIconToggle.addEventListener('change', e => { customIconGroup.style.display = e.target.checked ? 'flex' : 'none'; });
+        saveBtn.addEventListener('click', () => {
+            const n = bmName.value.trim(); let u = bmUrl.value.trim();
+            if (!n || !u) return alert('Заполните название и URL');
+            if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+            const ic = bmCustomIconToggle.checked, iu = bmIconUrl.value.trim();
+            if (ic && !iu) return alert('Укажите URL иконки');
+            const data = { name: n, url: u, isCustomIcon: ic, iconUrl: iu };
+            if (editingIndex === -1) bookmarks.push(data); else bookmarks[editingIndex] = data;
+            localStorage.setItem('troubleTabBookmarks', JSON.stringify(bookmarks));
+            showListView();
+        });
+        deleteBtn.addEventListener('click', () => {
+            if (confirm('Удалить эту вкладку?')) {
+                bookmarks.splice(editingIndex, 1);
+                localStorage.setItem('troubleTabBookmarks', JSON.stringify(bookmarks));
+                showListView();
+            }
+        });
+
+        function openServices() {
+            servicesOverlay.classList.add('active');
+            renderServices();
+        }
+        function closeServices() {
+            servicesOverlay.classList.remove('active');
+            setTimeout(() => searchInput.focus(), 300);
+        }
+        openServicesBtn.addEventListener('click', openServices);
+        closeServicesBtn.addEventListener('click', closeServices);
+        servicesOverlay.addEventListener('click', e => { if (e.target === servicesOverlay) closeServices(); });
+
+        let zenTimer;
+        const ZEN_TIMEOUT = 300000; // 5 минут
+
+        function resetZenTimer() {
+            if (document.body.classList.contains('zen-mode')) {
+                document.body.classList.remove('zen-mode');
+            }
+            
+            clearTimeout(zenTimer);
+            
+            if (modalOverlay.classList.contains('active')) return;
+            if (servicesOverlay.classList.contains('active')) return;
+
+            zenTimer = setTimeout(() => {
+                if (document.activeElement !== searchInput || searchInput.value.trim() === '') {
+                    document.body.classList.add('zen-mode');
+                }
+            }, ZEN_TIMEOUT);
+        }
+
+        ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'wheel'].forEach(evt => {
+            window.addEventListener(evt, resetZenTimer, { passive: true });
+        });
+        
+        searchInput.addEventListener('input', resetZenTimer);
+        searchInput.addEventListener('focus', resetZenTimer);
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            adjustBubbleCount();
+        }
+        class Bubble {
+            constructor() { this.reset(); this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height; }
+            reset() {
+                this.radius = Math.random()*25 + 10;
+                this.x = Math.random()*canvas.width; this.y = Math.random()*canvas.height;
+                this.vx = (Math.random()-0.5)*0.8; this.vy = (Math.random()-0.5)*0.8;
+                this.opacity = Math.random()*0.3 + 0.1;
+                this.popping = false; this.popScale = 1;
+            }
+            update() {
+                if (this.popping) {
+                    this.popScale += 0.1; this.opacity -= 0.05;
+                    if (this.opacity <= 0) this.reset();
+                    return;
+                }
+                this.x += this.vx; this.y += this.vy;
+                if (this.x - this.radius < 0) { this.x = this.radius; this.vx *= -1; }
+                if (this.x + this.radius > canvas.width) { this.x = canvas.width - this.radius; this.vx *= -1; }
+                if (this.y - this.radius < 0) { this.y = this.radius; this.vy *= -1; }
+                if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy *= -1; }
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius*this.popScale, 0, Math.PI*2);
+                ctx.fillStyle = `rgba(62, 39, 35, ${this.opacity})`;
+                ctx.fill();
+                ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity+0.1})`;
+                ctx.lineWidth = 1; ctx.stroke();
+            }
+        }
+        function adjustBubbleCount() {
+            if (!isBubbleAnimating) return;
+            const area = canvas.width * canvas.height;
+            let c = Math.max(5, Math.min(50, Math.floor(area/25000)));
+            while (bubbles.length < c) bubbles.push(new Bubble());
+            while (bubbles.length > c) bubbles.pop();
+        }
+        function handleCollisions() {
+            for (let i = 0; i < bubbles.length; i++) {
+                for (let j = i+1; j < bubbles.length; j++) {
+                    let b1 = bubbles[i], b2 = bubbles[j];
+                    if (b1.popping || b2.popping) continue;
+                    let dx = b2.x-b1.x, dy = b2.y-b1.y;
+                    let d = Math.sqrt(dx*dx+dy*dy), md = b1.radius+b2.radius;
+                    if (d < md) {
+                        let a = Math.atan2(dy,dx), sn = Math.sin(a), cs = Math.cos(a);
+                        let vx1 = b1.vx*cs+b1.vy*sn, vy1 = b1.vy*cs-b1.vx*sn;
+                        let vx2 = b2.vx*cs+b2.vy*sn, vy2 = b2.vy*cs-b2.vx*sn;
+                        let t = vx1; vx1 = vx2; vx2 = t;
+                        b1.vx = vx1*cs-vy1*sn; b1.vy = vy1*cs+vx1*sn;
+                        b2.vx = vx2*cs-vy2*sn; b2.vy = vy2*cs+vx2*sn;
+                        let o = md-d;
+                        b1.x -= (o/2)*cs; b1.y -= (o/2)*sn;
+                        b2.x += (o/2)*cs; b2.y += (o/2)*sn;
+                    }
+                }
+            }
+        }
+        function animateBubbles() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            handleCollisions();
+            bubbles.forEach(b => { b.update(); b.draw(); });
+            animationId = requestAnimationFrame(animateBubbles);
+        }
+        function startBubbles() {
+            if (isBubbleAnimating) return;
+            isBubbleAnimating = true;
+            resizeCanvas(); bubbles = []; adjustBubbleCount(); animateBubbles();
+        }
+        function stopBubbles() {
+            isBubbleAnimating = false;
+            cancelAnimationFrame(animationId);
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+        }
+        canvas.addEventListener('click', e => {
+            if (!isBubbleAnimating) return;
+            const r = canvas.getBoundingClientRect();
+            const x = e.clientX-r.left, y = e.clientY-r.top;
+            for (let i = bubbles.length-1; i >= 0; i--) {
+                let b = bubbles[i];
+                if (b.popping) continue;
+                if (Math.hypot(x-b.x, y-b.y) < b.radius) { b.popping = true; break; }
+            }
+        });
+
+        function resizeDustCanvas() {
+            dustCanvas.width = window.innerWidth;
+            dustCanvas.height = window.innerHeight;
+            adjustDustCount();
+        }
+        function adjustDustCount() {
+            if (!isDustAnimating) return;
+            const area = dustCanvas.width * dustCanvas.height;
+            const target = Math.max(30, Math.min(140, Math.floor(area / 12000)));
+            while (dust.length < target) dust.push(new Dust());
+            while (dust.length > target) dust.pop();
+        }
+        class Dust {
+            constructor() {
+                this.reset();
+                this.x = Math.random() * dustCanvas.width;
+                this.y = Math.random() * dustCanvas.height;
+            }
+            reset() {
+                this.x = Math.random() * dustCanvas.width;
+                this.y = Math.random() * dustCanvas.height;
+                this.z = Math.random();
+                const speed = 0.20 + this.z * 0.50;
+                const ang = Math.random() * Math.PI * 2;
+                this.vx = Math.cos(ang) * speed;
+                this.vy = Math.sin(ang) * speed;
+                this.baseSize = 0.76 + this.z * 2;
+            }
+            update() {
+                if (mouse.active) {
+                    const dx = this.x - mouse.x, dy = this.y - mouse.y;
+                    const dist2 = dx*dx + dy*dy;
+                    const radius = 110;
+                    if (dist2 < radius*radius && dist2 > 0.0001) {
+                        const dist = Math.sqrt(dist2);
+                        const force = (1 - dist/radius) * 0.09;
+                        this.vx += (dx/dist) * force;
+                        this.vy += (dy/dist) * force;
+                    }
+                }
+                this.vx *= 0.999;
+                this.vy *= 0.999;
+                this.vx += (Math.random() - 0.5) * 0.020;
+                this.vy += (Math.random() - 0.5) * 0.020;
+                const sp2 = this.vx*this.vx + this.vy*this.vy;
+                if (sp2 < 0.0010) {
+                    const a = Math.random() * Math.PI * 2;
+                    this.vx += Math.cos(a) * 0.01;
+                    this.vy += Math.sin(a) * 0.01;
+                }
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < -10) this.x = dustCanvas.width + 10;
+                if (this.x > dustCanvas.width + 10) this.x = -10;
+                if (this.y < -10) this.y = dustCanvas.height + 10;
+                if (this.y > dustCanvas.height + 10) this.y = -10;
+            }
+            draw() {
+                let lit = 0;
+                for (const beam of activeBeams) {
+                    const dx = this.x - beam.source.x, dy = this.y - beam.source.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist > beam.length || dist < 0.001) continue;
+                    const pointAngle = Math.atan2(dy, dx);
+                    let aDiff = pointAngle - beam.angle;
+                    while (aDiff > Math.PI) aDiff -= 2*Math.PI;
+                    while (aDiff < -Math.PI) aDiff += 2*Math.PI;
+                    aDiff = Math.abs(aDiff);
+                    if (aDiff < beam.halfSpread) {
+                        const distFall = Math.max(0, 1 - dist / beam.length);
+                        const angFall = 1 - aDiff / beam.halfSpread;
+                        lit = Math.max(lit, distFall * angFall);
+                    }
+                }
+                const baseOp = 0.06 + this.z * 0.10;
+                const litOp  = 0.18 + this.z * 0.50;
+                const op = baseOp + (litOp - baseOp) * lit;
+                const r = Math.round(200 + lit * 55);
+                const g = Math.round(190 + lit * 50);
+                const b = Math.round(170 + lit * 10);
+                dustCtx.fillStyle = `rgba(${r},${g},${b},${op})`;
+                dustCtx.beginPath();
+                dustCtx.arc(this.x, this.y, this.baseSize, 0, Math.PI * 2);
+                dustCtx.fill();
+            }
+        }
+        function animateDust() {
+            dustCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+            dust.forEach(p => { p.update(); p.draw(); });
+            dustAnimId = requestAnimationFrame(animateDust);
+        }
+        function startDust() {
+            if (isDustAnimating) return;
+            isDustAnimating = true;
+            resizeDustCanvas();
+            if (dust.length === 0) {
+                const area = dustCanvas.width * dustCanvas.height;
+                const target = Math.max(30, Math.min(140, Math.floor(area / 12000)));
+                for (let i = 0; i < target; i++) dust.push(new Dust());
+            }
+            animateDust();
+        }
+        function stopDust() {
+            isDustAnimating = false;
+            cancelAnimationFrame(dustAnimId);
+            dustCtx.clearRect(0, 0, dustCanvas.width, dustCanvas.height);
+        }
+        document.addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
+        document.documentElement.addEventListener('mouseleave', () => { mouse.active = false; });
+        window.addEventListener('blur', () => { mouse.active = false; });
+
+        function resizeLightCanvases() {
+            const w = window.innerWidth, h = window.innerHeight;
+            [lightCanvas, beamCanvas, shadowCanvas].forEach(c => { c.width = w; c.height = h; });
+        }
+        function getObstacles() {
+            const arr = [];
+            const add = el => {
+                const r = el.getBoundingClientRect();
+                if (r.width > 0 && r.height > 0) {
+                    arr.push({
+                        x: r.left, y: r.top, w: r.width, h: r.height,
+                        corners: [
+                            {x: r.left, y: r.top}, {x: r.right, y: r.top},
+                            {x: r.right, y: r.bottom}, {x: r.left, y: r.bottom}
+                        ]
+                    });
+                }
+            };
+            document.querySelectorAll('.logo span').forEach(add);
+            const sw = document.querySelector('.search-wrapper'); if (sw) add(sw);
+            document.querySelectorAll('.pill-btn').forEach(add);
+            const cw = document.getElementById('clockWidget'); if (cw) add(cw);
+            return arr;
+        }
+        function updateFlashlightPosition() {
+            const sw = document.querySelector('.search-wrapper');
+            const sr = sw.getBoundingClientRect();
+            const tx = sr.left + sr.width/2, ty = sr.top + sr.height/2;
+            const lPivot = { x: -9, y: -12 };
+            const lDx = tx - lPivot.x, lDy = ty - lPivot.y;
+            const lRot = Math.atan2(-lDx, lDy) * 180/Math.PI;
+            fLeft.style.transform = `rotate(${lRot}deg)`;
+            const lensLen = 66;
+            const lAng = lRot * Math.PI / 180;
+            return { x: lPivot.x - lensLen * Math.sin(lAng), y: lPivot.y + lensLen * Math.cos(lAng) };
+        }
+        function drawBeam(beam, obstacles, intensity) {
+            const w = beamCanvas.width, h = beamCanvas.height;
+            beamCtx.clearRect(0, 0, w, h);
+            const { source, angle, halfSpread, length } = beam;
+            const blurAmount = Math.max(w, h) * 0.04;
+
+            beamCtx.save();
+            beamCtx.filter = `blur(${blurAmount}px)`;
+            const grad = beamCtx.createRadialGradient(source.x, source.y, 0, source.x, source.y, length);
+            grad.addColorStop(0,    `rgba(255, 248, 200, ${0.95 * intensity})`);
+            grad.addColorStop(0.1,  `rgba(255, 240, 150, ${0.70 * intensity})`);
+            grad.addColorStop(0.3,  `rgba(255, 230, 100, ${0.42 * intensity})`);
+            grad.addColorStop(0.55, `rgba(255, 215, 80,  ${0.22 * intensity})`);
+            grad.addColorStop(0.8,  `rgba(255, 205, 70,  ${0.08 * intensity})`);
+            grad.addColorStop(1,    `rgba(255, 200, 60, 0)`);
+            beamCtx.beginPath();
+            beamCtx.moveTo(source.x, source.y);
+            beamCtx.arc(source.x, source.y, length, angle - halfSpread, angle + halfSpread);
+            beamCtx.closePath();
+            beamCtx.fillStyle = grad;
+            beamCtx.fill();
+            beamCtx.restore();
+
+            shadowCtx.clearRect(0, 0, w, h);
+            const shadowMaxLen = Math.max(w, h) * 0.4;
+            obstacles.forEach(o => {
+                shadowCtx.fillStyle = 'rgba(0,0,0,1)';
+                shadowCtx.fillRect(o.x, o.y, o.w, o.h);
+                const proj = o.corners.map(c => {
+                    const dx = c.x - source.x, dy = c.y - source.y;
+                    const dist = Math.hypot(dx, dy) || 1;
+                    const scale = shadowMaxLen / dist;
+                    return { x: c.x + dx*scale, y: c.y + dy*scale };
+                });
+                const cx = o.x + o.w/2, cy = o.y + o.h/2;
+                const px = (proj[0].x + proj[1].x + proj[2].x + proj[3].x) / 4;
+                const py = (proj[0].y + proj[1].y + proj[2].y + proj[3].y) / 4;
+                const sGrad = shadowCtx.createLinearGradient(cx, cy, px, py);
+                sGrad.addColorStop(0,   'rgba(0,0,0,1)');
+                sGrad.addColorStop(0.35,'rgba(0,0,0,0.75)');
+                sGrad.addColorStop(0.75,'rgba(0,0,0,0.2)');
+                sGrad.addColorStop(1,   'rgba(0,0,0,0)');
+                shadowCtx.fillStyle = sGrad;
+                shadowCtx.beginPath();
+                shadowCtx.moveTo(proj[0].x, proj[0].y);
+                shadowCtx.lineTo(proj[1].x, proj[1].y);
+                shadowCtx.lineTo(proj[2].x, proj[2].y);
+                shadowCtx.lineTo(proj[3].x, proj[3].y);
+                shadowCtx.closePath();
+                shadowCtx.fill();
+            });
+
+            beamCtx.save();
+            beamCtx.globalCompositeOperation = 'destination-out';
+            beamCtx.filter = `blur(${Math.max(w, h) * 0.012}px)`;
+            beamCtx.drawImage(shadowCanvas, 0, 0);
+            beamCtx.restore();
+
+            lightCtx.save();
+            lightCtx.globalCompositeOperation = 'lighter';
+            lightCtx.drawImage(beamCanvas, 0, 0);
+            lightCtx.restore();
+        }
+        function refreshLighting() {
+            if (!lightCanvas.width) resizeLightCanvases();
+            lightCtx.clearRect(0, 0, lightCanvas.width, lightCanvas.height);
+            activeBeams = [];
+            if (!leftLightOn) return;
+            const sw = document.querySelector('.search-wrapper');
+            const sr = sw.getBoundingClientRect();
+            const target = { x: sr.left + sr.width/2, y: sr.top + sr.height/2 };
+            const source = updateFlashlightPosition();
+            const angle = Math.atan2(target.y - source.y, target.x - source.x);
+            const halfSpread = Math.PI / 5;
+            const length = Math.hypot(lightCanvas.width, lightCanvas.height) * 1.4;
+            const beam = { source, target, angle, halfSpread, length };
+            activeBeams.push(beam);
+            const obstacles = getObstacles();
+            drawBeam(beam, obstacles, 1.0);
+        }
+
+        const KIZAMI_LIB_KEY = 'kizami.library.v1';
+        const READER_URL = '/KFWR---Kizami-Free-Web-Reader/';
+
+        function getContinueReadingBook(){
+            try {
+                const raw = localStorage.getItem(KIZAMI_LIB_KEY);
+                if (!raw) return null;
+                const lib = JSON.parse(raw);
+                if (!Array.isArray(lib) || !lib.length) return null;
+                const candidates = lib.filter(b =>
+                    b && typeof b.id === 'string' &&
+                    typeof b.title === 'string' && b.title.trim() &&
+                    (b.page || 0) > 0 &&
+                    (b.totalPages || 0) > 0
+                );
+                if (!candidates.length) return null;
+                return candidates.sort((a, b) => (b.lastOpened || 0) - (a.lastOpened || 0))[0];
+            } catch(e){ return null; }
+        }
+
+        function renderServices(){
+            const tile = document.getElementById('serviceTile');
+            const continueEl = document.getElementById('continueReading');
+            if (!tile || !continueEl) return;
+
+            const book = getContinueReadingBook();
+
+            if (!book){
+                tile.hidden = false;
+                continueEl.hidden = true;
+                return;
+            }
+
+            tile.hidden = true;
+            continueEl.hidden = false;
+
+            const initial = (book.title || '?').trim().charAt(0).toUpperCase() || '?';
+            const author = (book.author || '').trim() || 'Неизвестный автор';
+            const pageNum = Math.min((book.page || 0) + 1, book.totalPages || 1);
+            const pct = Math.max(1, Math.min(99, Math.round((book.page / book.totalPages) * 100)));
+
+            document.getElementById('crCover').textContent = initial;
+            document.getElementById('crTitle').textContent = book.title;
+            document.getElementById('crMeta').textContent = `${author} · Стр. ${pageNum} из ${book.totalPages}`;
+            document.getElementById('crProgress').style.width = pct + '%';
+
+            continueEl.onclick = () => {
+                window.location.href = READER_URL + '?book=' + encodeURIComponent(book.id);
+            };
+        }
+
+        (function watchKizamiChannel(){
+            if (!window.BroadcastChannel) return;
+            try {
+                const bc = new BroadcastChannel('kizami');
+                bc.onmessage = (e) => {
+                    const d = e.data || {};
+                    if (d.type === 'progress' || d.type === 'library-changed'){
+                        renderServices();
+                    }
+                };
+            } catch(e){}
+        })();
+
+        window.addEventListener('focus', () => {
+            renderServices();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) renderServices();
+        });
+        window.addEventListener('storage', (e) => {
+            if (e.key === KIZAMI_LIB_KEY) renderServices();
+        });
+
+        fLeft.addEventListener('click', () => {
+            leftLightOn = !leftLightOn;
+            fLeft.classList.toggle('active', leftLightOn);
+            refreshLighting();
+        });
+        window.addEventListener('resize', () => {
+            resizeCanvas(); resizeDustCanvas(); resizeLightCanvases(); refreshLighting();
+        });
+        window.addEventListener('load', () => {
+            searchInput.focus();
+            const se = localStorage.getItem('troubleTabEngine');
+            if (se) searchEngine.value = se;
+            
+            updateGreeting();
+            setInterval(() => updateGreeting(false), 60000);
+            
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            renderBookmarks();
+            resizeLightCanvases();
+            resizeDustCanvas();
+            applyTheme();
+            
+            initWeather();
+            setInterval(initWeather, 30 * 60 * 1000);
+
+            resetZenTimer();
+        });
+        setTimeout(() => { updateFlashlightPosition(); refreshLighting(); }, 200);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && servicesOverlay.classList.contains('active')) {
+                closeServices();
+            }
+        });
+    </script>
+</body>
+</html>
