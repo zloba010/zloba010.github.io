@@ -1,17 +1,23 @@
 {
-  "last_updated": "2026-11-27T17:48:09+00:00",
+  "last_updated": "2026-11-27T19:10:46+00:00",
   "sites": {
     "Root": {
       "url": "https://zloba010.github.io/",
       "repo": "zloba010.github.io",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 69,
+      "current_ms": 170,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
           "status": "up",
           "ms": 69,
+          "code": 200
+        },
+        {
+          "time": "2026-11-27T19:10:46+00:00",
+          "status": "up",
+          "ms": 170,
           "code": 200
         }
       ]
@@ -21,12 +27,18 @@
       "repo": "KFWR---Kizami-Free-Web-Reader",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 84,
+      "current_ms": 101,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
           "status": "up",
           "ms": 84,
+          "code": 200
+        },
+        {
+          "time": "2026-11-27T19:10:46+00:00",
+          "status": "up",
+          "ms": 101,
           "code": 200
         }
       ]
@@ -36,12 +48,18 @@
       "repo": "kizamianotes",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": -509,
+      "current_ms": 100,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
           "status": "up",
           "ms": -509,
+          "code": 200
+        },
+        {
+          "time": "2026-11-27T19:10:46+00:00",
+          "status": "up",
+          "ms": 100,
           "code": 200
         }
       ]
@@ -51,12 +69,18 @@
       "repo": "KizamiaUpscaleImage",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 75,
+      "current_ms": 134,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
           "status": "up",
           "ms": 75,
+          "code": 200
+        },
+        {
+          "time": "2026-11-27T19:10:46+00:00",
+          "status": "up",
+          "ms": 134,
           "code": 200
         }
       ]
@@ -66,12 +90,18 @@
       "repo": "Kizamia-Weather",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 67,
+      "current_ms": 638,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
           "status": "up",
           "ms": 67,
+          "code": 200
+        },
+        {
+          "time": "2026-11-27T19:10:46+00:00",
+          "status": "up",
+          "ms": 638,
           "code": 200
         }
       ]
