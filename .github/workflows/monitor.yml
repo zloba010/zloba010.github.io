@@ -1,0 +1,111 @@
+name: Ecosystem Monitor
+on:
+  schedule:
+    - cron: '*/5 * * * *' # Каждые 5 минут
+  workflow_dispatch: # Ручной запуск
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Check Websites and Update Data
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Определяем сайты для проверки: "Имя|URL|RepoName"
+          SITES=(
+            "Root|https://zloba010.github.io/|zloba010.github.io"
+            "KFWR|https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader/|KFWR---Kizami-Free-Web-Reader"
+            "Kizamia Notes|https://zloba010.github.io/kizamianotes/|kizamianotes"
+            "Upscale Image|https://zloba010.github.io/KizamiaUpscaleImage/|KizamiaUpscaleImage"
+            "Kizamia Weather|https://zloba010.github.io/Kizamia-Weather/|Kizamia-Weather"
+          )
+
+          # Инициализируем или читаем существующий JSON
+          if [ -f uptime-data.json ]; then
+            DATA=$(cat uptime-data.json)
+          else
+            DATA='{"last_updated": "", "sites": {}}'
+          fi
+
+          CURRENT_TIME=$(date -Iseconds)
+          echo "Начало проверки: $CURRENT_TIME"
+
+          for site_info in "${SITES[@]}"; do
+            IFS='|' read -r name url repo <<< "$site_info"
+            
+            # Замер времени и получение HTTP кода
+            START=$(date +%s%3N)
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 5 "$url")
+            END=$(date +%s%3N)
+            RESPONSE_TIME=$((END - START))
+
+            # Определение статуса
+            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
+              STATUS="up"
+            else
+              STATUS="down"
+            fi
+
+            echo "Проверка $name: $STATUS (${RESPONSE_TIME}мс, код: $HTTP_CODE)"
+
+            # Обновление JSON с помощью jq (установлен в ubuntu-latest)
+            # Добавляем новую запись в историю и обрезаем до последних 288 записей (24 часа при интервале 5 мин)
+            DATA=$(echo "$DATA" | jq --arg name "$name" --arg url "$url" --arg repo "$repo" \
+                                      --arg status "$STATUS" --argjson code "$HTTP_CODE" --argjson ms "$RESPONSE_TIME" --arg time "$CURRENT_TIME" '
+              .last_updated = $time |
+              .sites[$name] = {
+                url: $url,
+                repo: $repo,
+                current_status: $status,
+                current_code: $code,
+                current_ms: $ms,
+                history: ((.sites[$name].history // []) + [{time: $time, status: $status, ms: $ms, code: $code}]) | .[-288:]
+              }
+            ')
+
+            # ЛОГИКА АЛЕРТОВ: Если сайт упал, создаем Issue (если его еще нет)
+            if [ "$STATUS" == "down" ]; then
+              ISSUE_TITLE="🚨 Сайт недоступен: $name"
+              # Проверяем, есть ли уже открытый issue с таким названием
+              OPEN_ISSUE=$(gh issue list --repo "$REPO" --search "in:title \"$ISSUE_TITLE\" is:open" --json number --jq 'length')
+              
+              if [ "$OPEN_ISSUE" -eq 0 ]; then
+                echo "Создание алерта для $name..."
+                gh issue create --repo "$REPO" \
+                  --title "$ISSUE_TITLE" \
+                  --body "Сайт [$name]($url) вернул код ответа **$HTTP_CODE**.\n\nВремя проверки: $CURRENT_TIME\nВремя отклика: ${RESPONSE_TIME}мс" \
+                  --label "monitoring-alert"
+              fi
+            else
+              # Если сайт поднялся, закрываем соответствующие открытые issues
+              ISSUE_TITLE="🚨 Сайт недоступен: $name"
+              OPEN_ISSUES=$(gh issue list --repo "$REPO" --search "in:title \"$ISSUE_TITLE\" is:open" --json number --jq '.[].number')
+              for issue_num in $OPEN_ISSUES; do
+                echo "Сайт $name восстановлен. Закрываем Issue #$issue_num"
+                gh issue close "$issue_num" --repo "$REPO" --comment "✅ Сайт $name снова доступен. Проверка прошла успешно."
+              done
+            fi
+          done
+
+          # Сохраняем обновленный JSON
+          echo "$DATA" | jq '.' > uptime-data.json
+          
+          # Коммитим изменения, если они есть
+          if git diff --quiet uptime-data.json; then
+            echo "Изменений нет, пропускаем коммит."
+          else
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Monitor Bot"
+            git add uptime-data.json
+            git commit -m "chore: update uptime monitoring data"
+            git push
+          fi
