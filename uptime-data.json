@@ -1,0 +1,80 @@
+{
+  "last_updated": "2026-11-27T17:48:09+00:00",
+  "sites": {
+    "Root": {
+      "url": "https://zloba010.github.io/",
+      "repo": "zloba010.github.io",
+      "current_status": "up",
+      "current_code": 200,
+      "current_ms": 69,
+      "history": [
+        {
+          "time": "2026-11-27T17:48:09+00:00",
+          "status": "up",
+          "ms": 69,
+          "code": 200
+        }
+      ]
+    },
+    "KFWR": {
+      "url": "https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader/",
+      "repo": "KFWR---Kizami-Free-Web-Reader",
+      "current_status": "up",
+      "current_code": 200,
+      "current_ms": 84,
+      "history": [
+        {
+          "time": "2026-11-27T17:48:09+00:00",
+          "status": "up",
+          "ms": 84,
+          "code": 200
+        }
+      ]
+    },
+    "Kizamia Notes": {
+      "url": "https://zloba010.github.io/kizamianotes/",
+      "repo": "kizamianotes",
+      "current_status": "up",
+      "current_code": 200,
+      "current_ms": -509,
+      "history": [
+        {
+          "time": "2026-11-27T17:48:09+00:00",
+          "status": "up",
+          "ms": -509,
+          "code": 200
+        }
+      ]
+    },
+    "Upscale Image": {
+      "url": "https://zloba010.github.io/KizamiaUpscaleImage/",
+      "repo": "KizamiaUpscaleImage",
+      "current_status": "up",
+      "current_code": 200,
+      "current_ms": 75,
+      "history": [
+        {
+          "time": "2026-11-27T17:48:09+00:00",
+          "status": "up",
+          "ms": 75,
+          "code": 200
+        }
+      ]
+    },
+    "Kizamia Weather": {
+      "url": "https://zloba010.github.io/Kizamia-Weather/",
+      "repo": "Kizamia-Weather",
+      "current_status": "up",
+      "current_code": 200,
+      "current_ms": 67,
+      "history": [
+        {
+          "time": "2026-11-27T17:48:09+00:00",
+          "status": "up",
+          "ms": 67,
+          "code": 200
+        }
+      ]
+    }
+  }
+}
