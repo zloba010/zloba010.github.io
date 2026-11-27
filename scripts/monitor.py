@@ -75,7 +75,7 @@ for site in SITES:
     code, ms, ok = ping(url)
     status = "up" if ok else "down"
     
-    # Инициализируем структуру сайта
+    # Инициализируем структуру сайта с защитой от старых данных
     if name not in data["sites"]:
         data["sites"][name] = {
             "url": url,
@@ -92,8 +92,17 @@ for site in SITES:
         }
     
     s = data["sites"][name]
-    s["url"] = url
-    s["repo"] = repo
+    
+    # Миграция старых данных: добавляем отсутствующие поля
+    s.setdefault("url", url)
+    s.setdefault("repo", repo)
+    s.setdefault("history", [])
+    s.setdefault("daily", [])
+    s.setdefault("incidents", [])
+    s.setdefault("deploys", [])
+    s.setdefault("commits", [])
+    s.setdefault("runs", [])
+    
     s["current_status"] = status
     s["current_code"] = code
     s["current_ms"] = ms
