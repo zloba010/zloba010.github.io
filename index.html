@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KizamiaDev — разработка веб-приложений и программ</title>
+<style>
+  :root{
+    --bg:#0f1117; --panel:#171a23; --border:#262b3a;
+    --text:#e8eaf2; --muted:#9aa3b8; --accent:#6c8cff;
+    --accent2:#8b5cf6; --code:#ffd166;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+       background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .grain{position:fixed;inset:0;pointer-events:none;opacity:.06;z-index:0;
+        background-image:radial-gradient(rgba(255,255,255,.6) 1px,transparent 1px);
+        background-size:3px 3px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+
+  /* Nav */
+  nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(14px);
+      background:rgba(15,17,23,.75);border-bottom:1px solid var(--border)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;
+            padding-top:14px;padding-bottom:14px}
+  .logo{font-weight:800;letter-spacing:.5px;font-size:18px}
+  .logo span{color:var(--accent)}
+  .nav-links{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;
+               transition:color .2s}
+  .nav-links a:hover{color:var(--text)}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;
+       border-radius:999px;font-weight:600;font-size:14px;text-decoration:none;
+       border:1px solid var(--border);color:var(--text);
+       background:var(--panel);transition:.2s}
+  .btn:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+  .btn-cta{background:linear-gradient(135deg,var(--accent),var(--accent2));
+           border:none;color:#fff}
+  .btn-cta:hover{filter:brightness(1.1);color:#fff}
+
+  /* Hero */
+  header{padding:84px 0 64px;text-align:center}
+  .badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;
+         border-radius:999px;font-size:13px;color:var(--muted);
+         border:1px solid var(--border);background:var(--panel);margin-bottom:22px}
+  .badge .dot{width:8px;height:8px;border-radius:50%;background:#34d399;
+              box-shadow:0 0 12px #34d399}
+  h1{font-size:clamp(30px,5vw,52px);line-height:1.15;font-weight:800;
+     letter-spacing:-.5px;margin-bottom:18px}
+  h1 .grad{background:linear-gradient(135deg,var(--accent),var(--accent2));
+           -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--muted);font-size:clamp(15px,2vw,18px);max-width:640px;margin:0 auto}
+  .hero-actions{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;
+                margin-top:32px}
+
+  /* Sections */
+  section{padding:64px 0;border-top:1px solid var(--border)}
+  .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+            margin-bottom:30px}
+  .sec-head h2{font-size:24px;font-weight:700;letter-spacing:-.3px}
+  .sec-head .tag{color:var(--muted);font-size:13px;border:1px solid var(--border);
+                 padding:4px 10px;border-radius:6px}
+
+  /* About */
+  .about-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:center}
+  .about-text p{margin-bottom:16px;color:var(--text)}
+  .about-text p:last-child{margin-bottom:0}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+  .stat{background:var(--panel);border:1px solid var(--border);border-radius:14px;
+        padding:20px;text-align:center}
+  .stat b{display:block;font-size:26px;font-weight:800;color:var(--accent)}
+  .stat span{font-size:13px;color:var(--muted)}
+
+  /* Projects */
+  .proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+             gap:20px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:18px;
+        padding:26px;display:flex;flex-direction:column;gap:14px;transition:.25s;
+        position:relative;overflow:hidden}
+  .card:hover{transform:translateY(-4px);border-color:#3a4155}
+  .card .icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+              font-size:22px;background:rgba(108,140,255,.12)}
+  .card h3{font-size:18px;font-weight:700}
+  .card p{color:var(--muted);font-size:14.5px;flex:1}
+  .card .foot{display:flex;align-items:center;justify-content:space-between;
+              margin-top:6px}
+  .card .tag-line{font-size:12.5px;color:var(--accent);font-weight:600}
+  .card a{color:var(--accent);text-decoration:none;font-size:14px;font-weight:600;
+          white-space:nowrap}
+  .card a:hover{text-decoration:underline}
+  .more-card{background:linear-gradient(160deg,rgba(108,140,255,.14),rgba(139,92,246,.1));
+             border-style:dashed}
+
+  /* Footer */
+  footer{padding:48px 0 36px;border-top:1px solid var(--border);text-align:center;
+         color:var(--muted);font-size:14px}
+  footer .links{display:flex;gap:22px;justify-content:center;flex-wrap:wrap;
+                margin:18px 0 10px}
+  footer a{color:var(--accent);text-decoration:none}
+
+  @media (max-width:760px){
+    .about-grid{grid-template-columns:1fr}
+    .stat-row{grid-template-columns:1fr}
+    .nav-links .btn-cta{display:none}
+    nav .wrap{flex-direction:column;gap:12px}
+  }
+</style>
+</head>
+<body>
+<div class="grain"></div>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Kizamia<span>.Dev</span></div>
+    <div class="nav-links">
+      <a href="#about">Обо мне</a>
+      <a href="#projects">Проекты</a>
+      <a href="https://github.com/zloba010" target="_blank" rel="noopener">GitHub</a>
+      <a href="#contact" class="btn btn-cta">Связаться</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header>
+    <div class="badge"><span class="dot"></span> открыт к заказам и интересным задачам</div>
+    <h1>Разработка веб-приложений и программ — <span class="grad">под ключ</span> и для всех</h1>
+    <p class="sub">Привет! Меня зовут <b>Kizamia</b>. Я делаю сайты, веб-приложения и программы:
+    от идеи и дизайна до запуска и поддержки как для бизнеса,
+    так и просто для людей.</p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn btn-cta">Смотреть работы</a>
+      <a href="https://github.com/zloba010" target="_blank" rel="noopener" class="btn">GitHub профиля</a>
+    </div>
+  </header>
+
+  <section id="about">
+    <div class="sec-head">
+      <h2>Кто я и чем занимаюсь</h2>
+      <span class="tag">about</span>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>Я <b>Kizamia</b> — разработчик, который берёт на себя весь путь продукта: продумываю логику,
+        пишу интерфейс и серверную часть, настраиваю сборку и довожу до релиза. Работаю и <b>под ключ</b>
+        — когда нужен готовый результат с ответственностью за сроки, — и <b>для народа</b> — открытые
+        инструменты, которыми может пользоваться кто угодно, бесплатно и без лимитов.</p>
+        <p>Сильная сторона — веб: быстрые интерфейсы, которые не раздражают, читаемый код, который не
+        страшно передать другому разработчику, и внимание к мелочам — от первого экрана до состояния
+        «загрузка не удалась». Берусь и за десктопные утилиты, когда задача того требует.</p>
+        <p>Люблю, когда вещь <b>работает без сюрпризов</b>: грузится быстро, не ломается на телефоне,
+        не требует инструкции. Если у вас есть идея или боль — превратим её в работающий продукт,
+        а не в презентацию.</p>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>30+</b><span>проектов</span></div>
+        <div class="stat"><b>4,9★</b><span>средняя оценка</span></div>
+        <div class="stat"><b>24/7</b><span>поддержка своих продуктов</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="sec-head">
+      <h2>Сайты и веб-приложения</h2>
+      <span class="tag">works</span>
+    </div>
+    <div class="proj-grid">
+
+      <div class="card">
+        <div class="icon">🖥️</div>
+        <h3>TroubleTab</h3>
+        <p>Кастомная новая вкладка для браузера. Вместо пустой страницы — своё пространство:
+        быстрые закладки, часы, погода и оформление под настроение. Ставится за минуту, не просит денег.</p>
+        <div class="foot">
+          <span class="tag-line">кастомная новая вкладка</span>
+          <a href="https://zloba010.github.io/troubletab" target="_blank" rel="noopener">Открыть →</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="icon">📚</div>
+        <h3>Kizamia Free Web Reader</h3>
+        <p>Веб-читалка книг в браузере. Открываете — и читаете: без установки, без регистрации,
+        без рекламы посреди страницы. Шрифт, отступы и тёмная тема настраиваются под себя.</p>
+        <div class="foot">
+          <span class="tag-line">веб-читалка книг</span>
+          <a href="https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader" target="_blank" rel="noopener">Открыть →</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="icon">🖼️</div>
+        <h3>Kizamia Upscale Image</h3>
+        <p>Апскейлер изображений <b>без лимитов</b>: поднимите разрешение фото, картинки или скриншота
+        прямо в браузере — без водяных знаков, без очередей и без «осталось 3 попытки». Сколько нужно,
+        столько и работает.</p>
+        <div class="foot">
+          <span class="tag-line">апскейл без лимитов</span>
+          <a href="https://zloba010.github.io/KizamiaUpscaleImage" target="_blank" rel="noopener">Открыть →</a>
+        </div>
+      </div>
+
+      <div class="card more-card">
+        <div class="icon">⚡</div>
+        <h3>И ещё десятки проектов</h3>
+        <p>Утилиты, эксперименты, инструменты для себя и для всех — от мелких скриптов, которые экономят
+        час в день, до полноценных приложений. Три ссылки выше — только начало.</p>
+        <div class="foot">
+          <span class="tag-line">полный список на GitHub</span>
+          <a href="https://github.com/zloba010" target="_blank" rel="noopener">Все проекты →</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="sec-head">
+      <h2>Есть задача или идея?</h2>
+      <span class="tag">contact</span>
+    </div>
+    <div style="max-width:640px;margin:0 auto;text-align:center;color:var(--muted)">
+      <p style="margin-bottom:18px">Разработка под ключ, доработка существующего проекта, быстрый инструмент
+      «для народа» или просто совет — напишите, разберёмся.</p>
+      <a href="https://github.com/zloba010" target="_blank" rel="noopener" class="btn btn-cta">Написать на GitHub</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="https://github.com/zloba010" target="_blank" rel="noopener">GitHub</a>
+      <a href="#projects">Проекты</a>
+      <a href="#about">Обо мне</a>
+    </div>
+    Сделано с вниманием к деталям · Kizamia · 2026
+  </div>
+</footer>
+
+<script>
+  // Лёгкая живая деталь: плавное появление карточек при скролле
+  const cards = document.querySelectorAll('.card');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  cards.forEach(c => {
+    c.style.opacity = '0';
+    c.style.transform = 'translateY(14px)';
+    c.style.transition = 'opacity .5s ease, transform .5s ease';
+    io.observe(c);
+  });
+
+  // Активная ссылка навигации при скролле
+  const navA = document.querySelectorAll('nav a[href^="#"]');
+  const sections = [...navA].map(a => document.querySelector(a.getAttribute('href')))
+                            .filter(Boolean);
+  const secIo = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navA.forEach(x => x.classList.remove('active'));
+        const link = [...navA].find(a => a.getAttribute('href') === '#' + e.target.id);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-40% 0px -58% 0px' });
+  sections.forEach(s => secIo.observe(s));
+</script>
+</body>
+</html>
