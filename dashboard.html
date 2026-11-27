@@ -30,7 +30,6 @@ body[data-theme="glass"]{background:radial-gradient(circle at 15% 25%,#fff 0%,tr
 @keyframes gBG{0%{background-position:0 0}100%{background-position:100% 100%}}
 .wrap{max-width:1440px;margin:0 auto}
 
-/* header */
 .hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
 .hdr h1{font-size:1.25rem;font-weight:900;display:flex;align-items:center;gap:10px;letter-spacing:-.3px}
 .live{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted);font-weight:600}
@@ -42,27 +41,23 @@ body[data-theme="glass"]{background:radial-gradient(circle at 15% 25%,#fff 0%,tr
 .hbtn{background:var(--panel);border:var(--glass-border);color:var(--text);border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:1.05rem;backdrop-filter:var(--blur);box-shadow:0 3px 12px var(--shadow)}
 .hbtn:hover{border-color:var(--accent)}
 
-/* panels */
 .panel{background:var(--panel);border:var(--glass-border);border-radius:14px;padding:16px 18px;backdrop-filter:var(--blur);box-shadow:0 6px 24px var(--shadow);margin-bottom:14px}
 .panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px}
 .panel-t{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
 .panel-sub{font-size:.72rem;color:var(--muted)}
 
-/* kpi */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
 .kpi{background:var(--panel);border:var(--glass-border);border-radius:14px;padding:16px;backdrop-filter:var(--blur);box-shadow:0 6px 24px var(--shadow)}
 .kpi .v{font-size:1.7rem;font-weight:900;line-height:1.1;letter-spacing:-1px}
 .kpi .l{font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
 .kpi .d{font-size:.7rem;margin-top:6px;color:var(--muted)}
 
-/* gauges */
 .gauges{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
 .gauge{background:var(--panel);border:var(--glass-border);border-radius:14px;padding:14px;text-align:center;backdrop-filter:var(--blur);box-shadow:0 6px 24px var(--shadow)}
 .gauge svg{width:100%;max-width:170px}
 .gauge .gv{font-size:1.5rem;font-weight:900;margin-top:-34px}
 .gauge .gl{font-size:.7rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-top:8px}
 
-/* uptime bars (statuspage-style) */
 .ubar{margin-bottom:12px}
 .ubar-top{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:5px}
 .ubar-top b{font-weight:700}
@@ -75,25 +70,20 @@ body[data-theme="glass"]{background:radial-gradient(circle at 15% 25%,#fff 0%,tr
 .ubar-row i.na{background:var(--grid)}
 .ubar-foot{display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-top:4px}
 
-/* tabs */
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
 .tabs button{background:var(--panel);border:var(--glass-border);color:var(--muted);padding:9px 18px;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;backdrop-filter:var(--blur)}
 .tabs button.on{color:#fff;background:var(--accent);border-color:var(--accent)}
 .tab{display:none}.tab.on{display:block}
 
-/* charts */
 .chartbox{position:relative;height:260px}
 .chartbox.tall{height:340px}
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
-.legend span{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);font-weight:600;cursor:pointer}
+.legend span{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);font-weight:600}
 .legend i{width:10px;height:10px;border-radius:3px}
 
-/* grids */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
 @media(max-width:900px){.g2{grid-template-columns:1fr}}
 
-/* tables */
 table{width:100%;border-collapse:collapse;font-size:.82rem}
 th{text-align:left;color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;border-bottom:1px solid var(--grid)}
 td{padding:9px 10px;border-bottom:1px solid var(--grid);vertical-align:top}
@@ -103,11 +93,9 @@ tr:hover td{background:var(--input)}
 .tag.ok{background:rgba(16,185,129,.15);color:var(--ok)}
 .tag.err{background:rgba(239,68,68,.15);color:var(--err)}
 .tag.warn{background:rgba(245,158,11,.15);color:var(--warn)}
-.tag.info{background:rgba(59,130,246,.15);color:var(--info)}
 .sha{font-family:ui-monospace,monospace;font-size:.75rem;color:var(--accent)}
 .mono{font-family:ui-monospace,monospace;font-size:.78rem;color:var(--muted)}
 
-/* site cards */
 .sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .site{background:var(--panel);border:1.5px solid var(--glass-border);border-radius:14px;padding:16px;cursor:pointer;transition:.2s;backdrop-filter:var(--blur);box-shadow:0 6px 24px var(--shadow)}
 .site:hover{border-color:var(--accent);transform:translateY(-2px)}
@@ -123,7 +111,6 @@ tr:hover td{background:var(--input)}
 .mini i{flex:1;min-width:1.5px}
 .mini i.up{background:var(--ok)}.mini i.down{background:var(--err)}.mini i.na{background:var(--grid)}
 
-/* feed */
 .feed{max-height:420px;overflow-y:auto}
 .fi{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--grid)}
 .fi:last-child{border:none}
@@ -132,7 +119,6 @@ tr:hover td{background:var(--input)}
 .fi .t1{font-size:.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fi .t2{font-size:.72rem;color:var(--muted);margin-top:2px}
 
-/* modal */
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:99}
 .ov.on{display:flex}
 .mv{background:var(--panel);border:var(--glass-border);border-radius:18px;padding:26px;max-width:440px;width:92%;backdrop-filter:var(--blur)}
@@ -182,7 +168,6 @@ tr:hover td{background:var(--input)}
     <button data-t="arch">Архив</button>
   </div>
 
-  <!-- ОБЗОР -->
   <div class="tab on" id="t-ov">
     <div class="panel">
       <div class="panel-h"><div class="panel-t">Доступность сервисов · последние 24 часа</div><div class="panel-sub" id="barsMeta"></div></div>
@@ -206,7 +191,6 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- САЙТЫ -->
   <div class="tab" id="t-sites">
     <div class="sites" id="siteCards"></div>
     <div style="height:14px"></div>
@@ -221,12 +205,11 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- ИЗМЕНЕНИЯ -->
   <div class="tab" id="t-chg">
     <div class="g2">
       <div class="panel">
-        <div class="panel-h"><div class="panel-t">Деплои GitHub Pages · длительность и простой во время обновления</div></div>
-        <div class="chartbox tall"><canvas id="chDeploys"></canvas></div>
+        <div class="panel-h"><div class="panel-t">Деплои GitHub Pages · длительность</div></div>
+        <div class="chartbox tall"><canvas id="chDeploys2"></canvas></div>
       </div>
       <div class="panel">
         <div class="panel-h"><div class="panel-t">Запуски workflow · длительность</div></div>
@@ -239,7 +222,6 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- ИНЦИДЕНТЫ -->
   <div class="tab" id="t-inc">
     <div class="panel">
       <div class="panel-h"><div class="panel-t">Длительность инцидентов, мин</div></div>
@@ -251,7 +233,6 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- АРХИВ -->
   <div class="tab" id="t-arch">
     <div class="panel">
       <div class="panel-h"><div class="panel-t">Uptime по месяцам, %</div></div>
@@ -275,7 +256,6 @@ tr:hover td{background:var(--input)}
   </div>
 </div>
 
-<!-- MODAL -->
 <div class="ov" id="modal">
   <div class="mv">
     <h3>⚙️ Панель управления</h3>
@@ -288,12 +268,10 @@ tr:hover td{background:var(--input)}
 </div>
 
 <script>
-/* ================= CONFIG ================= */
 const OWNER='zloba010', REPO='zloba010.github.io';
 const PALETTE=['#ff1744','#ffeb3b','#4299e1','#10b981','#f59e0b','#a78bfa','#fb923c'];
 let D=null, RANGE='24h', TAB='ov', SEL=null, charts={};
 
-/* ================= UTILS ================= */
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function ago(iso){const d=(Date.now()-new Date(iso))/1000;
@@ -308,14 +286,12 @@ function fmtT(iso,r){const d=new Date(iso);
 function css(v){return getComputedStyle(document.body).getPropertyValue(v).trim();}
 function siteColor(i){return PALETTE[i%PALETTE.length];}
 
-/* ================= THEME ================= */
 const TH=['light','dark','glass'],TI=['☀️','🌙','💎'];
 let ti=Math.max(0,TH.indexOf(localStorage.getItem('troubleTabTheme')||'dark'));
 function applyTheme(){document.body.dataset.theme=TH[ti];$('#themeBtn').textContent=TI[ti];
   localStorage.setItem('troubleTabTheme',TH[ti]);if(D)render();}
 $('#themeBtn').onclick=()=>{ti=(ti+1)%3;applyTheme();};
 
-/* ================= RANGES / TABS ================= */
 $('#ranges').onclick=e=>{if(e.target.tagName!=='BUTTON')return;
   $$('#ranges button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');
   RANGE=e.target.dataset.r;if(D)render();};
@@ -324,64 +300,95 @@ $('#tabs').onclick=e=>{if(e.target.tagName!=='BUTTON')return;
   TAB=e.target.dataset.t;$$('.tab').forEach(t=>t.classList.remove('on'));$('#t-'+TAB).classList.add('on');
   if(D)render();};
 
-/* ================= DATA ================= */
 async function load(){
   try{
     const r=await fetch('uptime-data.json?t='+Date.now());
     if(!r.ok)throw new Error('uptime-data.json не найден (HTTP '+r.status+'). Запусти Actions → Ecosystem Monitor → Run workflow.');
-    D=await r.json();$('#errBox').style.display='none';render();
-  }catch(e){$('#errBox').textContent='⚠️ '+e.message;$('#errBox').style.display='block';}
+    D=await r.json();
+    if(!D || !D.sites || Object.keys(D.sites).length===0){
+      throw new Error('Файл данных пуст. Дождись завершения Action.');
+    }
+    $('#errBox').style.display='none';
+    render();
+  }catch(e){
+    $('#errBox').textContent='⚠️ '+e.message;
+    $('#errBox').style.display='block';
+  }
 }
-function rangeMs(){return{'15m':15,'1h':60,'6h':360,'24h':1440,'7d':10080,'30d':43200,'1y':525600}[RANGE]*60000;}
-function hist(site){const cut=Date.now()-rangeMs();
-  if(['15m','1h','6h','24h'].includes(RANGE))return site.history.filter(h=>new Date(h.time)>=cut);
-  return site.daily.map(d=>({time:d.date+'T12:00:00Z',status:d.up/d.checks>.99?'up':'down',
-    ms:Math.round(d.sum_ms/d.checks),code:d.errors?500:200}));}
 
-/* ================= RENDER ================= */
-function render(){if(!D)return;
+function rangeMs(){return{'15m':15,'1h':60,'6h':360,'24h':1440,'7d':10080,'30d':43200,'1y':525600}[RANGE]*60000;}
+function hist(site){
+  if(!site || !site.history) return [];
+  const cut=Date.now()-rangeMs();
+  if(['15m','1h','6h','24h'].includes(RANGE))return site.history.filter(h=>new Date(h.time)>=cut);
+  if(!site.daily) return [];
+  return site.daily.map(d=>({time:d.date+'T12:00:00Z',status:d.up/d.checks>.99?'up':'down',
+    ms:Math.round(d.sum_ms/d.checks),code:d.errors?500:200}));
+}
+
+function render(){
+  if(!D || !D.sites || Object.keys(D.sites).length===0){
+    $('#errBox').textContent='⚠️ Данные мониторинга пусты. Запусти Actions → Ecosystem Monitor → Run workflow и дождись зелёной галочки.';
+    $('#errBox').style.display='block';
+    return;
+  }
+  $('#errBox').style.display='none';
   $('#lastUpd').textContent='Последняя проверка: '+new Date(D.last_updated).toLocaleString('ru-RU')+' · обновлено '+ago(D.last_updated);
-  renderKPIs();renderGauges();renderBars();renderCharts();renderSites();renderChanges();renderIncidents();renderArchive();}
+  renderKPIs();
+  renderGauges();
+  renderBars();
+  renderCharts();
+  renderSites();
+  renderChanges();
+  renderIncidents();
+  renderArchive();
+}
 
 function renderKPIs(){
   const sites=Object.values(D.sites),n=sites.length;
   const up=sites.filter(s=>s.current_status==='up').length;
-  const avg=Math.round(sites.reduce((a,s)=>a+s.current_ms,0)/n);
-  const p95=Math.round(sites.reduce((a,s)=>a+Math.max(...s.history.map(h=>h.ms)),0)/n);
-  const day30=sites.map(s=>s.daily.filter(d=>new Date(d.date)>Date.now()-30*864e5))
-    .map(a=>a.reduce((x,d)=>x+d.up,0)/Math.max(1,a.reduce((x,d)=>x+d.checks,0))*100);
+  const avg=Math.round(sites.reduce((a,s)=>a+(s.current_ms||0),0)/n);
+  const day30=sites.map(s=>{
+    const d=(s.daily||[]).filter(x=>new Date(x.date)>Date.now()-30*864e5);
+    const c=d.reduce((a,x)=>a+x.checks,0);
+    return c?d.reduce((a,x)=>a+x.up,0)/c*100:100;
+  });
   const up30=(day30.reduce((a,b)=>a+b,0)/n).toFixed(2);
-  const inc24=sites.reduce((a,s)=>a+s.history.filter(h=>h.status==='down'&&new Date(h.time)>Date.now()-864e5).length,0);
-  const dep24=sites.reduce((a,s)=>a+s.deploys.filter(d=>new Date(d.created_at)>Date.now()-864e5).length,0);
-  const lastDep=sites.flatMap(s=>s.deploys).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
+  const inc24=sites.reduce((a,s)=>a+(s.history||[]).filter(h=>h.status==='down'&&new Date(h.time)>Date.now()-864e5).length,0);
+  const dep24=sites.reduce((a,s)=>a+(s.deploys||[]).filter(d=>new Date(d.created_at)>Date.now()-864e5).length,0);
+  const lastDep=sites.flatMap(s=>s.deploys||[]).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
   $('#kpis').innerHTML=[
     ['Сервисов',n,'онлайн: '+up,''],
     ['Uptime 30д',up30+'%',inc24?'⚠ '+inc24+' сбоев за 24ч':'стабильно',up30>99.5?'var(--ok)':'var(--err)'],
-    ['Ср. отклик',avg+' мс','p95: '+p95+' мс',''],
+    ['Ср. отклик',avg+' мс','p95: —',''],
     ['Деплоев 24ч',dep24,lastDep?fmtDur(lastDep.duration_s)+' послед.':'нет',''],
     ['Активных инцидентов',sites.filter(s=>s.current_status==='down').length,'',''],
   ].map(([l,v,d,c])=>`<div class="kpi"><div class="v" style="${c?'color:'+c:''}">${v}</div><div class="l">${l}</div><div class="d">${d}</div></div>`).join('');
 }
 
-function gaugeSVG(val,max,col){const pct=Math.max(0,Math.min(1,val/max));const L=251.3;
+function gaugeSVG(val,max,col){
+  const pct=Math.max(0,Math.min(1,val/max));
+  const L=251.3;
   return `<svg viewBox="0 0 200 115">
     <path d="M20,100 A80,80 0 0 1 180,100" fill="none" stroke="${css('--grid')}" stroke-width="14" stroke-linecap="round"/>
     <path d="M20,100 A80,80 0 0 1 180,100" fill="none" stroke="${col}" stroke-width="14" stroke-linecap="round"
       stroke-dasharray="${L}" stroke-dashoffset="${L*(1-pct)}" style="transition:stroke-dashoffset .6s"/>
-  </svg>`;}
+  </svg>`;
+}
+
 function renderGauges(){
   const sites=Object.values(D.sites);
-  const up24=sites.map(s=>{const h=s.history.filter(x=>new Date(x.time)>Date.now()-864e5);
+  const up24=sites.map(s=>{const h=(s.history||[]).filter(x=>new Date(x.time)>Date.now()-864e5);
     return h.length?h.filter(x=>x.status==='up').length/h.length*100:100;});
-  const up30=sites.map(s=>{const d=s.daily.filter(x=>new Date(x.date)>Date.now()-30*864e5);
+  const up30=sites.map(s=>{const d=(s.daily||[]).filter(x=>new Date(x.date)>Date.now()-30*864e5);
     const c=d.reduce((a,x)=>a+x.checks,0);return c?d.reduce((a,x)=>a+x.up,0)/c*100:100;});
-  const avg=sites.reduce((a,s)=>a+s.current_ms,0)/sites.length;
-  const errs=sites.reduce((a,s)=>a+s.history.filter(h=>h.status==='down').length,0);
+  const avg=sites.reduce((a,s)=>a+(s.current_ms||0),0)/sites.length;
+  const errs=sites.reduce((a,s)=>a+(s.history||[]).filter(h=>h.status==='down').length,0);
   $('#gauges').innerHTML=[
     ['Uptime 24ч',up24.reduce((a,b)=>a+b,0)/sites.length,'%',up24.every(v=>v>99)?'var(--ok)':'var(--warn)'],
     ['Uptime 30д',up30.reduce((a,b)=>a+b,0)/sites.length,'%',up30.every(v=>v>99.5)?'var(--ok)':'var(--warn)'],
     ['Ср. отклик',Math.round(avg),'мс',avg<500?'var(--ok)':'var(--warn)'],
-    ['Сбои 24ч',errs,'проверок',errs? 'var(--err)':'var(--ok)'],
+    ['Сбои 24ч',errs,'проверок',errs?'var(--err)':'var(--ok)'],
   ].map(([l,v,u,c])=>`<div class="gauge">${gaugeSVG(v,l.includes('Uptime')?100:1000,c)}
     <div class="gv" style="color:${c}">${v.toFixed(l.includes('Uptime')?2:0)}${u}</div><div class="gl">${l}</div></div>`).join('');
 }
@@ -389,7 +396,7 @@ function renderGauges(){
 function renderBars(){
   $('#barsMeta').textContent='1 сегмент = 5 минут';
   $('#uptimeBars').innerHTML=Object.entries(D.sites).map(([name,s])=>{
-    const h=s.history.slice(-288);
+    const h=(s.history||[]).slice(-288);
     const cells=h.map(x=>`<i class="${x.status}" title="${new Date(x.time).toLocaleString('ru-RU')} · ${x.code} · ${x.ms}мс"></i>`).join('');
     const pad='<i class="na"></i>'.repeat(Math.max(0,288-h.length));
     const pct=(h.filter(x=>x.status==='up').length/Math.max(1,h.length)*100).toFixed(2);
@@ -411,8 +418,6 @@ function baseOpts(yTitle){return{responsive:true,maintainAspectRatio:false,
 
 function renderCharts(){
   const names=Object.keys(D.sites);
-  // multi-line response
-  const cut=Date.now()-rangeMs();
   const useDaily=!['15m','1h','6h','24h'].includes(RANGE);
   let labels=null;const ds=[];
   names.forEach((n,i)=>{const pts=hist(D.sites[n]);
@@ -421,15 +426,15 @@ function renderCharts(){
       borderWidth:2,tension:.3,pointRadius:0,pointHoverRadius:4,fill:false});});
   mkChart('chResp',{type:'line',data:{labels:labels||[],datasets:ds},options:baseOpts('мс')});
   $('#respLegend').innerHTML=names.map((n,i)=>`<span><i style="background:${siteColor(i)}"></i>${n}</span>`).join('');
-  // availability horizontal
+
   mkChart('chAvail',{type:'bar',data:{labels:names,datasets:[{data:names.map(n=>{
-    const h=D.sites[n].history.filter(x=>new Date(x.time)>Date.now()-864e5);
+    const h=(D.sites[n].history||[]).filter(x=>new Date(x.time)>Date.now()-864e5);
     return h.length?+(h.filter(x=>x.status==='up').length/h.length*100).toFixed(2):100;}),
     backgroundColor:css('--ok')+'cc',borderRadius:4,barThickness:16}]},
     options:{...baseOpts(''),indexAxis:'y',scales:{x:{min:95,max:100,grid:{color:css('--grid')},ticks:{color:css('--muted')}},
       y:{grid:{display:false},ticks:{color:css('--text'),font:{size:11,weight:'700'}}}}}});
-  // deploy durations horizontal
-  const deps=names.flatMap(n=>D.sites[n].deploys.map(d=>({...d,site:n}))).slice(0,12);
+
+  const deps=names.flatMap(n=>(D.sites[n].deploys||[]).map(d=>({...d,site:n}))).slice(0,12);
   mkChart('chDeploy',{type:'bar',data:{labels:deps.map(d=>d.site+' · '+(d.sha||'')),
     datasets:[{data:deps.map(d=>d.duration_s),backgroundColor:deps.map(d=>d.status==='succeeded'?css('--ok')+'cc':css('--err')+'cc'),borderRadius:4,barThickness:14}]},
     options:{...baseOpts('сек'),indexAxis:'y',scales:{x:{grid:{color:css('--grid')},ticks:{color:css('--muted')}},
@@ -438,7 +443,7 @@ function renderCharts(){
 
 function renderSites(){
   $('#siteCards').innerHTML=Object.entries(D.sites).map(([n,s])=>{
-    const h=s.history.slice(-60);const pct=(h.filter(x=>x.status==='up').length/Math.max(1,h.length)*100).toFixed(1);
+    const h=(s.history||[]).slice(-60);const pct=(h.filter(x=>x.status==='up').length/Math.max(1,h.length)*100).toFixed(1);
     return `<div class="site ${SEL===n?'on':''}" data-s="${esc(n)}">
       <div class="r1"><span class="nm">${esc(n)}</span><span class="st ${s.current_status}"></span></div>
       <div class="nums"><div>отклик <b>${s.current_ms}мс</b></div><div>код <b>${s.current_code}</b></div><div>uptime <b>${pct}%</b></div></div>
@@ -446,12 +451,14 @@ function renderSites(){
   $$('.site').forEach(c=>c.onclick=()=>{SEL=c.dataset.s;renderSites();renderSiteDetail();});
   if(SEL)renderSiteDetail();else $('#siteDetail').style.display='none';
 }
+
 function renderSiteDetail(){
-  const s=D.sites[SEL];const el=$('#siteDetail');el.style.display='block';
+  const s=D.sites[SEL];if(!s)return;
+  const el=$('#siteDetail');el.style.display='block';
   $('#sdTitle').textContent='📈 '+SEL;
   $('#sdMeta').innerHTML=`<a href="${s.url}" target="_blank" style="color:var(--accent)">открыть ↗</a> · <a href="https://github.com/${OWNER}/${s.repo}" target="_blank" style="color:var(--muted)">репозиторий</a>`;
-  const h=s.history;const upPct=(h.filter(x=>x.status==='up').length/Math.max(1,h.length)*100);
-  const incs=s.incidents.filter(i=>new Date(i.start)>Date.now()-30*864e5);
+  const h=s.history||[];const upPct=(h.filter(x=>x.status==='up').length/Math.max(1,h.length)*100);
+  const incs=(s.incidents||[]).filter(i=>new Date(i.start)>Date.now()-30*864e5);
   $('#sdGauges').innerHTML=[
     ['Uptime',upPct,'%',upPct>99?'var(--ok)':'var(--err)'],
     ['Отклик',s.current_ms,'мс',s.current_ms<500?'var(--ok)':'var(--warn)'],
@@ -461,64 +468,67 @@ function renderSiteDetail(){
   mkChart('chSite',{type:'line',data:{labels:pts.map(p=>fmtT(p.time,RANGE)),
     datasets:[{label:'мс',data:pts.map(p=>p.ms),borderColor:css('--accent'),backgroundColor:css('--accent')+'22',borderWidth:2,tension:.3,pointRadius:0,fill:true}]},
     options:baseOpts('мс')});
-  $('#sdDeploys').innerHTML=s.deploys.length?`<table><tr><th>Статус</th><th>Длит.</th><th>Простой</th><th>Коммит</th><th>Когда</th></tr>
+  $('#sdDeploys').innerHTML=(s.deploys||[]).length?`<table><tr><th>Статус</th><th>Длит.</th><th>Коммит</th><th>Когда</th></tr>
     ${s.deploys.map(d=>`<tr><td><span class="tag ${d.status==='succeeded'?'ok':'err'}">${d.status}</span></td>
-    <td>${fmtDur(d.duration_s)}</td><td>${d.down_during_s?fmtDur(d.down_during_s):'—'}</td>
+    <td>${fmtDur(d.duration_s)}</td>
     <td class="sha">${d.sha||''}</td><td class="mono">${ago(d.created_at)}</td></tr>`).join('')}</table>`:'<div class="panel-sub">Нет данных Pages API (проверь MONITOR_TOKEN).</div>';
-  $('#sdCommits').innerHTML=s.commits.map(c=>`<div class="fi"><div class="ic">✏️</div><div class="bd">
+  $('#sdCommits').innerHTML=(s.commits||[]).map(c=>`<div class="fi"><div class="ic">✏️</div><div class="bd">
     <div class="t1">${esc(c.msg)}</div><div class="t2">${esc(c.author)} · <span class="sha">${c.sha}</span> · ${ago(c.date)}</div></div></div>`).join('')||'<div class="panel-sub">Нет коммитов.</div>';
 }
 
 function renderChanges(){
-  const all=[];Object.entries(D.sites).forEach(([n,s])=>{
-    s.commits.forEach(c=>all.push({t:c.date,k:'commit',site:n,txt:c.msg,who:c.author,sha:c.sha}));
-    s.deploys.forEach(d=>all.push({t:d.created_at,k:'deploy',site:n,txt:`${d.status} · ${fmtDur(d.duration_s)}${d.down_during_s?' · простой '+fmtDur(d.down_during_s):''}`,who:d.sha||'',sha:d.sha}));
-    s.runs.forEach(r=>all.push({t:r.created_at,k:'run',site:n,txt:`${r.name} · ${r.conclusion||r.status} · ${fmtDur(r.duration_s)}`,who:r.event,sha:''}));});
+  const all=[];
+  Object.entries(D.sites).forEach(([n,s])=>{
+    (s.commits||[]).forEach(c=>all.push({t:c.date,k:'commit',site:n,txt:c.msg,who:c.author,sha:c.sha}));
+    (s.deploys||[]).forEach(d=>all.push({t:d.created_at,k:'deploy',site:n,txt:`${d.status} · ${fmtDur(d.duration_s)}`,who:d.sha||'',sha:d.sha}));
+    (s.runs||[]).forEach(r=>all.push({t:r.created_at,k:'run',site:n,txt:`${r.name} · ${r.conclusion||r.status} · ${fmtDur(r.duration_s)}`,who:r.event,sha:''}));
+  });
   all.sort((a,b)=>new Date(b.t)-new Date(a.t));
   const ic={commit:'✏️',deploy:'🚀',run:'⚙️'};
   $('#chgFeed').innerHTML=all.slice(0,40).map(x=>`<div class="fi"><div class="ic">${ic[x.k]}</div><div class="bd">
-    <div class="t1">${esc(x.txt)}</div><div class="t2"><b>${x.site}</b> · ${esc(x.who)} · ${ago(x.t)} · <span class="mono">${new Date(x.t).toLocaleString('ru-RU')}</span></div></div></div>`).join('');
-  const deps=all.filter(x=>x.k==='deploy').slice(0,14);
-  mkChart('chDeploys',{type:'bar',data:{labels:deps.map(d=>d.site+' '+fmtT(d.t,'30d')),
-    datasets:[{label:'Деплой, с',data:deps.map(d=>parseInt(d.txt.match(/·\s*([\d.]+)(с|м|ч)/)?.[1]||0)||0),
-      backgroundColor:css('--ok')+'cc',borderRadius:3,barThickness:12}]},
-    options:{...baseOpts(''),indexAxis:'y'}});
-  const runs=all.filter(x=>x.k==='run').slice(0,14);
-  mkChart('chRuns',{type:'bar',data:{labels:runs.map(r=>r.site+' '+fmtT(r.t,'30d')),
-    datasets:[{label:'Сек',data:runs.map(()=>0),backgroundColor:'transparent'}]},options:baseOpts('')});
-  // runs duration real data
-  const rd=Object.entries(D.sites).flatMap(([n,s])=>s.runs.map(r=>({...r,site:n}))).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,14);
-  mkChart('chRuns',{type:'bar',data:{labels:rd.map(r=>r.site+' · '+r.name.slice(0,18)),
-    datasets:[{data:rd.map(r=>r.duration_s),backgroundColor:rd.map(r=>r.conclusion==='success'?css('--ok')+'cc':css('--warn')+'cc'),borderRadius:3,barThickness:12}]},
+    <div class="t1">${esc(x.txt)}</div><div class="t2"><b>${x.site}</b> · ${esc(x.who)} · ${ago(x.t)} · <span class="mono">${new Date(x.t).toLocaleString('ru-RU')}</span></div></div></div>`).join('')||'<div class="panel-sub">Нет данных.</div>';
+
+  const deps=Object.entries(D.sites).flatMap(([n,s])=>(s.deploys||[]).map(d=>({...d,site:n}))).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,14);
+  mkChart('chDeploys2',{type:'bar',data:{labels:deps.map(d=>d.site+' '+fmtT(d.created_at,'30d')),
+    datasets:[{data:deps.map(d=>d.duration_s),backgroundColor:deps.map(d=>d.status==='succeeded'?css('--ok')+'cc':css('--err')+'cc'),borderRadius:3,barThickness:12}]},
+    options:{...baseOpts('сек'),indexAxis:'y'}});
+
+  const runs=Object.entries(D.sites).flatMap(([n,s])=>(s.runs||[]).map(r=>({...r,site:n}))).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,14);
+  mkChart('chRuns',{type:'bar',data:{labels:runs.map(r=>r.site+' · '+r.name.slice(0,18)),
+    datasets:[{data:runs.map(r=>r.duration_s),backgroundColor:runs.map(r=>r.conclusion==='success'?css('--ok')+'cc':css('--warn')+'cc'),borderRadius:3,barThickness:12}]},
     options:{...baseOpts('сек'),indexAxis:'y'}});
 }
 
 function renderIncidents(){
-  const all=Object.entries(D.sites).flatMap(([n,s])=>s.incidents.map(i=>({...i,site:n})))
+  const all=Object.entries(D.sites).flatMap(([n,s])=>(s.incidents||[]).map(i=>({...i,site:n})))
     .sort((a,b)=>new Date(b.start)-new Date(a.start));
   $('#incMeta').textContent='всего записей: '+all.length;
   const rows=all.slice(0,12).reverse();
   mkChart('chInc',{type:'bar',data:{labels:rows.map(i=>i.site+' '+fmtT(i.start,'30d')),
-    datasets:[{data:rows.map(i=>i.minutes||((i.end?new Date(i.end):Date.now())-new Date(i.start))/60000),
+    datasets:[{data:rows.map(i=>i.minutes!=null?i.minutes:((i.end?new Date(i.end):Date.now())-new Date(i.start))/60000),
       backgroundColor:css('--err')+'cc',borderRadius:3,barThickness:14}]},
     options:{...baseOpts('мин'),indexAxis:'y'}});
-  $('#incTable').innerHTML=`<tr><th>Сервис</th><th>Начало</th><th>Конец</th><th>Длит.</th><th>Код</th><th>Причина</th><th>Статус</th></tr>`+
+  $('#incTable').innerHTML=`<tr><th>Сервис</th><th>Начало</th><th>Конец</th><th>Длит.</th><th>Код</th><th>Статус</th></tr>`+
     all.slice(0,25).map(i=>{const dur=i.minutes!=null?i.minutes.toFixed(1)+' мин':'идёт сейчас';
     return `<tr><td><b>${i.site}</b></td><td class="mono">${new Date(i.start).toLocaleString('ru-RU')}</td>
     <td class="mono">${i.end?new Date(i.end).toLocaleString('ru-RU'):'—'}</td><td>${dur}</td>
     <td><span class="tag err">${i.code}</span></td>
-    <td>${i.deploy_sha?`<span class="sha">${i.deploy_sha}</span> (обновление)`:'—'}</td>
-    <td>${i.end?'<span class="tag ok">закрыт</span>':'<span class="tag warn">активен</span>'}</td></tr>`;}).join('');
+    <td>${i.end?'<span class="tag ok">закрыт</span>':'<span class="tag warn">активен</span>'}</td></tr>`;}).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Инцидентов не было</td></tr>';
 }
 
 function renderArchive(){
   const months={},mresp={};
-  Object.values(D.sites).forEach(s=>s.daily.forEach(d=>{
+  Object.values(D.sites).forEach(s=>(s.daily||[]).forEach(d=>{
     const m=d.date.slice(0,7);(months[m]=months[m]||{up:0,c:0});(mresp[m]=mresp[m]||{s:0,c:0});
     months[m].up+=d.up;months[m].c+=d.checks;mresp[m].s+=d.sum_ms;mresp[m].c+=d.checks;}));
   const keys=Object.keys(months).sort();
+  if(keys.length===0){
+    $('#chMonth').parentElement.innerHTML='<div class="panel-sub" style="padding:40px;text-align:center">Недостаточно данных для архива. Action должен отработать минимум 24 часа.</div>';
+    $('#yearTable').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Нет данных</td></tr>';
+    return;
+  }
   mkChart('chMonth',{type:'bar',data:{labels:keys.map(k=>{const[y,m]=k.split('-');
-    return new Date(y,m-1).toLocaleDateString('ru-RU',{month:'long',year:'2-digit'})+' · '+k.slice(0,4);}),
+    return new Date(y,m-1).toLocaleDateString('ru-RU',{month:'long',year:'2-digit'});}),
     datasets:[{data:keys.map(k=>+(months[k].up/months[k].c*100).toFixed(2)),
       backgroundColor:css('--ok')+'cc',borderRadius:4,barThickness:18}]},
     options:{...baseOpts('%'),indexAxis:'y',scales:{x:{min:90,max:100,grid:{color:css('--grid')},ticks:{color:css('--muted')}},
@@ -528,7 +538,7 @@ function renderArchive(){
     options:{...baseOpts('мс'),indexAxis:'y'}});
   const years={};keys.forEach(k=>{const y=k.slice(0,4);(years[y]=years[y]||{up:0,c:0,inc:0});
     years[y].up+=months[k].up;years[y].c+=months[k].c;});
-  Object.values(D.sites).forEach(s=>s.incidents.forEach(i=>{const y=i.start.slice(0,4);
+  Object.values(D.sites).forEach(s=>(s.incidents||[]).forEach(i=>{const y=i.start.slice(0,4);
     years[y]=years[y]||{up:0,c:0,inc:0};years[y].inc++;}));
   $('#yearTable').innerHTML=`<tr><th>Год</th><th>Uptime</th><th>Инцидентов</th><th>Проверок</th></tr>`+
     Object.keys(years).sort().reverse().map(y=>{const v=years[y];
@@ -536,22 +546,26 @@ function renderArchive(){
     <td>${v.inc||0}</td><td class="mono">${v.c}</td></tr>`;}).join('');
 }
 
-/* ================= ADMIN ================= */
 const modal=$('#modal');
 $('#gearBtn').onclick=$('#gearBtn2').onclick=()=>modal.classList.add('on');
 $('#closeM').onclick=()=>modal.classList.remove('on');
+modal.onclick=e=>{if(e.target===modal)modal.classList.remove('on');};
 $('#saveTok').onclick=()=>{const t=$('#tokInp').value.trim();
   if(t.startsWith('ghp_')||t.startsWith('github_pat_')){localStorage.setItem('kizamia_admin_token',t);
     $('#tokInp').value='';alert('✅ Токен сохранён локально.');}else alert('Неверный формат токена.');};
 $('#runNow').onclick=async()=>{const t=localStorage.getItem('kizamia_admin_token');
   if(!t)return alert('Сначала сохрани токен.');
-  const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/monitor.yml/dispatches`,
-    {method:'POST',headers:{Authorization:'token '+t,Accept:'application/vnd.github+json'},body:JSON.stringify({ref:'main'})});
-  alert(r.status===204?'✅ Проверка запущена. Данные обновятся через 1–2 минуты.':'GitHub вернул '+r.status+'.');
-  modal.classList.remove('on');};
+  try{
+    const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}/actions/workflows/monitor.yml/dispatches`,
+      {method:'POST',headers:{Authorization:'token '+t,Accept:'application/vnd.github+json'},body:JSON.stringify({ref:'main'})});
+    alert(r.status===204?'✅ Проверка запущена. Данные обновятся через 1–2 минуты.':'GitHub вернул '+r.status+'.');
+    modal.classList.remove('on');
+  }catch(e){alert('Ошибка: '+e.message);}
+};
 
-/* ================= BOOT ================= */
-applyTheme();load();setInterval(load,60000);
+applyTheme();
+load();
+setInterval(load,60000);
 </script>
 </body>
 </html>
