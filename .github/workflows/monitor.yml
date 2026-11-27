@@ -12,93 +12,31 @@ jobs:
   monitor:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          fetch-depth: 0
+          python-version: '3.11'
 
-      - name: Ensure alert label exists
+      - name: Ensure alert label
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh label create "monitoring-alert" --repo "$GITHUB_REPOSITORY" \
-            --description "Автоматический алерт от Ecosystem Monitor" \
-            --color "ef4444" --force
+            --description "Автоалерт мониторинга" --color "ef4444" --force || true
 
-      - name: Check websites and update data
+      - name: Run monitor
         env:
+          MONITOR_TOKEN: ${{ secrets.MONITOR_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python3 scripts/monitor.py
+
+      - name: Commit data
         run: |
-          SITES=(
-            "Root|https://zloba010.github.io/|zloba010.github.io"
-            "KFWR|https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader/|KFWR---Kizami-Free-Web-Reader"
-            "Kizamia Notes|https://zloba010.github.io/kizamianotes/|kizamianotes"
-            "Upscale Image|https://zloba010.github.io/KizamiaUpscaleImage/|KizamiaUpscaleImage"
-            "Kizamia Weather|https://zloba010.github.io/Kizamia-Weather/|Kizamia-Weather"
-          )
-
-          if [ -f uptime-data.json ]; then
-            DATA=$(cat uptime-data.json)
-          else
-            DATA='{"last_updated": "", "sites": {}}'
-          fi
-
-          CURRENT_TIME=$(date -Iseconds)
-
-          for site_info in "${SITES[@]}"; do
-            IFS='|' read -r name url repo <<< "$site_info"
-
-            START=$(date +%s%3N)
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 --connect-timeout 5 "$url" || echo "0")
-            END=$(date +%s%3N)
-            RESPONSE_TIME=$((END - START))
-            if [ "$HTTP_CODE" = "000" ]; then HTTP_CODE=0; fi
-
-            if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 400 ]; then
-              STATUS="up"
-            else
-              STATUS="down"
-            fi
-            echo "$name: $STATUS (${RESPONSE_TIME}ms, code $HTTP_CODE)"
-
-            DATA=$(echo "$DATA" | jq --arg name "$name" --arg url "$url" --arg repo "$repo" \
-                      --arg status "$STATUS" --argjson code "$HTTP_CODE" --argjson ms "$RESPONSE_TIME" --arg time "$CURRENT_TIME" '
-              .last_updated = $time |
-              .sites[$name] = {
-                url: $url,
-                repo: $repo,
-                current_status: $status,
-                current_code: $code,
-                current_ms: $ms,
-                history: ((.sites[$name].history // []) + [{time: $time, status: $status, ms: $ms, code: $code}]) | .[-288:]
-              }')
-
-            if [ "$STATUS" = "down" ]; then
-              ISSUE_TITLE="🚨 Сайт недоступен: $name"
-              OPEN_COUNT=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --json title --jq "[.[] | select(.title == \"$ISSUE_TITLE\")] | length")
-              if [ "$OPEN_COUNT" -eq 0 ]; then
-                gh issue create --repo "$GITHUB_REPOSITORY" --title "$ISSUE_TITLE" \
-                  --body "Сайт [$name]($url) вернул код $HTTP_CODE. Время: $CURRENT_TIME. Отклик: ${RESPONSE_TIME}мс." \
-                  --label "monitoring-alert" || true
-              fi
-            else
-              ISSUE_TITLE="🚨 Сайт недоступен: $name"
-              ISSUES=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --json number,title --jq "[.[] | select(.title == \"$ISSUE_TITLE\")] | .[].number")
-              for n in $ISSUES; do
-                gh issue close "$n" --repo "$GITHUB_REPOSITORY" --comment "✅ Сайт $name снова доступен." || true
-              done
-            fi
-          done
-
-          echo "$DATA" | jq '.' > uptime-data.json
-
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Monitor Bot"
+          git config --local user.email "bot@troubletab.dev"
+          git config --local user.name "TroubleTab Monitor Bot"
           git add uptime-data.json
-          if git diff --cached --quiet; then
-            echo "Изменений нет."
-          else
-            git commit -m "chore: update uptime data"
-            git pull --rebase origin main || true
-            git push || (git pull --rebase origin main && git push) || true
-          fi
+          if git diff --cached --quiet; then echo "Нет изменений"; exit 0; fi
+          git commit -m "chore(monitor): update metrics $(date -u +%FT%TZ)"
+          git pull --rebase origin main || true
+          git push || (git pull --rebase origin main && git push) || true
