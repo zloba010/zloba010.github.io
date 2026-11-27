@@ -1,1 +1,436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TroubleTab Monitor · Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #f4ebd9; --text-color: #3e2723; --primary-color: #3e2723;
+            --accent-color: #ff1744; --panel-bg: rgba(244, 235, 217, 0.95);
+            --input-bg: rgba(255, 255, 255, 0.5); --border-color: #3e2723;
+            --glass-blur: none; --glass-border: 2px solid transparent;
+            --shadow-color: rgba(0,0,0,0.1); --muted: rgba(62, 39, 35, 0.55);
+            --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+        }
+        [data-theme="dark"] {
+            --bg-color: #2c1e16; --text-color: #e6d5c3; --primary-color: #e6d5c3;
+            --accent-color: #ffeb3b; --panel-bg: rgba(44, 30, 22, 0.95);
+            --input-bg: rgba(0, 0, 0, 0.3); --border-color: #e6d5c3;
+            --shadow-color: rgba(0,0,0,0.4); --muted: rgba(230, 213, 195, 0.55);
+        }
+        [data-theme="glass"] {
+            --bg-color: #e2e8f0; --text-color: #2d3748; --primary-color: #2d3748;
+            --accent-color: #4299e1; --panel-bg: rgba(255, 255, 255, 0.15);
+            --input-bg: transparent; --border-color: rgba(255, 255, 255, 0.9);
+            --glass-blur: blur(25px); --glass-border: 1.5px solid rgba(255, 255, 255, 0.8);
+            --shadow-color: rgba(0, 0, 0, 0.08); --muted: rgba(45, 55, 72, 0.55);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        /* HEADER */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
+        .icon-btn { background: var(--panel-bg); color: var(--text-color); border: var(--glass-border); border-radius: 50%; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: var(--glass-blur); box-shadow: 0 4px 15px var(--shadow-color); font-size: 1.2rem; transition: all 0.2s; }
+        .icon-btn:hover { box-shadow: 0 0 20px var(--accent-color); border-color: var(--accent-color); transform: translateY(-2px); }
 
+        /* CARDS */
+        .section-card { background: var(--panel-bg); border: var(--glass-border); border-radius: 20px; padding: 24px; backdrop-filter: var(--glass-blur); box-shadow: 0 8px 30px var(--shadow-color); margin-bottom: 24px; }
+        .section-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+
+        /* SUMMARY GRID */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .summary-item { background: var(--input-bg); border-radius: 16px; padding: 20px; text-align: center; border: 1.5px solid transparent; }
+        .summary-value { font-size: 2.2rem; font-weight: 900; line-height: 1; margin-bottom: 6px; }
+        .summary-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* SITES GRID */
+        .sites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+        .site-card { background: var(--input-bg); border-radius: 16px; padding: 20px; border: 1.5px solid transparent; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+        .site-card:hover { border-color: var(--accent-color); transform: translateY(-2px); }
+        .site-card.active { border-color: var(--accent-color); background: var(--panel-bg); }
+        .site-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .site-name { font-weight: 700; font-size: 1rem; }
+        .status-badge { font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+        .status-badge.up { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .status-badge.down { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .status-badge.loading { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .site-meta { font-size: 0.8rem; color: var(--muted); display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .sparkline-container { height: 60px; width: 100%; }
+
+        /* DETAIL VIEW */
+        .detail-view { display: none; animation: fadeIn 0.3s ease; }
+        .detail-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px; }
+        
+        /* LOGS */
+        .log-list { max-height: 300px; overflow-y: auto; }
+        .log-item { display: flex; gap: 15px; padding: 12px 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        .log-item:last-child { border-bottom: none; }
+        .log-time { color: var(--muted); font-family: monospace; font-size: 0.8rem; min-width: 130px; }
+        .log-msg { flex: 1; }
+        .log-msg.error { color: var(--danger); font-weight: 600; }
+        .log-msg.success { color: var(--success); }
+
+        /* FOOTER */
+        .footer { text-align: center; font-size: 0.85rem; color: var(--muted); margin-top: 40px; padding-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .footer a { color: var(--text-color); text-decoration: none; font-weight: 600; }
+        .admin-trigger { cursor: pointer; opacity: 0.3; transition: opacity 0.2s; }
+        .admin-trigger:hover { opacity: 1; color: var(--accent-color); }
+
+        /* ADMIN MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: var(--panel-bg); border: var(--glass-border); border-radius: 24px; padding: 30px; max-width: 400px; width: 90%; text-align: center; }
+        .form-input { width: 100%; background: var(--input-bg); border: var(--glass-border); border-radius: 12px; padding: 12px; color: var(--text-color); font-size: 0.95rem; outline: none; margin: 15px 0; text-align: center; }
+        .btn-primary { background: var(--accent-color); color: #fff; border: none; border-radius: 12px; padding: 12px 24px; font-weight: 700; cursor: pointer; width: 100%; margin-bottom: 10px; }
+        .btn-secondary { background: transparent; color: var(--muted); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 24px; font-weight: 600; cursor: pointer; width: 100%; }
+
+        @media (max-width: 600px) {
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .sites-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+    <div class="container">
+        <div class="top-bar">
+            <div class="logo">📡 TroubleTab Monitor</div>
+            <button class="icon-btn" id="themeToggle" title="Сменить тему">☀️</button>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="summary-grid" id="summaryGrid">
+            <div class="summary-item"><div class="summary-value" id="totalSites">-</div><div class="summary-label">Всего сайтов</div></div>
+            <div class="summary-item"><div class="summary-value" style="color:var(--success)" id="upSites">-</div><div class="summary-label">Онлайн</div></div>
+            <div class="summary-item"><div class="summary-value" style="color:var(--danger)" id="downSites">-</div><div class="summary-label">Ошибки</div></div>
+            <div class="summary-item"><div class="summary-value" id="avgResponse">-</div><div class="summary-label">Ср. отклик (мс)</div></div>
+        </div>
+
+        <!-- SITES LIST -->
+        <div class="section-card">
+            <div class="section-title">🌐 Статусы сервисов</div>
+            <div class="sites-grid" id="sitesGrid">
+                <div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--muted);">Загрузка данных мониторинга...</div>
+            </div>
+        </div>
+
+        <!-- DETAIL VIEW (Hidden by default) -->
+        <div class="section-card detail-view" id="detailView">
+            <div class="section-title" id="detailTitle">📈 Детальная статистика</div>
+            <div class="chart-container">
+                <canvas id="responseChart"></canvas>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <div class="section-title" style="margin:0; font-size:0.9rem;">📋 Последние события</div>
+                <a href="#" id="repoLink" target="_blank" class="btn-secondary" style="width:auto; padding: 6px 12px; font-size:0.8rem;">Открыть репозиторий ↗</a>
+            </div>
+            <div class="log-list" id="detailLog"></div>
+        </div>
+
+        <div class="footer">
+            <span>проект был написан <a href="https://github.com/zloba010" target="_blank" rel="noopener">kizamia</a></span>
+            <span class="admin-trigger" id="adminTrigger" title="Управление">⚙️</span>
+        </div>
+    </div>
+
+    <!-- ADMIN MODAL -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-box">
+            <h3 style="margin-bottom:10px;">⚙️ Панель управления</h3>
+            <p style="font-size:0.9rem; color:var(--muted); margin-bottom:15px;">Введите GitHub Token для ручного запуска проверки или управления новостями (будет реализовано далее).</p>
+            <input type="password" class="form-input" id="tokenInput" placeholder="ghp_... или github_pat_...">
+            <button class="btn-primary" id="saveTokenBtn">Сохранить токен</button>
+            <button class="btn-secondary" id="closeModalBtn">Отмена</button>
+            <button class="btn-secondary" id="triggerActionBtn" style="margin-top:10px; background:var(--primary-color); color:var(--bg-color); border:none;">🔄 Запустить проверку сейчас</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== КОНФИГУРАЦИЯ =====
+        const REPO_OWNER = 'zloba010';
+        const REPO_NAME = 'zloba010.github.io';
+        
+        // ===== ТЕМЫ =====
+        const themes = ['light', 'dark', 'glass'];
+        const themeIcons = ['☀️', '🌙', '💎'];
+        const themeToggleBtn = document.getElementById('themeToggle');
+        let savedTheme = localStorage.getItem('troubleTabTheme') || 'light';
+        let currentThemeIndex = themes.indexOf(savedTheme);
+        if (currentThemeIndex === -1) currentThemeIndex = 0;
+
+        function applyTheme() {
+            document.body.setAttribute('data-theme', themes[currentThemeIndex]);
+            themeToggleBtn.textContent = themeIcons[currentThemeIndex];
+            localStorage.setItem('troubleTabTheme', themes[currentThemeIndex]);
+            updateChartTheme(); // Обновляем цвета графика при смене темы
+        }
+        themeToggleBtn.addEventListener('click', () => {
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+            applyTheme();
+        });
+        applyTheme();
+
+        // ===== АДМИН ЛОГИКА =====
+        const adminTrigger = document.getElementById('adminTrigger');
+        const adminModal = document.getElementById('adminModal');
+        
+        adminTrigger.addEventListener('click', () => {
+            if(localStorage.getItem('kizamia_admin_token')) {
+                if(confirm('Очистить сохраненный токен и выйти?')) {
+                    localStorage.removeItem('kizamia_admin_token');
+                    alert('Токен удален.');
+                }
+            } else {
+                adminModal.classList.add('active');
+            }
+        });
+
+        document.getElementById('closeModalBtn').addEventListener('click', () => adminModal.classList.remove('active'));
+        
+        document.getElementById('saveTokenBtn').addEventListener('click', () => {
+            const token = document.getElementById('tokenInput').value.trim();
+            if (token.startsWith('ghp_') || token.startsWith('github_pat_')) {
+                localStorage.setItem('kizamia_admin_token', token);
+                adminModal.classList.remove('active');
+                document.getElementById('tokenInput').value = '';
+                alert('Токен сохранен локально!');
+            } else {
+                alert('Неверный формат токена.');
+            }
+        });
+
+        document.getElementById('triggerActionBtn').addEventListener('click', async () => {
+            const token = localStorage.getItem('kizamia_admin_token');
+            if(!token) { alert('Сначала сохраните токен!'); return; }
+            
+            const btn = document.getElementById('triggerActionBtn');
+            btn.textContent = '⏳ Запуск...';
+            btn.disabled = true;
+
+            try {
+                await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/monitor.yml/dispatches`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify({ ref: 'main' })
+                });
+                alert('Запрос отправлен! Данные обновятся через 1-2 минуты после завершения Action.');
+                adminModal.classList.remove('active');
+            } catch(e) {
+                alert('Ошибка запуска. Проверьте токен.');
+            }
+            btn.textContent = '🔄 Запустить проверку сейчас';
+            btn.disabled = false;
+        });
+
+        // ===== ДАННЫЕ И ГРАФИКИ =====
+        let monitorData = null;
+        let responseChartInstance = null;
+
+        async function loadData() {
+            try {
+                const res = await fetch(`uptime-data.json?t=${Date.now()}`);
+                if(!res.ok) throw new Error('Файл не найден. Возможно, Action еще не отработал.');
+                monitorData = await res.json();
+                renderSummary();
+                renderSitesGrid();
+            } catch (e) {
+                document.getElementById('sitesGrid').innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--danger);">⚠️ ${e.message}<br><small>Убедитесь, что GitHub Action отработал хотя бы один раз.</small></div>`;
+            }
+        }
+
+        function renderSummary() {
+            const sites = Object.values(monitorData.sites);
+            const total = sites.length;
+            const up = sites.filter(s => s.current_status === 'up').length;
+            const down = total - up;
+            const avgMs = Math.round(sites.reduce((acc, s) => acc + s.current_ms, 0) / total);
+
+            document.getElementById('totalSites').textContent = total;
+            document.getElementById('upSites').textContent = up;
+            document.getElementById('downSites').textContent = down;
+            document.getElementById('avgResponse').textContent = avgMs;
+        }
+
+        function renderSitesGrid() {
+            const grid = document.getElementById('sitesGrid');
+            grid.innerHTML = '';
+            
+            Object.entries(monitorData.sites).forEach(([name, data]) => {
+                const isUp = data.current_status === 'up';
+                const badgeClass = isUp ? 'up' : 'down';
+                const badgeText = isUp ? `${data.current_code} OK` : `${data.current_code} ERR`;
+                
+                const card = document.createElement('div');
+                card.className = 'site-card';
+                card.onclick = () => showDetail(name, card);
+                card.innerHTML = `
+                    <div class="site-header">
+                        <div class="site-name">${name}</div>
+                        <div class="status-badge ${badgeClass}">${badgeText}</div>
+                    </div>
+                    <div class="site-meta">
+                        <span>⏱ ${data.current_ms}мс</span>
+                        <span>🔗 ${new URL(data.url).hostname}</span>
+                    </div>
+                    <div class="sparkline-container">
+                        <canvas id="spark-${name.replace(/\s+/g, '')}"></canvas>
+                    </div>
+                `;
+                grid.appendChild(card);
+
+                // Рисуем спарклайн (мини-график)
+                setTimeout(() => drawSparkline(`spark-${name.replace(/\s+/g, '')}`, data.history), 50);
+            });
+        }
+
+        function drawSparkline(canvasId, history) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const msData = history.map(h => h.ms);
+            const labels = history.map(h => new Date(h.time).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'}));
+            const color = getComputedStyle(document.body).getPropertyValue('--accent-color').trim();
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: msData,
+                        borderColor: color,
+                        borderWidth: 2,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+
+        function showDetail(name, cardElement) {
+            // UI переключение
+            document.querySelectorAll('.site-card').forEach(c => c.classList.remove('active'));
+            cardElement.classList.add('active');
+            
+            const detailView = document.getElementById('detailView');
+            detailView.classList.add('active');
+            document.getElementById('detailTitle').innerHTML = `📈 ${name}`;
+            
+            const data = monitorData.sites[name];
+            document.getElementById('repoLink').href = `https://github.com/${REPO_OWNER}/${data.repo}`;
+
+            // Рендер логов
+            const logContainer = document.getElementById('detailLog');
+            logContainer.innerHTML = '';
+            // Берем последние 15 записей в обратном порядке
+            const recentHistory = [...data.history].reverse().slice(0, 15);
+            
+            recentHistory.forEach(h => {
+                const time = new Date(h.time).toLocaleString('ru-RU', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                const isError = h.status === 'down';
+                logContainer.innerHTML += `
+                    <div class="log-item">
+                        <div class="log-time">${time}</div>
+                        <div class="log-msg ${isError ? 'error' : 'success'}">
+                            ${isError ? '❌' : '✅'} Код: ${h.code} | Отклик: ${h.ms}мс
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Рендер основного графика
+            renderMainChart(name, data.history);
+            
+            // Плавный скролл к деталям на мобильных
+            if(window.innerWidth < 700) {
+                detailView.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function renderMainChart(name, history) {
+            const ctx = document.getElementById('responseChart').getContext('2d');
+            if (responseChartInstance) responseChartInstance.destroy();
+
+            const labels = history.map(h => new Date(h.time).toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'}));
+            const msData = history.map(h => h.ms);
+            const color = getComputedStyle(document.body).getPropertyValue('--accent-color').trim();
+            const gridColor = getComputedStyle(document.body).getPropertyValue('--border-color').trim();
+
+            responseChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Время отклика (мс)',
+                        data: msData,
+                        borderColor: color,
+                        backgroundColor: color + '20', // 20 = прозрачность в hex
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: getComputedStyle(document.body).getPropertyValue('--panel-bg').trim(),
+                            titleColor: getComputedStyle(document.body).getPropertyValue('--text-color').trim(),
+                            bodyColor: getComputedStyle(document.body).getPropertyValue('--text-color').trim(),
+                            borderColor: getComputedStyle(document.body).getPropertyValue('--border-color').trim(),
+                            borderWidth: 1,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) { return context.parsed.y + ' мс'; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: getComputedStyle(document.body).getPropertyValue('--muted').trim(), maxTicksLimit: 8 }
+                        },
+                        y: {
+                            grid: { color: gridColor + '40' },
+                            ticks: { color: getComputedStyle(document.body).getPropertyValue('--muted').trim() }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChartTheme() {
+            if (responseChartInstance) {
+                // Перерисовываем активный график при смене темы
+                const activeCard = document.querySelector('.site-card.active');
+                if (activeCard) {
+                    const name = activeCard.querySelector('.site-name').textContent;
+                    renderMainChart(name, monitorData.sites[name].history);
+                }
+            }
+        }
+
+        // ===== СТАРТ =====
+        loadData();
+        // Автообновление каждые 60 секунд
+        setInterval(loadData, 60000);
+    </script>
+</body>
+</html>
