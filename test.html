@@ -649,25 +649,15 @@
             applyTheme();
         });
 
-        // ===== РАДИО: ТОЛЬКО СТРОГИЕ HTTPS ПОТОКИ (БЕЗ ПОРТОВ) =====
-        // Поскольку сайт работает на GitHub Pages (HTTPS), браузер блокирует любые http:// ссылки (Mixed Content).
-        // Мы используем только стандартные https:// URL без нестандартных портов (:8000, :8052), которые гарантированно имеют валидные SSL-сертификаты.
+        // ===== ВАШИ РАДИОСТАНЦИИ (ТОЛЬКО ПРЯМЫЕ РАБОЧИЕ HTTPS ПОТОКИ) =====
         const radioStations = [
-            { name: 'Радио России', domain: 'vgtrk.com', emoji: '🇷🇺', streams: ['https://icecast-vgtrk.cdnvideo.ru/radiorus_192'] },
-            { name: 'Маяк', domain: 'vgtrk.com', emoji: '🗼', streams: ['https://icecast-vgtrk.cdnvideo.ru/radiomayak_192'] },
-            { name: 'Вести ФМ', domain: 'vgtrk.com', emoji: '📢', streams: ['https://icecast-vgtrk.cdnvideo.ru/vestifm_mp3_192kbps'] },
-            { name: 'Радио Культура', domain: 'vgtrk.com', emoji: '🎭', streams: ['https://icecast-vgtrk.cdnvideo.ru/culturafm_aac_64kbps'] },
-            { name: 'Юмор FM', domain: 'vgtrk.com', emoji: '😄', streams: ['https://icecast-vgtrk.cdnvideo.ru/yumorfm_aac_64kbps'] },
-            { name: 'Европа Плюс', domain: 'europaplus.ru', emoji: '🎶', streams: ['https://ep128.hostingradio.ru/europaplus128.mp3'] },
-            { name: 'Авторадио', domain: 'avtoradio.ru', emoji: '🚗', streams: ['https://avtoradio.hostingradio.ru/avtoradio128.mp3'] },
-            { name: 'Радио Рекорд', domain: 'radiorecord.ru', emoji: '🎧', streams: ['https://radiorecord.hostingradio.ru/rr_main96.aacp'] },
-            { name: 'Наше Радио', domain: 'nashe.ru', emoji: '🎸', streams: ['https://nashe1.hostingradio.ru/nashe-128.mp3'] },
-            { name: 'Ретро FM', domain: 'retrofm.ru', emoji: '📻', streams: ['https://retro.hostingradio.ru/retro128.mp3'] },
-            { name: 'DFM', domain: 'dfm.ru', emoji: '💿', streams: ['https://dfm.hostingradio.ru/dfm128.mp3'] },
-            { name: 'Хит FM', domain: 'hitfm.ru', emoji: '🎤', streams: ['https://hitfm.hostingradio.ru/hitfm128.mp3'] },
-            { name: 'Love Radio', domain: 'loveradio.ru', emoji: '❤️', streams: ['https://loveradio.hostingradio.ru/loveradio128.mp3'] },
-            { name: 'Радио ENERGY', domain: 'energyfm.ru', emoji: '⚡', streams: ['https://energy.hostingradio.ru/energy128.mp3'] },
-            { name: 'Радио Звезда', domain: 'radiozvezda.ru', emoji: '⭐', streams: ['https://radiozvezda.hostingradio.ru/radiozvezda128.mp3'] }
+            { name: 'Радио Звезда', domain: 'radiozvezda.ru', emoji: '⭐', streams: ['https://icecast-zvezda.mediacdn.ru/radio/zvezda/zvezda_128'] },
+            { name: 'Русское Радио', domain: 'rusradio.ru', emoji: '🎵', streams: ['https://rusradio.hostingradio.ru/rusradio128.mp3'] },
+            { name: 'Ретро FM', domain: 'retrofm.ru', emoji: '📻', streams: ['https://hls-01-retro.emgsound.ru/12/128/playlist.m3u8', 'https://retro.hostingradio.ru/retro128.mp3'] },
+            { name: 'Дорожное Радио', domain: 'dorognoe.ru', emoji: '🚗', streams: ['https://dorognoe.hostingradio.ru:8000/dorognoe'] },
+            { name: 'Европа Плюс', domain: 'europaplus.ru', emoji: '🎶', streams: ['https://ep128.hostingradio.ru:8030/ep128'] },
+            { name: 'Радио Маяк', domain: 'radiomayak.ru', emoji: '🗼', streams: ['https://icecast-vgtrk.cdnvideo.ru/mayakfm_aac_64kbps'] },
+            { name: 'Радио Ваня', domain: 'radiovanya.ru', emoji: '🎧', streams: ['https://ic1.radiosignal.one/vanya-mp3'] }
         ];
 
         const radioAudio = document.getElementById('radioAudio');
