@@ -13,30 +13,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Ensure alert label
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh label create "monitoring-alert" --repo "$GITHUB_REPOSITORY" \
-            --description "Автоалерт мониторинга" --color "ef4444" --force || true
-
+      
       - name: Run monitor
         env:
           MONITOR_TOKEN: ${{ secrets.MONITOR_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python3 scripts/monitor.py
-
+        run: |
+          python3 scripts/monitor.py
+          echo "---"
+          cat uptime-data.json | head -50
+      
       - name: Commit data
         run: |
           git config --local user.email "bot@troubletab.dev"
           git config --local user.name "TroubleTab Monitor Bot"
           git add uptime-data.json
-          if git diff --cached --quiet; then echo "Нет изменений"; exit 0; fi
-          git commit -m "chore(monitor): update metrics $(date -u +%FT%TZ)"
+          if git diff --cached --quiet; then
+            echo "Нет изменений"
+            exit 0
+          fi
+          git commit -m "chore(monitor): update metrics"
           git pull --rebase origin main || true
           git push || (git pull --rebase origin main && git push) || true
