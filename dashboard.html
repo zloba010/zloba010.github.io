@@ -134,6 +134,7 @@ tr:hover td{background:var(--input)}
 .gear{cursor:pointer;opacity:.4;transition:.2s}
 .gear:hover{opacity:1;transform:rotate(90deg)}
 ::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--grid);border-radius:4px}
+.empty-msg{text-align:center;color:var(--muted);padding:40px 20px;font-size:.9rem}
 </style>
 </head>
 <body data-theme="dark">
@@ -234,18 +235,20 @@ tr:hover td{background:var(--input)}
   </div>
 
   <div class="tab" id="t-arch">
-    <div class="panel">
+    <div class="panel" id="archMonthPanel">
       <div class="panel-h"><div class="panel-t">Uptime по месяцам, %</div></div>
       <div class="chartbox tall"><canvas id="chMonth"></canvas></div>
+      <div class="empty-msg" id="archMonthEmpty" style="display:none">Недостаточно данных для архива. Action должен отработать минимум 24 часа.</div>
     </div>
     <div class="g2">
       <div class="panel">
         <div class="panel-h"><div class="panel-t">Годовые сводки</div></div>
         <div style="overflow-x:auto"><table id="yearTable"></table></div>
       </div>
-      <div class="panel">
+      <div class="panel" id="archRespPanel">
         <div class="panel-h"><div class="panel-t">Средний отклик по месяцам, мс</div></div>
         <div class="chartbox"><canvas id="chMonthResp"></canvas></div>
+        <div class="empty-msg" id="archRespEmpty" style="display:none">Нет данных.</div>
       </div>
     </div>
   </div>
@@ -406,8 +409,8 @@ function renderBars(){
 }
 
 function mkChart(id,cfg){if(charts[id])charts[id].destroy();
-  const el=document.getElementById(id);if(!el)return;
-  charts[id]=new Chart(el.getContext('2d'),cfg);}
+  const el=document.getElementById(id);if(!el)return null;
+  charts[id]=new Chart(el.getContext('2d'),cfg);return charts[id];}
 function baseOpts(yTitle){return{responsive:true,maintainAspectRatio:false,
   interaction:{mode:'index',intersect:false},
   plugins:{legend:{display:false},tooltip:{backgroundColor:css('--panel'),titleColor:css('--text'),
@@ -418,7 +421,6 @@ function baseOpts(yTitle){return{responsive:true,maintainAspectRatio:false,
 
 function renderCharts(){
   const names=Object.keys(D.sites);
-  const useDaily=!['15m','1h','6h','24h'].includes(RANGE);
   let labels=null;const ds=[];
   names.forEach((n,i)=>{const pts=hist(D.sites[n]);
     if(!pts.length)return;if(!labels)labels=pts.map(p=>fmtT(p.time,RANGE));
@@ -522,11 +524,27 @@ function renderArchive(){
     const m=d.date.slice(0,7);(months[m]=months[m]||{up:0,c:0});(mresp[m]=mresp[m]||{s:0,c:0});
     months[m].up+=d.up;months[m].c+=d.checks;mresp[m].s+=d.sum_ms;mresp[m].c+=d.checks;}));
   const keys=Object.keys(months).sort();
+  
+  // Показываем/скрываем сообщения о пустых данных
+  const monthEmpty = $('#archMonthEmpty');
+  const respEmpty = $('#archRespEmpty');
+  const monthCanvas = $('#chMonth');
+  const respCanvas = $('#chMonthResp');
+  
   if(keys.length===0){
-    $('#chMonth').parentElement.innerHTML='<div class="panel-sub" style="padding:40px;text-align:center">Недостаточно данных для архива. Action должен отработать минимум 24 часа.</div>';
+    if(monthEmpty) monthEmpty.style.display='block';
+    if(monthCanvas) monthCanvas.style.display='none';
+    if(respEmpty) respEmpty.style.display='block';
+    if(respCanvas) respCanvas.style.display='none';
     $('#yearTable').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Нет данных</td></tr>';
     return;
   }
+  
+  if(monthEmpty) monthEmpty.style.display='none';
+  if(monthCanvas) monthCanvas.style.display='block';
+  if(respEmpty) respEmpty.style.display='none';
+  if(respCanvas) respCanvas.style.display='block';
+  
   mkChart('chMonth',{type:'bar',data:{labels:keys.map(k=>{const[y,m]=k.split('-');
     return new Date(y,m-1).toLocaleDateString('ru-RU',{month:'long',year:'2-digit'});}),
     datasets:[{data:keys.map(k=>+(months[k].up/months[k].c*100).toFixed(2)),
