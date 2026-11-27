@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-11-27T19:18:38+00:00",
+  "last_updated": "2026-11-27T19:57:11.251077+00:00",
   "sites": {
     "Root": {
       "url": "https://zloba010.github.io/",
       "repo": "zloba010.github.io",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 375,
+      "current_ms": 76,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -25,15 +25,129 @@
           "status": "up",
           "ms": 375,
           "code": 200
+        },
+        {
+          "time": "2026-11-27T19:57:11.251077+00:00",
+          "status": "up",
+          "ms": 76,
+          "code": 200
         }
-      ]
+      ],
+      "daily": [
+        {
+          "date": "2026-11-27",
+          "checks": 1,
+          "up": 1,
+          "errors": 0,
+          "sum_ms": 76,
+          "max_ms": 76,
+          "downtime_s": 0,
+          "deploys": 0
+        }
+      ],
+      "incidents": [],
+      "deploys": [],
+      "commits": [
+        {
+          "sha": "f559f88",
+          "date": "2026-11-27T19:55:21Z",
+          "author": "Kizamia",
+          "msg": "Update monitor.py"
+        },
+        {
+          "sha": "6999a4c",
+          "date": "2026-11-27T19:50:13Z",
+          "author": "Kizamia",
+          "msg": "Update dashboard.html"
+        },
+        {
+          "sha": "78c4ce4",
+          "date": "2026-11-27T19:38:09Z",
+          "author": "Kizamia",
+          "msg": "Update dashboard.html"
+        },
+        {
+          "sha": "6057c5d",
+          "date": "2026-11-27T19:32:17Z",
+          "author": "Kizamia",
+          "msg": "Update monitor.yml"
+        },
+        {
+          "sha": "797d716",
+          "date": "2026-11-27T19:31:59Z",
+          "author": "Kizamia",
+          "msg": "Update monitor.py"
+        },
+        {
+          "sha": "61ac40f",
+          "date": "2026-11-27T19:25:56Z",
+          "author": "Kizamia",
+          "msg": "Update dashboard.html"
+        },
+        {
+          "sha": "27aefb4",
+          "date": "2026-11-27T19:25:16Z",
+          "author": "Kizamia",
+          "msg": "Update monitor.yml"
+        },
+        {
+          "sha": "03002f4",
+          "date": "2026-11-27T19:24:41Z",
+          "author": "Kizamia",
+          "msg": "Create monitor.py"
+        },
+        {
+          "sha": "51485a4",
+          "date": "2026-11-27T19:18:41Z",
+          "author": "GitHub Monitor Bot",
+          "msg": "chore: update uptime data"
+        },
+        {
+          "sha": "21e955d",
+          "date": "2026-11-27T19:10:48Z",
+          "author": "GitHub Monitor Bot",
+          "msg": "chore: update uptime data"
+        },
+        {
+          "sha": "bbea167",
+          "date": "2026-11-27T17:48:11Z",
+          "author": "GitHub Monitor Bot",
+          "msg": "chore: update uptime data"
+        },
+        {
+          "sha": "1862a91",
+          "date": "2026-11-27T17:47:22Z",
+          "author": "Kizamia",
+          "msg": "monitor.yml"
+        },
+        {
+          "sha": "929f29c",
+          "date": "2026-11-27T17:46:30Z",
+          "author": "Kizamia",
+          "msg": "dashboard.html"
+        },
+        {
+          "sha": "81bf0cb",
+          "date": "2026-11-27T17:36:06Z",
+          "author": "Kizamia",
+          "msg": "dashboard.html"
+        },
+        {
+          "sha": "4eaaf9b",
+          "date": "2026-11-27T17:34:18Z",
+          "author": "Kizamia",
+          "msg": "-"
+        }
+      ],
+      "runs": [],
+      "current_time": "2026-11-27T19:57:11.251077+00:00"
     },
     "KFWR": {
       "url": "https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader/",
       "repo": "KFWR---Kizami-Free-Web-Reader",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 293,
+      "current_ms": 122,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -52,15 +166,129 @@
           "status": "up",
           "ms": 293,
           "code": 200
+        },
+        {
+          "time": "2026-11-27T19:57:11.251077+00:00",
+          "status": "up",
+          "ms": 122,
+          "code": 200
         }
-      ]
+      ],
+      "daily": [
+        {
+          "date": "2026-11-27",
+          "checks": 1,
+          "up": 1,
+          "errors": 0,
+          "sum_ms": 122,
+          "max_ms": 122,
+          "downtime_s": 0,
+          "deploys": 0
+        }
+      ],
+      "incidents": [],
+      "deploys": [],
+      "commits": [
+        {
+          "sha": "d4c0b1d",
+          "date": "2026-11-24T05:55:44Z",
+          "author": "Kizamia",
+          "msg": "Update sw.js"
+        },
+        {
+          "sha": "2b561cc",
+          "date": "2026-11-24T05:48:55Z",
+          "author": "Kizamia",
+          "msg": "Update manifest.json"
+        },
+        {
+          "sha": "2cca0e1",
+          "date": "2026-11-24T05:40:35Z",
+          "author": "Kizamia",
+          "msg": "Update sw.js"
+        },
+        {
+          "sha": "39fcf5f",
+          "date": "2026-11-24T05:38:38Z",
+          "author": "Kizamia",
+          "msg": "Add files via upload"
+        },
+        {
+          "sha": "d1f3fc4",
+          "date": "2026-11-24T05:38:13Z",
+          "author": "Kizamia",
+          "msg": "Update manifest.json"
+        },
+        {
+          "sha": "5427764",
+          "date": "2026-11-24T05:27:02Z",
+          "author": "Kizamia",
+          "msg": "Update sw.js"
+        },
+        {
+          "sha": "7045801",
+          "date": "2026-11-24T05:21:00Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "a6ec78f",
+          "date": "2026-11-24T05:19:44Z",
+          "author": "Kizamia",
+          "msg": "Create sw.js"
+        },
+        {
+          "sha": "31eaf54",
+          "date": "2026-11-24T05:17:29Z",
+          "author": "Kizamia",
+          "msg": "Add files via upload"
+        },
+        {
+          "sha": "6b67f05",
+          "date": "2026-11-24T04:24:27Z",
+          "author": "Kizamia",
+          "msg": "Update manifest.json"
+        },
+        {
+          "sha": "8848502",
+          "date": "2026-11-24T04:20:22Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "b76a0c2",
+          "date": "2026-11-24T04:18:44Z",
+          "author": "Kizamia",
+          "msg": "Create manifest.json"
+        },
+        {
+          "sha": "8ed91b6",
+          "date": "2026-11-21T09:41:32Z",
+          "author": "Kizamia",
+          "msg": "Update README.md"
+        },
+        {
+          "sha": "23eca21",
+          "date": "2026-11-13T21:24:04Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "e990e22",
+          "date": "2026-11-13T19:48:31Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        }
+      ],
+      "runs": [],
+      "current_time": "2026-11-27T19:57:11.251077+00:00"
     },
     "Kizamia Notes": {
       "url": "https://zloba010.github.io/kizamianotes/",
       "repo": "kizamianotes",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": -353,
+      "current_ms": 42,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -79,15 +307,57 @@
           "status": "up",
           "ms": -353,
           "code": 200
+        },
+        {
+          "time": "2026-11-27T19:57:11.251077+00:00",
+          "status": "up",
+          "ms": 42,
+          "code": 200
         }
-      ]
+      ],
+      "daily": [
+        {
+          "date": "2026-11-27",
+          "checks": 1,
+          "up": 1,
+          "errors": 0,
+          "sum_ms": 42,
+          "max_ms": 42,
+          "downtime_s": 0,
+          "deploys": 0
+        }
+      ],
+      "incidents": [],
+      "deploys": [],
+      "commits": [
+        {
+          "sha": "4b6f60f",
+          "date": "2026-11-14T14:01:53Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "9d5f6a5",
+          "date": "2026-11-14T07:11:18Z",
+          "author": "Kizamia",
+          "msg": "Add files via upload"
+        },
+        {
+          "sha": "c0444f8",
+          "date": "2026-11-14T07:09:58Z",
+          "author": "Kizamia",
+          "msg": "Initial commit"
+        }
+      ],
+      "runs": [],
+      "current_time": "2026-11-27T19:57:11.251077+00:00"
     },
     "Upscale Image": {
       "url": "https://zloba010.github.io/KizamiaUpscaleImage/",
       "repo": "KizamiaUpscaleImage",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 192,
+      "current_ms": 61,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -106,15 +376,111 @@
           "status": "up",
           "ms": 192,
           "code": 200
+        },
+        {
+          "time": "2026-11-27T19:57:11.251077+00:00",
+          "status": "up",
+          "ms": 61,
+          "code": 200
         }
-      ]
+      ],
+      "daily": [
+        {
+          "date": "2026-11-27",
+          "checks": 1,
+          "up": 1,
+          "errors": 0,
+          "sum_ms": 61,
+          "max_ms": 61,
+          "downtime_s": 0,
+          "deploys": 0
+        }
+      ],
+      "incidents": [],
+      "deploys": [],
+      "commits": [
+        {
+          "sha": "b3ae63c",
+          "date": "2026-11-26T06:17:39Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "0cfeb69",
+          "date": "2026-11-22T18:38:19Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "a61b641",
+          "date": "2026-11-22T18:36:09Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "6a7c051",
+          "date": "2026-11-22T03:54:59Z",
+          "author": "Kizamia",
+          "msg": "Update README.md"
+        },
+        {
+          "sha": "5a53ea8",
+          "date": "2026-11-22T03:49:20Z",
+          "author": "Kizamia",
+          "msg": "Update README.md"
+        },
+        {
+          "sha": "f2da885",
+          "date": "2026-11-22T03:48:14Z",
+          "author": "Kizamia",
+          "msg": "Update README.md"
+        },
+        {
+          "sha": "9d0ea49",
+          "date": "2026-11-22T03:38:00Z",
+          "author": "Kizamia",
+          "msg": "Update README.md"
+        },
+        {
+          "sha": "ddf5da4",
+          "date": "2026-11-22T03:35:42Z",
+          "author": "Kizamia",
+          "msg": "Create README.md"
+        },
+        {
+          "sha": "6965dd4",
+          "date": "2026-11-22T01:14:49Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "b42cf12",
+          "date": "2026-11-22T01:10:20Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "e967b5e",
+          "date": "2026-11-22T00:57:20Z",
+          "author": "Kizamia",
+          "msg": "Add files via upload"
+        },
+        {
+          "sha": "255320e",
+          "date": "2026-11-22T00:54:26Z",
+          "author": "Kizamia",
+          "msg": "Initial commit"
+        }
+      ],
+      "runs": [],
+      "current_time": "2026-11-27T19:57:11.251077+00:00"
     },
     "Kizamia Weather": {
       "url": "https://zloba010.github.io/Kizamia-Weather/",
       "repo": "Kizamia-Weather",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 119,
+      "current_ms": 47,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -133,8 +499,50 @@
           "status": "up",
           "ms": 119,
           "code": 200
+        },
+        {
+          "time": "2026-11-27T19:57:11.251077+00:00",
+          "status": "up",
+          "ms": 47,
+          "code": 200
         }
-      ]
+      ],
+      "daily": [
+        {
+          "date": "2026-11-27",
+          "checks": 1,
+          "up": 1,
+          "errors": 0,
+          "sum_ms": 47,
+          "max_ms": 47,
+          "downtime_s": 0,
+          "deploys": 0
+        }
+      ],
+      "incidents": [],
+      "deploys": [],
+      "commits": [
+        {
+          "sha": "c3221d3",
+          "date": "2026-11-27T14:18:05Z",
+          "author": "Kizamia",
+          "msg": "Update index.html"
+        },
+        {
+          "sha": "c048d43",
+          "date": "2026-11-27T13:14:21Z",
+          "author": "Kizamia",
+          "msg": "Create index.html"
+        },
+        {
+          "sha": "267ea85",
+          "date": "2026-11-27T13:13:47Z",
+          "author": "Kizamia",
+          "msg": "Initial commit"
+        }
+      ],
+      "runs": [],
+      "current_time": "2026-11-27T19:57:11.251077+00:00"
     }
   }
 }
