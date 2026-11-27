@@ -17,6 +17,7 @@
             --glass-border: 2px solid transparent;
             --shadow-color: rgba(0,0,0,0.1);
             --muted: rgba(62, 39, 35, 0.55);
+            --particle-color: rgba(62, 39, 35, 0.15);
         }
         [data-theme="dark"] {
             --bg-color: #2c1e16;
@@ -30,6 +31,7 @@
             --glass-border: 2px solid transparent;
             --shadow-color: rgba(0,0,0,0.4);
             --muted: rgba(230, 213, 195, 0.55);
+            --particle-color: rgba(230, 213, 195, 0.1);
         }
         [data-theme="glass"] {
             --bg-color: #e2e8f0;
@@ -43,6 +45,7 @@
             --glass-border: 1.5px solid rgba(255, 255, 255, 0.8);
             --shadow-color: rgba(0, 0, 0, 0.08);
             --muted: rgba(45, 55, 72, 0.55);
+            --particle-color: rgba(255, 255, 255, 0.15);
         }
         * {
             box-sizing: border-box;
@@ -57,6 +60,7 @@
             min-height: 100vh;
             position: relative;
             padding: 20px;
+            overflow-x: hidden;
         }
         body[data-theme="glass"] {
             background: 
@@ -72,20 +76,15 @@
             100% { background-position: 100% 100%; }
         }
 
-        /* ===== ПОГОДНЫЙ CANVAS ===== */
+        /* ===== CANVAS ДЛЯ ПОГОДНЫХ АНИМАЦИЙ ===== */
         #weatherCanvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: -1;
             pointer-events: none;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 1s ease;
-        }
-        #weatherCanvas.active {
-            opacity: 1;
         }
 
         /* ===== HEADER ===== */
@@ -97,7 +96,7 @@
             margin: 0 auto 30px;
             gap: 12px;
             position: relative;
-            z-index: 2;
+            z-index: 10;
         }
         .back-link {
             display: flex;
@@ -153,7 +152,7 @@
             max-width: 1000px;
             margin: 0 auto;
             position: relative;
-            z-index: 2;
+            z-index: 10;
         }
 
         /* ===== HERO КАРТОЧКА ===== */
@@ -382,18 +381,17 @@
             margin: 30px auto 0;
             text-align: center;
             font-size: 0.85rem;
-            color: var(--muted);
-            position: relative;
-            z-index: 2;
+            font-weight: 500;
         }
         .footer a {
             color: var(--text-color);
             text-decoration: none;
-            font-weight: 600;
-            transition: all 0.2s;
+            opacity: 0.7;
+            transition: all 0.3s ease;
         }
         .footer a:hover {
             color: var(--accent-color);
+            opacity: 1;
             text-shadow: 0 0 8px var(--accent-color);
         }
 
@@ -431,7 +429,7 @@
 </head>
 <body data-theme="light">
 
-    <!-- Canvas для фоновых погодных анимаций -->
+    <!-- Canvas для погодных анимаций -->
     <canvas id="weatherCanvas"></canvas>
 
     <div class="top-bar">
@@ -474,8 +472,8 @@
             document.body.setAttribute('data-theme', theme);
             themeToggleBtn.textContent = themeIcons[currentThemeIndex];
             localStorage.setItem('kizamiWeatherTheme', theme);
-            // Перезапускаем анимацию для новых цветов
-            if (currentWeatherCode !== null) startWeatherAnimation(currentWeatherCode);
+            // Обновляем цвет частиц при смене темы
+            updateParticleColor();
         }
         themeToggleBtn.addEventListener('click', () => {
             currentThemeIndex = (currentThemeIndex + 1) % themes.length;
@@ -483,39 +481,39 @@
         });
         applyTheme();
 
-        // ===== ПОГОДНЫЕ КОДЫ WMO =====
+        // ===== ПОГОДНЫЕ КОДЫ WMO → ОПИСАНИЕ + ЭМОДЗИ + ТИП АНИМАЦИИ =====
         const weatherInfo = {
-            0:  { desc: 'Ясно',                  emoji: '☀️' },
-            1:  { desc: 'Преимущественно ясно',  emoji: '🌤️' },
-            2:  { desc: 'Переменная облачность', emoji: '⛅' },
-            3:  { desc: 'Пасмурно',              emoji: '☁️' },
-            45: { desc: 'Туман',                 emoji: '🌫️' },
-            48: { desc: 'Изморозь',              emoji: '🌫️' },
-            51: { desc: 'Лёгкая морось',         emoji: '🌦️' },
-            53: { desc: 'Морось',                emoji: '🌦️' },
-            55: { desc: 'Сильная морось',        emoji: '🌦️' },
-            56: { desc: 'Ледяная морось',        emoji: '🌧️' },
-            57: { desc: 'Сильная ледяная морось',emoji: '🌧️' },
-            61: { desc: 'Небольшой дождь',       emoji: '🌦️' },
-            63: { desc: 'Дождь',                 emoji: '🌧️' },
-            65: { desc: 'Сильный дождь',         emoji: '🌧️' },
-            66: { desc: 'Ледяной дождь',         emoji: '🌧️' },
-            67: { desc: 'Сильный ледяной дождь', emoji: '🌧️' },
-            71: { desc: 'Небольшой снег',        emoji: '🌨️' },
-            73: { desc: 'Снег',                  emoji: '❄️' },
-            75: { desc: 'Сильный снег',          emoji: '❄️' },
-            77: { desc: 'Снежные зёрна',         emoji: '🌨️' },
-            80: { desc: 'Ливень',                emoji: '🌦️' },
-            81: { desc: 'Сильный ливень',        emoji: '🌧️' },
-            82: { desc: 'Очень сильный ливень',  emoji: '⛈️' },
-            85: { desc: 'Снегопад',              emoji: '🌨️' },
-            86: { desc: 'Сильный снегопад',      emoji: '❄️' },
-            95: { desc: 'Гроза',                 emoji: '⛈️' },
-            96: { desc: 'Гроза с градом',        emoji: '⛈️' },
-            99: { desc: 'Сильная гроза с градом',emoji: '⛈️' }
+            0:  { desc: 'Ясно',                  emoji: '☀️', anim: 'clear' },
+            1:  { desc: 'Преимущественно ясно',  emoji: '🌤️', anim: 'clear' },
+            2:  { desc: 'Переменная облачность', emoji: '⛅', anim: 'clouds' },
+            3:  { desc: 'Пасмурно',              emoji: '☁️', anim: 'clouds' },
+            45: { desc: 'Туман',                 emoji: '🌫️', anim: 'fog' },
+            48: { desc: 'Изморозь',              emoji: '🌫️', anim: 'fog' },
+            51: { desc: 'Лёгкая морось',         emoji: '🌦️', anim: 'rain' },
+            53: { desc: 'Морось',                emoji: '🌦️', anim: 'rain' },
+            55: { desc: 'Сильная морось',        emoji: '🌦️', anim: 'rain' },
+            56: { desc: 'Ледяная морось',        emoji: '🌧️', anim: 'rain' },
+            57: { desc: 'Сильная ледяная морось',emoji: '🌧️', anim: 'rain' },
+            61: { desc: 'Небольшой дождь',       emoji: '🌦️', anim: 'rain' },
+            63: { desc: 'Дождь',                 emoji: '🌧️', anim: 'rain' },
+            65: { desc: 'Сильный дождь',         emoji: '🌧️', anim: 'rain' },
+            66: { desc: 'Ледяной дождь',         emoji: '🌧️', anim: 'rain' },
+            67: { desc: 'Сильный ледяной дождь', emoji: '🌧️', anim: 'rain' },
+            71: { desc: 'Небольшой снег',        emoji: '🌨️', anim: 'snow' },
+            73: { desc: 'Снег',                  emoji: '❄️', anim: 'snow' },
+            75: { desc: 'Сильный снег',          emoji: '❄️', anim: 'snow' },
+            77: { desc: 'Снежные зёрна',         emoji: '🌨️', anim: 'snow' },
+            80: { desc: 'Ливень',                emoji: '🌦️', anim: 'rain' },
+            81: { desc: 'Сильный ливень',        emoji: '🌧️', anim: 'rain' },
+            82: { desc: 'Очень сильный ливень',  emoji: '⛈️', anim: 'rain' },
+            85: { desc: 'Снегопад',              emoji: '🌨️', anim: 'snow' },
+            86: { desc: 'Сильный снегопад',      emoji: '❄️', anim: 'snow' },
+            95: { desc: 'Гроза',                 emoji: '⛈️', anim: 'rain' },
+            96: { desc: 'Гроза с градом',        emoji: '⛈️', anim: 'rain' },
+            99: { desc: 'Сильная гроза с градом',emoji: '⛈️', anim: 'rain' }
         };
         function getWeatherInfo(code) {
-            return weatherInfo[code] || { desc: 'Нет данных', emoji: '🌡️' };
+            return weatherInfo[code] || { desc: 'Нет данных', emoji: '🌡️', anim: 'clear' };
         }
 
         // ===== ДНИ НЕДЕЛИ =====
@@ -603,298 +601,141 @@
             } catch(e) { return 'Moscow'; }
         }
 
-        // ===== ПОГОДНЫЕ АНИМАЦИИ =====
-        const weatherCanvas = document.getElementById('weatherCanvas');
-        const wCtx = weatherCanvas.getContext('2d');
-        let animationId = null;
+        // ===== АНИМАЦИИ ФОНА (CANVAS) =====
+        const canvas = document.getElementById('weatherCanvas');
+        const ctx = canvas.getContext('2d');
         let particles = [];
-        let currentWeatherCode = null;
-        let currentAnimationType = null;
-        let lastFlashTime = 0;
+        let animationId = null;
+        let currentAnimType = 'none';
+        let particleColor = 'rgba(62, 39, 35, 0.15)';
 
-        function resizeWeatherCanvas() {
-            weatherCanvas.width = window.innerWidth;
-            weatherCanvas.height = window.innerHeight;
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
-        resizeWeatherCanvas();
-        window.addEventListener('resize', resizeWeatherCanvas);
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-        // Определяем тип анимации по коду погоды
-        function getAnimationType(code) {
-            if (code === 0) return 'sunny';
-            if (code >= 1 && code <= 3) return 'clouds';
-            if (code === 45 || code === 48) return 'fog';
-            if (code >= 51 && code <= 67) return 'rain';
-            if (code >= 71 && code <= 77) return 'snow';
-            if (code >= 80 && code <= 82) return 'heavy_rain';
-            if (code >= 85 && code <= 86) return 'heavy_snow';
-            if (code >= 95 && code <= 99) return 'storm';
-            return null;
+        function updateParticleColor() {
+            const style = getComputedStyle(document.body);
+            particleColor = style.getPropertyValue('--particle-color').trim();
         }
 
-        // Цвета частиц для разных тем
-        function getParticleColor(type) {
-            const theme = themes[currentThemeIndex];
-            const colors = {
-                rain: theme === 'dark' ? '180, 200, 220' : '60, 100, 140',
-                heavy_rain: theme === 'dark' ? '150, 180, 210' : '40, 80, 120',
-                snow: theme === 'dark' ? '230, 240, 250' : '220, 235, 250',
-                heavy_snow: theme === 'dark' ? '240, 245, 255' : '230, 240, 250',
-                fog: theme === 'dark' ? '200, 200, 210' : '180, 190, 200',
-                clouds: theme === 'dark' ? '150, 160, 180' : '150, 165, 185',
-                sunny: theme === 'dark' ? '255, 220, 100' : '255, 200, 80',
-                storm: theme === 'dark' ? '200, 210, 220' : '80, 100, 130'
-            };
-            return colors[type] || '150, 150, 150';
-        }
-
-        // Создаём частицы
-        function createParticles(type) {
-            particles = [];
-            const w = weatherCanvas.width;
-            const h = weatherCanvas.height;
-            
-            let count = 0;
-            switch(type) {
-                case 'rain': count = 80; break;
-                case 'heavy_rain': count = 200; break;
-                case 'snow': count = 60; break;
-                case 'heavy_snow': count = 150; break;
-                case 'fog': count = 20; break;
-                case 'clouds': count = 12; break;
-                case 'sunny': count = 25; break;
-                case 'storm': count = 150; break;
-                default: return;
+        class Particle {
+            constructor(type) {
+                this.type = type;
+                this.reset();
             }
-
-            for (let i = 0; i < count; i++) {
-                particles.push(createParticle(type, w, h, true));
-            }
-        }
-
-        function createParticle(type, w, h, randomY = false) {
-            const base = {
-                x: Math.random() * w,
-                y: randomY ? Math.random() * h : -20
-            };
-
-            switch(type) {
-                case 'rain':
-                case 'heavy_rain':
-                    return {
-                        ...base,
-                        length: 10 + Math.random() * 15,
-                        speed: 8 + Math.random() * 6,
-                        opacity: 0.15 + Math.random() * 0.15,
-                        angle: 0.15 + Math.random() * 0.05
-                    };
-                case 'snow':
-                case 'heavy_snow':
-                    return {
-                        ...base,
-                        radius: 1.5 + Math.random() * 3,
-                        speed: 0.5 + Math.random() * 1.5,
-                        opacity: 0.2 + Math.random() * 0.3,
-                        drift: Math.random() * 2 - 1,
-                        wobble: Math.random() * Math.PI * 2
-                    };
-                case 'fog':
-                    return {
-                        ...base,
-                        radius: 100 + Math.random() * 200,
-                        speed: 0.1 + Math.random() * 0.2,
-                        opacity: 0.04 + Math.random() * 0.06,
-                        drift: Math.random() * 0.5 - 0.25
-                    };
-                case 'clouds':
-                    return {
-                        ...base,
-                        radius: 80 + Math.random() * 150,
-                        speed: 0.2 + Math.random() * 0.3,
-                        opacity: 0.06 + Math.random() * 0.08,
-                        y: Math.random() * h * 0.6
-                    };
-                case 'sunny':
-                    return {
-                        ...base,
-                        radius: 2 + Math.random() * 4,
-                        speed: 0.3 + Math.random() * 0.5,
-                        opacity: 0.15 + Math.random() * 0.25,
-                        pulse: Math.random() * Math.PI * 2,
-                        pulseSpeed: 0.02 + Math.random() * 0.03
-                    };
-                case 'storm':
-                    return {
-                        ...base,
-                        length: 15 + Math.random() * 20,
-                        speed: 12 + Math.random() * 8,
-                        opacity: 0.2 + Math.random() * 0.2,
-                        angle: 0.2 + Math.random() * 0.1
-                    };
-            }
-            return base;
-        }
-
-        // Отрисовка частиц
-        function drawParticles(type) {
-            const w = weatherCanvas.width;
-            const h = weatherCanvas.height;
-            const color = getParticleColor(type);
-
-            wCtx.clearRect(0, 0, w, h);
-
-            particles.forEach((p, i) => {
-                switch(type) {
-                    case 'rain':
-                    case 'heavy_rain':
-                    case 'storm':
-                        wCtx.strokeStyle = `rgba(${color}, ${p.opacity})`;
-                        wCtx.lineWidth = 1.2;
-                        wCtx.beginPath();
-                        wCtx.moveTo(p.x, p.y);
-                        wCtx.lineTo(p.x - p.length * Math.sin(p.angle), p.y + p.length * Math.cos(p.angle));
-                        wCtx.stroke();
-                        
-                        p.x -= p.speed * Math.sin(p.angle);
-                        p.y += p.speed * Math.cos(p.angle);
-                        
-                        if (p.y > h) {
-                            p.y = -20;
-                            p.x = Math.random() * w;
-                        }
-                        break;
-
-                    case 'snow':
-                    case 'heavy_snow':
-                        wCtx.fillStyle = `rgba(${color}, ${p.opacity})`;
-                        wCtx.beginPath();
-                        p.wobble += 0.02;
-                        const wobbleX = Math.sin(p.wobble) * 0.5;
-                        wCtx.arc(p.x + wobbleX, p.y, p.radius, 0, Math.PI * 2);
-                        wCtx.fill();
-                        
-                        p.x += p.drift + wobbleX * 0.1;
-                        p.y += p.speed;
-                        
-                        if (p.y > h) {
-                            p.y = -20;
-                            p.x = Math.random() * w;
-                        }
-                        if (p.x > w) p.x = 0;
-                        if (p.x < 0) p.x = w;
-                        break;
-
-                    case 'fog':
-                        wCtx.fillStyle = `rgba(${color}, ${p.opacity})`;
-                        wCtx.beginPath();
-                        wCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        wCtx.fill();
-                        
-                        p.x += p.speed;
-                        p.y += p.drift;
-                        
-                        if (p.x - p.radius > w) p.x = -p.radius;
-                        if (p.x + p.radius < 0) p.x = w + p.radius;
-                        if (p.y > h) p.y = 0;
-                        if (p.y < -p.radius) p.y = h;
-                        break;
-
-                    case 'clouds':
-                        wCtx.fillStyle = `rgba(${color}, ${p.opacity})`;
-                        wCtx.beginPath();
-                        // Рисуем "облако" из нескольких кругов
-                        wCtx.arc(p.x, p.y, p.radius * 0.6, 0, Math.PI * 2);
-                        wCtx.arc(p.x + p.radius * 0.4, p.y - p.radius * 0.2, p.radius * 0.5, 0, Math.PI * 2);
-                        wCtx.arc(p.x + p.radius * 0.8, p.y, p.radius * 0.55, 0, Math.PI * 2);
-                        wCtx.arc(p.x + p.radius * 0.4, p.y + p.radius * 0.15, p.radius * 0.5, 0, Math.PI * 2);
-                        wCtx.fill();
-                        
-                        p.x += p.speed;
-                        if (p.x - p.radius > w) {
-                            p.x = -p.radius * 2;
-                            p.y = Math.random() * h * 0.6;
-                        }
-                        break;
-
-                    case 'sunny':
-                        p.pulse += p.pulseSpeed;
-                        const currentOpacity = p.opacity * (0.5 + Math.sin(p.pulse) * 0.5);
-                        wCtx.fillStyle = `rgba(${color}, ${currentOpacity})`;
-                        wCtx.beginPath();
-                        wCtx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        wCtx.fill();
-                        // Лёгкий halo вокруг блика
-                        wCtx.fillStyle = `rgba(${color}, ${currentOpacity * 0.3})`;
-                        wCtx.beginPath();
-                        wCtx.arc(p.x, p.y, p.radius * 2.5, 0, Math.PI * 2);
-                        wCtx.fill();
-                        
-                        p.y += p.speed * 0.3;
-                        p.x += Math.sin(p.pulse * 0.5) * 0.2;
-                        
-                        if (p.y > h) {
-                            p.y = -20;
-                            p.x = Math.random() * w;
-                        }
-                        break;
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                if (this.type === 'rain') {
+                    this.y = Math.random() * -canvas.height; // Начинаем сверху
+                    this.speed = 8 + Math.random() * 7;
+                    this.length = 10 + Math.random() * 15;
+                    this.wind = 1 + Math.random() * 2;
+                } else if (this.type === 'snow') {
+                    this.y = Math.random() * -canvas.height;
+                    this.speed = 1 + Math.random() * 2;
+                    this.size = 1 + Math.random() * 3;
+                    this.drift = (Math.random() - 0.5) * 1.5;
+                } else if (this.type === 'fog' || this.type === 'clouds') {
+                    this.x = Math.random() * canvas.width * 1.5 - canvas.width * 0.25;
+                    this.y = Math.random() * canvas.height;
+                    this.speed = 0.2 + Math.random() * 0.5;
+                    this.size = 50 + Math.random() * 150;
+                    this.opacity = 0.02 + Math.random() * 0.04;
+                } else if (this.type === 'clear') {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.speed = 0.1 + Math.random() * 0.3;
+                    this.size = 1 + Math.random() * 2;
+                    this.opacity = 0.1 + Math.random() * 0.2;
                 }
-            });
-
-            // Вспышка молнии для грозы
-            if (type === 'storm') {
-                const now = Date.now();
-                if (now - lastFlashTime > 3000 + Math.random() * 5000) {
-                    if (Math.random() > 0.7) {
-                        wCtx.fillStyle = `rgba(255, 255, 240, 0.15)`;
-                        wCtx.fillRect(0, 0, w, h);
-                        lastFlashTime = now;
+            }
+            update() {
+                if (this.type === 'rain') {
+                    this.y += this.speed;
+                    this.x += this.wind;
+                    if (this.y > canvas.height) {
+                        this.y = -this.length;
+                        this.x = Math.random() * canvas.width;
+                    }
+                } else if (this.type === 'snow') {
+                    this.y += this.speed;
+                    this.x += this.drift + Math.sin(this.y * 0.01) * 0.5;
+                    if (this.y > canvas.height) {
+                        this.y = -5;
+                        this.x = Math.random() * canvas.width;
+                    }
+                } else if (this.type === 'fog' || this.type === 'clouds') {
+                    this.x += this.speed;
+                    if (this.x > canvas.width + this.size) {
+                        this.x = -this.size;
+                        this.y = Math.random() * canvas.height;
+                    }
+                } else if (this.type === 'clear') {
+                    this.y -= this.speed;
+                    if (this.y < -5) {
+                        this.y = canvas.height + 5;
+                        this.x = Math.random() * canvas.width;
                     }
                 }
             }
-        }
-
-        // Главный цикл анимации
-        function animateWeather() {
-            if (currentAnimationType) {
-                drawParticles(currentAnimationType);
-                animationId = requestAnimationFrame(animateWeather);
+            draw() {
+                ctx.fillStyle = particleColor;
+                if (this.type === 'rain') {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x, this.y);
+                    ctx.lineTo(this.x + this.wind, this.y + this.length);
+                    ctx.strokeStyle = particleColor;
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                } else if (this.type === 'snow') {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (this.type === 'fog' || this.type === 'clouds') {
+                    ctx.globalAlpha = this.opacity;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                } else if (this.type === 'clear') {
+                    ctx.globalAlpha = this.opacity;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.globalAlpha = 1.0;
+                }
             }
         }
 
-        // Запуск/остановка анимации
-        function startWeatherAnimation(code) {
-            const type = getAnimationType(code);
-            if (!type) {
-                stopWeatherAnimation();
-                return;
-            }
-
-            if (type === currentAnimationType && particles.length > 0) {
-                // Та же анимация уже запущена
-                return;
-            }
-
-            currentAnimationType = type;
-            createParticles(type);
-            
-            // Плавное появление
-            weatherCanvas.classList.add('active');
-            
+        function startAnimation(type) {
+            if (currentAnimType === type) return;
+            currentAnimType = type;
             if (animationId) cancelAnimationFrame(animationId);
-            animateWeather();
-        }
-
-        function stopWeatherAnimation() {
-            currentAnimationType = null;
+            
             particles = [];
-            weatherCanvas.classList.remove('active');
-            if (animationId) {
-                cancelAnimationFrame(animationId);
-                animationId = null;
+            let count = 0;
+            if (type === 'rain') count = 150;
+            else if (type === 'snow') count = 100;
+            else if (type === 'fog' || type === 'clouds') count = 25;
+            else if (type === 'clear') count = 40;
+
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle(type));
             }
-            setTimeout(() => {
-                if (!currentAnimationType) wCtx.clearRect(0, 0, weatherCanvas.width, weatherCanvas.height);
-            }, 1000);
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                animationId = requestAnimationFrame(animate);
+            }
+            animate();
         }
 
         // ===== РЕНДЕРИНГ =====
@@ -921,10 +762,10 @@
             const daily = data.daily;
             const weather = getWeatherInfo(current.weather_code);
             
-            // Сохраняем текущий код погоды и запускаем анимацию
-            currentWeatherCode = current.weather_code;
-            startWeatherAnimation(current.weather_code);
-            
+            // Запуск фоновой анимации
+            updateParticleColor();
+            startAnimation(weather.anim);
+
             const today = new Date();
             const dateStr = `${today.getDate()} ${months[today.getMonth()]} · ${weekDaysLong[today.getDay()]}`;
 
@@ -1025,7 +866,7 @@
         }
 
         function renderError(message) {
-            stopWeatherAnimation();
+            startAnimation('clear'); // Фоллбэк анимация при ошибке
             contentEl.innerHTML = `
                 <div class="hero-card" style="text-align:center;">
                     <div style="font-size:3rem;margin-bottom:16px;">⚠️</div>
@@ -1060,15 +901,13 @@
                     renderError(`Город "${cityName}" не найден. Проверьте название.`);
                     return;
                 }
-            } 
-            else {
+            } else {
                 const geoPos = await tryGeolocation();
                 if (geoPos) {
                     lat = geoPos.lat;
                     lon = geoPos.lon;
                     cityName = await reverseGeocode(lat, lon);
-                } 
-                else {
+                } else {
                     cityName = getCityFromTimezone();
                     const geo = await geocodeCity(cityName);
                     if (geo) {
@@ -1090,10 +929,7 @@
             }
         }
 
-        // Старт
         loadWeather();
-
-        // Автообновление каждые 30 минут
         setInterval(loadWeather, 30 * 60 * 1000);
     </script>
 </body>
