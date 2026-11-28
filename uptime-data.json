@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-11-28T13:56:25.459997+00:00",
+  "last_updated": "2026-11-28T18:30:11.729408+00:00",
   "sites": {
     "Root": {
       "url": "https://zloba010.github.io/",
       "repo": "zloba010.github.io",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 127,
+      "current_ms": 226,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -143,6 +143,13 @@
           "ms": 127,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T18:30:11.729408+00:00",
+          "status": "up",
+          "ms": 226,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -158,10 +165,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 16,
-          "up": 16,
+          "checks": 17,
+          "up": 17,
           "errors": 0,
-          "sum_ms": 2164,
+          "sum_ms": 2390,
           "max_ms": 271,
           "downtime_s": 0,
           "deploys": 0
@@ -170,6 +177,12 @@
       "incidents": [],
       "deploys": [],
       "commits": [
+        {
+          "sha": "bfc0501",
+          "date": "2026-11-28T13:56:30Z",
+          "author": "TroubleTab Monitor Bot",
+          "msg": "chore(monitor): обновление метрик 2026-11-28_13:56"
+        },
         {
           "sha": "bde3ed4",
           "date": "2026-11-28T13:55:35Z",
@@ -253,16 +266,10 @@
           "date": "2026-11-28T10:43:13Z",
           "author": "Kizamia",
           "msg": "Update monitor.yml"
-        },
-        {
-          "sha": "2148d7d",
-          "date": "2026-11-28T10:10:07Z",
-          "author": "Kizamia",
-          "msg": "Update dashboard.html"
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T13:56:25.459997+00:00",
+      "current_time": "2026-11-28T18:30:11.729408+00:00",
       "is_functional": true,
       "errors": []
     },
@@ -271,7 +278,7 @@
       "repo": "KFWR---Kizami-Free-Web-Reader",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 131,
+      "current_ms": 272,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -408,6 +415,13 @@
           "ms": 131,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T18:30:11.729408+00:00",
+          "status": "up",
+          "ms": 272,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -423,11 +437,11 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 16,
-          "up": 16,
+          "checks": 17,
+          "up": 17,
           "errors": 0,
-          "sum_ms": 1816,
-          "max_ms": 227,
+          "sum_ms": 2088,
+          "max_ms": 272,
           "downtime_s": 0,
           "deploys": 0
         }
@@ -527,7 +541,7 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T13:56:25.459997+00:00",
+      "current_time": "2026-11-28T18:30:11.729408+00:00",
       "is_functional": true,
       "errors": []
     },
@@ -536,7 +550,7 @@
       "repo": "kizamianotes",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 154,
+      "current_ms": 146,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -673,6 +687,13 @@
           "ms": 154,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T18:30:11.729408+00:00",
+          "status": "up",
+          "ms": 146,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -688,10 +709,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 16,
-          "up": 15,
+          "checks": 17,
+          "up": 16,
           "errors": 1,
-          "sum_ms": 1965,
+          "sum_ms": 2111,
           "max_ms": 322,
           "downtime_s": 0,
           "deploys": 0
@@ -703,7 +724,7 @@
           "end": null,
           "code": 200,
           "site": "Kizamia Notes",
-          "minutes": 117.6
+          "minutes": 391.3
         }
       ],
       "deploys": [],
@@ -752,7 +773,7 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T13:56:25.459997+00:00",
+      "current_time": "2026-11-28T18:30:11.729408+00:00",
       "is_functional": true,
       "errors": []
     },
@@ -761,7 +782,7 @@
       "repo": "KizamiaUpscaleImage",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 127,
+      "current_ms": 153,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -898,6 +919,13 @@
           "ms": 127,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T18:30:11.729408+00:00",
+          "status": "up",
+          "ms": 153,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -913,10 +941,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 16,
-          "up": 16,
+          "checks": 17,
+          "up": 17,
           "errors": 0,
-          "sum_ms": 2212,
+          "sum_ms": 2365,
           "max_ms": 326,
           "downtime_s": 0,
           "deploys": 0
@@ -999,7 +1027,7 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T13:56:25.459997+00:00",
+      "current_time": "2026-11-28T18:30:11.729408+00:00",
       "is_functional": true,
       "errors": []
     },
@@ -1008,7 +1036,7 @@
       "repo": "Kizamia-Weather",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 106,
+      "current_ms": 110,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -1145,6 +1173,13 @@
           "ms": 106,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T18:30:11.729408+00:00",
+          "status": "up",
+          "ms": 110,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -1160,10 +1195,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 16,
-          "up": 16,
+          "checks": 17,
+          "up": 17,
           "errors": 0,
-          "sum_ms": 1719,
+          "sum_ms": 1829,
           "max_ms": 271,
           "downtime_s": 0,
           "deploys": 0
@@ -1198,7 +1233,7 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T13:56:25.459997+00:00",
+      "current_time": "2026-11-28T18:30:11.729408+00:00",
       "is_functional": true,
       "errors": []
     }
@@ -1273,6 +1308,78 @@
     },
     {
       "time": "2026-11-28T13:56:25.459997+00:00",
+      "site": "Монитор",
+      "action": "Проверка завершена: 0 критических ошибок",
+      "status": "success"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Монитор",
+      "action": "Запуск проверки 5 сервисов",
+      "status": "info"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Root",
+      "action": "Начало проверки",
+      "status": "info"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Root",
+      "action": "Проверка завершена: 200, 226мс",
+      "status": "success"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "KFWR",
+      "action": "Начало проверки",
+      "status": "info"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "KFWR",
+      "action": "Проверка завершена: 200, 272мс",
+      "status": "success"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Kizamia Notes",
+      "action": "Начало проверки",
+      "status": "info"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Kizamia Notes",
+      "action": "Проверка завершена: 200, 146мс",
+      "status": "success"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Upscale Image",
+      "action": "Начало проверки",
+      "status": "info"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Upscale Image",
+      "action": "Проверка завершена: 200, 153мс",
+      "status": "success"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Kizamia Weather",
+      "action": "Начало проверки",
+      "status": "info"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
+      "site": "Kizamia Weather",
+      "action": "Проверка завершена: 200, 110мс",
+      "status": "success"
+    },
+    {
+      "time": "2026-11-28T18:30:11.729408+00:00",
       "site": "Монитор",
       "action": "Проверка завершена: 0 критических ошибок",
       "status": "success"
