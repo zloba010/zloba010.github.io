@@ -1,13 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import json, os, time, datetime, urllib.request, urllib.error
-from html.parser import HTMLParser
 
 OWNER = "zloba010"
 TOKEN = os.environ.get("MONITOR_TOKEN") or os.environ.get("GH_TOKEN")
 DATA_FILE = "uptime-data.json"
 
-# Список сайтов с их функциональными проверками
 SITES = [
     {
         "name": "Root",
@@ -56,7 +54,7 @@ SITES = [
     },
 ]
 
-HISTORY_KEEP = 288  # 24 часа по 5 минут = 288 записей
+HISTORY_KEEP = 288
 DAILY_KEEP = 400
 INC_KEEP = 80
 NOW = datetime.datetime.now(datetime.timezone.utc)
@@ -84,7 +82,6 @@ def gh_api(path, per_page=20):
         return []
 
 def ping(site):
-    """Проверяет сайт: HTTP-статус + функциональность"""
     t0 = time.time()
     status_code = 0
     is_functional = True
@@ -93,7 +90,6 @@ def ping(site):
     try:
         html, status_code = http_get(site["url"], {"User-Agent": "troubletab-monitor"}, timeout=10)
         
-        # Проверяем функциональность
         for check in site.get("checks", []):
             if check["type"] == "contains":
                 if check["text"].lower() not in html.lower():
@@ -124,7 +120,6 @@ def parse_dt(s):
     except Exception:
         return NOW
 
-# Загружаем существующие данные
 if os.path.exists(DATA_FILE):
     try:
         data = json.load(open(DATA_FILE, encoding="utf-8"))
@@ -135,7 +130,7 @@ else:
 
 data.setdefault("last_updated", "")
 data.setdefault("sites", {})
-data.setdefault("critical_issues", [])  # Новая секция для критических ошибок
+data.setdefault("critical_issues", [])
 
 critical_issues = []
 
@@ -147,7 +142,6 @@ for site in SITES:
     result = ping(site)
     status = "up" if result["ok"] else "down"
     
-    # Инициализируем структуру сайта
     if name not in data["sites"]:
         data["sites"][name] = {
             "url": url,
@@ -184,7 +178,6 @@ for site in SITES:
     s["is_functional"] = result["is_functional"]
     s["errors"] = result["errors"]
     
-    # Критические ошибки
     if not result["ok"]:
         critical_issues.append({
             "site": name,
@@ -195,7 +188,6 @@ for site in SITES:
             "time": NOW_ISO
         })
     
-    # История (24ч)
     s["history"].append({
         "time": NOW_ISO,
         "status": status,
@@ -205,7 +197,6 @@ for site in SITES:
     })
     s["history"] = s["history"][-HISTORY_KEEP:]
     
-    # Дневная сводка
     day = NOW.strftime("%Y-%m-%d")
     d = next((x for x in s["daily"] if x["date"] == day), None)
     if not d:
@@ -218,7 +209,6 @@ for site in SITES:
     d["max_ms"] = max(d["max_ms"], result["ms"])
     s["daily"] = s["daily"][-DAILY_KEEP:]
     
-    # Инциденты
     prev = s["history"][-2]["status"] if len(s["history"]) > 1 else status
     if prev == "up" and status == "down":
         s["incidents"].append({"start": NOW_ISO, "end": None, "code": result["code"], "site": name})
@@ -230,7 +220,6 @@ for site in SITES:
     
     s["incidents"] = s["incidents"][-INC_KEEP:]
     
-    # Деплои
     if TOKEN:
         try:
             deps = gh_api(f"/repos/{OWNER}/{repo}/pages/deployments", 10)
@@ -251,7 +240,6 @@ for site in SITES:
         except Exception as e:
             print(f"Error fetching deploys for {name}: {e}")
     
-    # Коммиты
     if TOKEN:
         try:
             commits = gh_api(f"/repos/{OWNER}/{repo}/commits", 15)
@@ -264,7 +252,6 @@ for site in SITES:
         except Exception as e:
             print(f"Error fetching commits for {name}: {e}")
     
-    # Runs
     if TOKEN:
         try:
             runs = gh_api(f"/repos/{OWNER}/{repo}/actions/runs", 12)
@@ -289,7 +276,6 @@ for site in SITES:
 data["last_updated"] = NOW_ISO
 data["critical_issues"] = critical_issues
 
-# Сохраняем
 with open(DATA_FILE, "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
 
