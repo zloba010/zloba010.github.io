@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-11-28T11:58:51.370831+00:00",
+  "last_updated": "2026-11-28T12:21:37.690553+00:00",
   "sites": {
     "Root": {
       "url": "https://zloba010.github.io/",
       "repo": "zloba010.github.io",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 117,
+      "current_ms": 271,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -129,6 +129,13 @@
           "ms": 117,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T12:21:37.690553+00:00",
+          "status": "up",
+          "ms": 271,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -144,11 +151,11 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 14,
-          "up": 14,
+          "checks": 15,
+          "up": 15,
           "errors": 0,
-          "sum_ms": 1766,
-          "max_ms": 212,
+          "sum_ms": 2037,
+          "max_ms": 271,
           "downtime_s": 0,
           "deploys": 0
         }
@@ -156,6 +163,18 @@
       "incidents": [],
       "deploys": [],
       "commits": [
+        {
+          "sha": "bf2ad13",
+          "date": "2026-11-28T12:07:36Z",
+          "author": "Kizamia",
+          "msg": "Update monitor.py"
+        },
+        {
+          "sha": "53428c0",
+          "date": "2026-11-28T11:58:55Z",
+          "author": "TroubleTab Monitor Bot",
+          "msg": "chore(monitor): update metrics 2026-11-28_11:58"
+        },
         {
           "sha": "8ce183e",
           "date": "2026-11-28T11:58:11Z",
@@ -233,22 +252,10 @@
           "date": "2026-11-28T09:24:38Z",
           "author": "TroubleTab Monitor Bot",
           "msg": "chore(monitor): update metrics"
-        },
-        {
-          "sha": "a48e587",
-          "date": "2026-11-28T09:22:35Z",
-          "author": "TroubleTab Monitor Bot",
-          "msg": "chore(monitor): update metrics"
-        },
-        {
-          "sha": "9e3400c",
-          "date": "2026-11-28T08:36:40Z",
-          "author": "TroubleTab Monitor Bot",
-          "msg": "chore(monitor): update metrics"
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T11:58:51.370831+00:00",
+      "current_time": "2026-11-28T12:21:37.690553+00:00",
       "is_functional": true,
       "errors": []
     },
@@ -257,7 +264,7 @@
       "repo": "KFWR---Kizami-Free-Web-Reader",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 76,
+      "current_ms": 160,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -380,6 +387,13 @@
           "ms": 76,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T12:21:37.690553+00:00",
+          "status": "up",
+          "ms": 160,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -395,10 +409,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 14,
-          "up": 14,
+          "checks": 15,
+          "up": 15,
           "errors": 0,
-          "sum_ms": 1525,
+          "sum_ms": 1685,
           "max_ms": 227,
           "downtime_s": 0,
           "deploys": 0
@@ -499,16 +513,16 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T11:58:51.370831+00:00",
+      "current_time": "2026-11-28T12:21:37.690553+00:00",
       "is_functional": true,
       "errors": []
     },
     "Kizamia Notes": {
       "url": "https://zloba010.github.io/kizamianotes/",
       "repo": "kizamianotes",
-      "current_status": "down",
+      "current_status": "up",
       "current_code": 200,
-      "current_ms": 62,
+      "current_ms": 198,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -631,6 +645,13 @@
           "ms": 62,
           "code": 200,
           "is_functional": false
+        },
+        {
+          "time": "2026-11-28T12:21:37.690553+00:00",
+          "status": "up",
+          "ms": 198,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -646,10 +667,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 14,
-          "up": 13,
+          "checks": 15,
+          "up": 14,
           "errors": 1,
-          "sum_ms": 1613,
+          "sum_ms": 1811,
           "max_ms": 322,
           "downtime_s": 0,
           "deploys": 0
@@ -661,7 +682,7 @@
           "end": null,
           "code": 200,
           "site": "Kizamia Notes",
-          "minutes": 0.0
+          "minutes": 22.8
         }
       ],
       "deploys": [],
@@ -710,18 +731,16 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T11:58:51.370831+00:00",
-      "is_functional": false,
-      "errors": [
-        "Форма для заметок присутствует"
-      ]
+      "current_time": "2026-11-28T12:21:37.690553+00:00",
+      "is_functional": true,
+      "errors": []
     },
     "Upscale Image": {
       "url": "https://zloba010.github.io/KizamiaUpscaleImage/",
       "repo": "KizamiaUpscaleImage",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 68,
+      "current_ms": 326,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -844,6 +863,13 @@
           "ms": 68,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T12:21:37.690553+00:00",
+          "status": "up",
+          "ms": 326,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -859,11 +885,11 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 14,
-          "up": 14,
+          "checks": 15,
+          "up": 15,
           "errors": 0,
-          "sum_ms": 1759,
-          "max_ms": 304,
+          "sum_ms": 2085,
+          "max_ms": 326,
           "downtime_s": 0,
           "deploys": 0
         }
@@ -945,7 +971,7 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T11:58:51.370831+00:00",
+      "current_time": "2026-11-28T12:21:37.690553+00:00",
       "is_functional": true,
       "errors": []
     },
@@ -954,7 +980,7 @@
       "repo": "Kizamia-Weather",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 91,
+      "current_ms": 146,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -1077,6 +1103,13 @@
           "ms": 91,
           "code": 200,
           "is_functional": true
+        },
+        {
+          "time": "2026-11-28T12:21:37.690553+00:00",
+          "status": "up",
+          "ms": 146,
+          "code": 200,
+          "is_functional": true
         }
       ],
       "daily": [
@@ -1092,10 +1125,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 14,
-          "up": 14,
+          "checks": 15,
+          "up": 15,
           "errors": 0,
-          "sum_ms": 1467,
+          "sum_ms": 1613,
           "max_ms": 271,
           "downtime_s": 0,
           "deploys": 0
@@ -1130,21 +1163,10 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T11:58:51.370831+00:00",
+      "current_time": "2026-11-28T12:21:37.690553+00:00",
       "is_functional": true,
       "errors": []
     }
   },
-  "critical_issues": [
-    {
-      "site": "Kizamia Notes",
-      "repo": "kizamianotes",
-      "url": "https://zloba010.github.io/kizamianotes/",
-      "status": 200,
-      "errors": [
-        "Форма для заметок присутствует"
-      ],
-      "time": "2026-11-28T11:58:51.370831+00:00"
-    }
-  ]
+  "critical_issues": []
 }
