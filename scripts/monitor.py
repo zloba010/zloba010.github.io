@@ -1,21 +1,62 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import json, os, time, datetime, urllib.request, urllib.error
+from html.parser import HTMLParser
 
 OWNER = "zloba010"
-REPO_SELF = "zloba010/zloba010.github.io"
 TOKEN = os.environ.get("MONITOR_TOKEN") or os.environ.get("GH_TOKEN")
 DATA_FILE = "uptime-data.json"
 
+# Список сайтов с их функциональными проверками
 SITES = [
-    {"name": "Root", "url": "https://zloba010.github.io/", "repo": "zloba010.github.io"},
-    {"name": "KFWR", "url": "https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader/", "repo": "KFWR---Kizami-Free-Web-Reader"},
-    {"name": "Kizamia Notes", "url": "https://zloba010.github.io/kizamianotes/", "repo": "kizamianotes"},
-    {"name": "Upscale Image", "url": "https://zloba010.github.io/KizamiaUpscaleImage/", "repo": "KizamiaUpscaleImage"},
-    {"name": "Kizamia Weather", "url": "https://zloba010.github.io/Kizamia-Weather/", "repo": "Kizamia-Weather"},
+    {
+        "name": "Root",
+        "url": "https://zloba010.github.io/",
+        "repo": "zloba010.github.io",
+        "checks": [
+            {"type": "http", "expected": 200},
+            {"type": "contains", "text": "Kizamia", "description": "Главная страница содержит 'Kizamia'"}
+        ]
+    },
+    {
+        "name": "KFWR",
+        "url": "https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader/",
+        "repo": "KFWR---Kizami-Free-Web-Reader",
+        "checks": [
+            {"type": "http", "expected": 200},
+            {"type": "contains", "text": "reader", "description": "Читалка загружается"}
+        ]
+    },
+    {
+        "name": "Kizamia Notes",
+        "url": "https://zloba010.github.io/kizamianotes/",
+        "repo": "kizamianotes",
+        "checks": [
+            {"type": "http", "expected": 200},
+            {"type": "contains", "text": "note", "description": "Заметки загружаются"}
+        ]
+    },
+    {
+        "name": "Upscale Image",
+        "url": "https://zloba010.github.io/KizamiaUpscaleImage/",
+        "repo": "KizamiaUpscaleImage",
+        "checks": [
+            {"type": "http", "expected": 200},
+            {"type": "contains", "text": "upscale", "description": "Апскейлер загружается"}
+        ]
+    },
+    {
+        "name": "Kizamia Weather",
+        "url": "https://zloba010.github.io/Kizamia-Weather/",
+        "repo": "Kizamia-Weather",
+        "checks": [
+            {"type": "http", "expected": 200},
+            {"type": "contains", "text": "weather", "description": "Погода загружается"}
+        ]
+    },
 ]
 
-HISTORY_KEEP = 288
+HISTORY_KEEP = 288  # 24 часа по 5 минут = 288 записей
 DAILY_KEEP = 400
 INC_KEEP = 80
 NOW = datetime.datetime.now(datetime.timezone.utc)
@@ -24,30 +65,58 @@ NOW_ISO = NOW.isoformat()
 def http_get(url, headers=None, timeout=15):
     req = urllib.request.Request(url, headers=headers or {})
     with urllib.request.urlopen(req, timeout=timeout) as r:
-        return json.loads(r.read().decode("utf-8"))
+        return r.read().decode("utf-8"), r.getcode()
 
 def gh_api(path, per_page=20):
     if not TOKEN:
         return []
     url = f"https://api.github.com{path}{'&' if '?' in path else '?'}per_page={per_page}"
     try:
-        return http_get(url, {"Authorization": f"token {TOKEN}", "Accept": "application/vnd.github+json", "User-Agent": "troubletab-monitor"})
+        req = urllib.request.Request(url, headers={
+            "Authorization": f"token {TOKEN}",
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "troubletab-monitor"
+        })
+        with urllib.request.urlopen(req, timeout=15) as r:
+            return json.loads(r.read().decode("utf-8"))
     except Exception as e:
         print(f"GitHub API error: {e}")
         return []
 
-def ping(url):
+def ping(site):
+    """Проверяет сайт: HTTP-статус + функциональность"""
     t0 = time.time()
+    status_code = 0
+    is_functional = True
+    errors = []
+    
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "troubletab-monitor"})
-        with urllib.request.urlopen(req, timeout=10) as r:
-            code = r.getcode()
+        html, status_code = http_get(site["url"], {"User-Agent": "troubletab-monitor"}, timeout=10)
+        
+        # Проверяем функциональность
+        for check in site.get("checks", []):
+            if check["type"] == "contains":
+                if check["text"].lower() not in html.lower():
+                    is_functional = False
+                    errors.append(check["description"])
     except urllib.error.HTTPError as e:
-        code = e.code
-    except Exception:
-        code = 0
+        status_code = e.code
+        is_functional = False
+        errors.append(f"HTTP {e.code}")
+    except Exception as e:
+        is_functional = False
+        errors.append(str(e)[:100])
+    
     ms = int((time.time() - t0) * 1000)
-    return code, ms, (200 <= code < 400)
+    ok = (status_code == 200) and is_functional
+    
+    return {
+        "code": status_code,
+        "ms": ms,
+        "ok": ok,
+        "is_functional": is_functional,
+        "errors": errors
+    }
 
 def parse_dt(s):
     try:
@@ -66,16 +135,19 @@ else:
 
 data.setdefault("last_updated", "")
 data.setdefault("sites", {})
+data.setdefault("critical_issues", [])  # Новая секция для критических ошибок
+
+critical_issues = []
 
 for site in SITES:
     name = site["name"]
     url = site["url"]
     repo = site["repo"]
     
-    code, ms, ok = ping(url)
-    status = "up" if ok else "down"
+    result = ping(site)
+    status = "up" if result["ok"] else "down"
     
-    # Инициализируем структуру сайта с защитой от старых данных
+    # Инициализируем структуру сайта
     if name not in data["sites"]:
         data["sites"][name] = {
             "url": url,
@@ -87,50 +159,70 @@ for site in SITES:
             "commits": [],
             "runs": [],
             "current_status": status,
-            "current_code": code,
-            "current_ms": ms,
+            "current_code": result["code"],
+            "current_ms": result["ms"],
+            "is_functional": result["is_functional"],
+            "errors": result["errors"],
         }
     
     s = data["sites"][name]
-    
-    # Миграция старых данных: добавляем отсутствующие поля
-    s.setdefault("url", url)
-    s.setdefault("repo", repo)
     s.setdefault("history", [])
     s.setdefault("daily", [])
     s.setdefault("incidents", [])
     s.setdefault("deploys", [])
     s.setdefault("commits", [])
     s.setdefault("runs", [])
+    s.setdefault("is_functional", True)
+    s.setdefault("errors", [])
     
+    s["url"] = url
+    s["repo"] = repo
     s["current_status"] = status
-    s["current_code"] = code
-    s["current_ms"] = ms
+    s["current_code"] = result["code"]
+    s["current_ms"] = result["ms"]
     s["current_time"] = NOW_ISO
+    s["is_functional"] = result["is_functional"]
+    s["errors"] = result["errors"]
+    
+    # Критические ошибки
+    if not result["ok"]:
+        critical_issues.append({
+            "site": name,
+            "repo": repo,
+            "url": url,
+            "status": result["code"],
+            "errors": result["errors"],
+            "time": NOW_ISO
+        })
     
     # История (24ч)
-    s["history"].append({"time": NOW_ISO, "status": status, "ms": ms, "code": code})
+    s["history"].append({
+        "time": NOW_ISO,
+        "status": status,
+        "ms": result["ms"],
+        "code": result["code"],
+        "is_functional": result["is_functional"]
+    })
     s["history"] = s["history"][-HISTORY_KEEP:]
     
     # Дневная сводка
     day = NOW.strftime("%Y-%m-%d")
     d = next((x for x in s["daily"] if x["date"] == day), None)
     if not d:
-        d = {"date": day, "checks": 0, "up": 0, "errors": 0, "sum_ms": 0, "max_ms": 0, "downtime_s": 0, "deploys": 0}
+        d = {"date": day, "checks": 0, "up": 0, "errors": 0, "sum_ms": 0, "max_ms": 0}
         s["daily"].append(d)
     d["checks"] += 1
-    d["up"] += 1 if ok else 0
-    d["errors"] += 0 if ok else 1
-    d["sum_ms"] += ms
-    d["max_ms"] = max(d["max_ms"], ms)
+    d["up"] += 1 if result["ok"] else 0
+    d["errors"] += 0 if result["ok"] else 1
+    d["sum_ms"] += result["ms"]
+    d["max_ms"] = max(d["max_ms"], result["ms"])
     s["daily"] = s["daily"][-DAILY_KEEP:]
     
     # Инциденты
     prev = s["history"][-2]["status"] if len(s["history"]) > 1 else status
     if prev == "up" and status == "down":
-        s["incidents"].append({"start": NOW_ISO, "end": None, "code": code, "site": name})
+        s["incidents"].append({"start": NOW_ISO, "end": None, "code": result["code"], "site": name})
     
-    # Обновляем длительность открытых инцидентов
     for inc in s["incidents"]:
         if inc["end"] is None:
             minutes = (NOW - parse_dt(inc["start"])).total_seconds() / 60
@@ -138,7 +230,7 @@ for site in SITES:
     
     s["incidents"] = s["incidents"][-INC_KEEP:]
     
-    # Деплои (только если есть токен)
+    # Деплои
     if TOKEN:
         try:
             deps = gh_api(f"/repos/{OWNER}/{repo}/pages/deployments", 10)
@@ -154,13 +246,12 @@ for site in SITES:
                     "updated_at": dep.get("updated_at"),
                     "duration_s": dur,
                     "sha": (dep.get("commit_sha") or "")[:7],
-                    "url": dep.get("url", ""),
                 })
             s["deploys"] = dep_list[:10]
         except Exception as e:
             print(f"Error fetching deploys for {name}: {e}")
     
-    # Коммиты (только если есть токен)
+    # Коммиты
     if TOKEN:
         try:
             commits = gh_api(f"/repos/{OWNER}/{repo}/commits", 15)
@@ -173,7 +264,7 @@ for site in SITES:
         except Exception as e:
             print(f"Error fetching commits for {name}: {e}")
     
-    # Runs (только если есть токен)
+    # Runs
     if TOKEN:
         try:
             runs = gh_api(f"/repos/{OWNER}/{repo}/actions/runs", 12)
@@ -190,13 +281,13 @@ for site in SITES:
                     "event": r.get("event"),
                     "created_at": r.get("created_at"),
                     "duration_s": max(0, int((en - st).total_seconds())),
-                    "url": r.get("html_url", ""),
                 })
             s["runs"] = s["runs"][:12]
         except Exception as e:
             print(f"Error fetching runs for {name}: {e}")
 
 data["last_updated"] = NOW_ISO
+data["critical_issues"] = critical_issues
 
 # Сохраняем
 with open(DATA_FILE, "w", encoding="utf-8") as f:
@@ -206,4 +297,9 @@ print(f"✅ Мониторинг завершён: {NOW_ISO}")
 print(f"Проверено сайтов: {len(SITES)}")
 for site in SITES:
     s = data["sites"][site["name"]]
-    print(f"  {site['name']}: {s['current_status']} ({s['current_code']}, {s['current_ms']}ms)")
+    func = "✓" if s["is_functional"] else "✗"
+    print(f"  {site['name']}: {s['current_status']} ({s['current_code']}, {s['current_ms']}ms) [{func}]")
+if critical_issues:
+    print(f"\n⚠️ Критические ошибки: {len(critical_issues)}")
+    for issue in critical_issues:
+        print(f"  - {issue['site']}: {', '.join(issue['errors'])}")
