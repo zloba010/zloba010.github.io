@@ -1,12 +1,12 @@
 {
-  "last_updated": "2026-11-28T07:50:27.462496+00:00",
+  "last_updated": "2026-11-28T07:52:38.378578+00:00",
   "sites": {
     "Root": {
       "url": "https://zloba010.github.io/",
       "repo": "zloba010.github.io",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 138,
+      "current_ms": 93,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -73,6 +73,12 @@
           "status": "up",
           "ms": 138,
           "code": 200
+        },
+        {
+          "time": "2026-11-28T07:52:38.378578+00:00",
+          "status": "up",
+          "ms": 93,
+          "code": 200
         }
       ],
       "daily": [
@@ -88,10 +94,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 5,
-          "up": 5,
+          "checks": 6,
+          "up": 6,
           "errors": 0,
-          "sum_ms": 725,
+          "sum_ms": 818,
           "max_ms": 212,
           "downtime_s": 0,
           "deploys": 0
@@ -100,6 +106,12 @@
       "incidents": [],
       "deploys": [],
       "commits": [
+        {
+          "sha": "c0a2b95",
+          "date": "2026-11-28T07:50:33Z",
+          "author": "TroubleTab Monitor Bot",
+          "msg": "chore(monitor): update metrics"
+        },
         {
           "sha": "619de81",
           "date": "2026-11-28T07:49:07Z",
@@ -183,23 +195,17 @@
           "date": "2026-11-27T19:25:56Z",
           "author": "Kizamia",
           "msg": "Update dashboard.html"
-        },
-        {
-          "sha": "27aefb4",
-          "date": "2026-11-27T19:25:16Z",
-          "author": "Kizamia",
-          "msg": "Update monitor.yml"
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T07:50:27.462496+00:00"
+      "current_time": "2026-11-28T07:52:38.378578+00:00"
     },
     "KFWR": {
       "url": "https://zloba010.github.io/KFWR---Kizami-Free-Web-Reader/",
       "repo": "KFWR---Kizami-Free-Web-Reader",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 125,
+      "current_ms": 66,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -266,6 +272,12 @@
           "status": "up",
           "ms": 125,
           "code": 200
+        },
+        {
+          "time": "2026-11-28T07:52:38.378578+00:00",
+          "status": "up",
+          "ms": 66,
+          "code": 200
         }
       ],
       "daily": [
@@ -281,10 +293,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 5,
-          "up": 5,
+          "checks": 6,
+          "up": 6,
           "errors": 0,
-          "sum_ms": 645,
+          "sum_ms": 711,
           "max_ms": 214,
           "downtime_s": 0,
           "deploys": 0
@@ -385,14 +397,14 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T07:50:27.462496+00:00"
+      "current_time": "2026-11-28T07:52:38.378578+00:00"
     },
     "Kizamia Notes": {
       "url": "https://zloba010.github.io/kizamianotes/",
       "repo": "kizamianotes",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 120,
+      "current_ms": 64,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -459,6 +471,12 @@
           "status": "up",
           "ms": 120,
           "code": 200
+        },
+        {
+          "time": "2026-11-28T07:52:38.378578+00:00",
+          "status": "up",
+          "ms": 64,
+          "code": 200
         }
       ],
       "daily": [
@@ -474,10 +492,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 5,
-          "up": 5,
+          "checks": 6,
+          "up": 6,
           "errors": 0,
-          "sum_ms": 766,
+          "sum_ms": 830,
           "max_ms": 322,
           "downtime_s": 0,
           "deploys": 0
@@ -506,14 +524,14 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T07:50:27.462496+00:00"
+      "current_time": "2026-11-28T07:52:38.378578+00:00"
     },
     "Upscale Image": {
       "url": "https://zloba010.github.io/KizamiaUpscaleImage/",
       "repo": "KizamiaUpscaleImage",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 178,
+      "current_ms": 84,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -580,6 +598,12 @@
           "status": "up",
           "ms": 178,
           "code": 200
+        },
+        {
+          "time": "2026-11-28T07:52:38.378578+00:00",
+          "status": "up",
+          "ms": 84,
+          "code": 200
         }
       ],
       "daily": [
@@ -595,10 +619,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 5,
-          "up": 5,
+          "checks": 6,
+          "up": 6,
           "errors": 0,
-          "sum_ms": 886,
+          "sum_ms": 970,
           "max_ms": 255,
           "downtime_s": 0,
           "deploys": 0
@@ -681,14 +705,14 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T07:50:27.462496+00:00"
+      "current_time": "2026-11-28T07:52:38.378578+00:00"
     },
     "Kizamia Weather": {
       "url": "https://zloba010.github.io/Kizamia-Weather/",
       "repo": "Kizamia-Weather",
       "current_status": "up",
       "current_code": 200,
-      "current_ms": 151,
+      "current_ms": 77,
       "history": [
         {
           "time": "2026-11-27T17:48:09+00:00",
@@ -755,6 +779,12 @@
           "status": "up",
           "ms": 151,
           "code": 200
+        },
+        {
+          "time": "2026-11-28T07:52:38.378578+00:00",
+          "status": "up",
+          "ms": 77,
+          "code": 200
         }
       ],
       "daily": [
@@ -770,10 +800,10 @@
         },
         {
           "date": "2026-11-28",
-          "checks": 5,
-          "up": 5,
+          "checks": 6,
+          "up": 6,
           "errors": 0,
-          "sum_ms": 610,
+          "sum_ms": 687,
           "max_ms": 151,
           "downtime_s": 0,
           "deploys": 0
@@ -808,7 +838,7 @@
         }
       ],
       "runs": [],
-      "current_time": "2026-11-28T07:50:27.462496+00:00"
+      "current_time": "2026-11-28T07:52:38.378578+00:00"
     }
   }
 }
