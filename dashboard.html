@@ -11,12 +11,21 @@
   --panel2:#1c1c22;--input:#222228;--border:#2a2a32;--muted:#8b8b95;
   --ok:#10b981;--warn:#f59e0b;--err:#ef4444;--info:#3b82f6;
   --grid:#222228;--shadow:rgba(0,0,0,.5);
+  /* Цвета погодных частиц для тёмной темы */
+  --rain-color:rgba(160,190,230,.65);
+  --snow-color:rgba(255,255,255,.9);
+  --cloud-color:rgba(130,140,150,.55);
+  --sun-color:rgba(255,210,60,.25);
 }
 [data-theme="light"]{
   --bg:#f5f5f7;--text:#1a1a1e;--accent:#d11340;--panel:#ffffff;
   --panel2:#fafafa;--input:#f0f0f3;--border:#dcdce2;--muted:#6b6b75;
   --ok:#059669;--warn:#d97706;--err:#dc2626;--info:#2563eb;
   --grid:#e5e5ea;--shadow:rgba(0,0,0,.06);
+  --rain-color:rgba(70,90,120,.7);
+  --snow-color:rgba(255,255,255,.95);
+  --cloud-color:rgba(170,190,210,.75);
+  --sun-color:rgba(255,200,50,.3);
 }
 *{box-sizing:border-box;margin:0;padding:0;
   font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
@@ -25,7 +34,6 @@ body{background:var(--bg);color:var(--text);
   font-size:clamp(13px,0.85vw,16px);transition:background .3s,color .3s}
 .wrap{height:100vh;display:flex;flex-direction:column;padding:clamp(10px,1vw,20px);gap:clamp(8px,.8vw,14px)}
 
-/* ===== HEADER ===== */
 .hdr{display:flex;justify-content:space-between;align-items:center;
   flex-shrink:0;gap:20px;padding-bottom:clamp(6px,.7vw,12px);
   border-bottom:1px solid var(--border)}
@@ -65,7 +73,6 @@ body{background:var(--bg);color:var(--text);
   cursor:pointer;font-size:clamp(.95rem,1.1vw,1.2rem);transition:.2s}
 .theme-btn:hover{border-color:var(--accent);transform:scale(1.05)}
 
-/* ===== TABS ===== */
 .tabs{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
 .tabs button{background:var(--panel);border:1px solid var(--border);color:var(--muted);
   padding:clamp(7px,.7vw,11px) clamp(14px,1.3vw,22px);border-radius:10px;
@@ -74,11 +81,9 @@ body{background:var(--bg);color:var(--text);
 .tabs button:hover{color:var(--text);border-color:var(--accent)}
 .tabs button.on{color:#fff;background:var(--accent);border-color:var(--accent)}
 
-/* ===== TAB CONTENT ===== */
 .tab{display:none;flex:1;flex-direction:column;min-height:0;overflow:hidden}
 .tab.on{display:flex}
 
-/* ===== KPI ROW ===== */
 .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(8px,.9vw,14px);flex-shrink:0}
 .kpi{background:var(--panel);border:1px solid var(--border);border-radius:10px;
   padding:clamp(10px,1vw,18px);display:flex;flex-direction:column;gap:3px;
@@ -96,7 +101,6 @@ body{background:var(--bg);color:var(--text);
 .kpi .badge.real{background:rgba(16,185,129,.15);color:var(--ok)}
 .kpi .badge.sim{background:rgba(245,158,11,.15);color:var(--warn)}
 
-/* ===== CRITICAL BAR ===== */
 .critical{background:var(--panel);border:1px solid var(--border);border-radius:10px;
   padding:clamp(8px,.9vw,14px) clamp(12px,1.2vw,20px);display:flex;
   align-items:center;gap:clamp(10px,1.3vw,22px);flex-shrink:0;cursor:pointer;
@@ -113,25 +117,62 @@ body{background:var(--bg);color:var(--text);
 @keyframes pulse{50%{opacity:.7}}
 .critical .okmsg{color:var(--ok);font-size:clamp(.7rem,.8vw,.9rem);font-weight:700}
 
-/* ===== PANELS ===== */
 .panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;
   padding:clamp(10px,1vw,18px);display:flex;flex-direction:column;gap:8px;min-height:0}
 .panel-h{display:flex;justify-content:space-between;align-items:center;flex-shrink:0;gap:10px}
 .panel-t{font-size:clamp(.65rem,.75vw,.85rem);font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
 .panel-sub{font-size:clamp(.6rem,.7vw,.8rem);color:var(--muted)}
 
-/* ===== CHARTS ===== */
 .chartbox{position:relative;flex:1;min-height:0}
 .chartbox canvas{position:absolute;inset:0}
 .chart-legend{display:flex;gap:clamp(10px,1.2vw,18px);font-size:clamp(.62rem,.72vw,.82rem);flex-shrink:0}
 .chart-legend span{display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:600}
 .chart-legend i{width:12px;height:3px;border-radius:2px}
 
-/* ===== MAIN TAB LAYOUT ===== */
 .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,.9vw,14px);flex:1;min-height:0}
-.main-full{grid-column:1 / -1}
+.main-half{grid-column:1 / 2}
 
-/* ===== UPTIME BARS ===== */
+/* ===== ПОГОДНЫЙ ВИДЖЕТ ===== */
+.weather-widget{background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  padding:clamp(10px,1vw,18px);display:flex;flex-direction:column;gap:8px;min-height:0;
+  position:relative;overflow:hidden}
+.weather-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.weather-content{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px;flex:1;justify-content:center}
+.weather-top{display:flex;align-items:center;gap:clamp(10px,1.2vw,16px)}
+.weather-icon{font-size:clamp(2.2rem,3.5vw,4rem);line-height:1;
+  filter:drop-shadow(0 2px 8px var(--shadow));
+  animation:weatherBounce 3s ease-in-out infinite}
+@keyframes weatherBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.weather-temp{font-size:clamp(1.8rem,3vw,3.2rem);font-weight:900;color:var(--accent);
+  letter-spacing:-2px;line-height:1}
+.weather-desc{font-size:clamp(.72rem,.85vw,.95rem);color:var(--text);font-weight:600}
+.weather-location{font-size:clamp(.62rem,.72vw,.82rem);color:var(--muted);
+  display:flex;align-items:center;gap:4px}
+.weather-details{display:flex;gap:clamp(8px,1vw,14px);flex-wrap:wrap;
+  font-size:clamp(.62rem,.72vw,.8rem);color:var(--muted)}
+.weather-details span{display:flex;align-items:center;gap:4px}
+
+/* Частицы погоды (адаптированы под маленький виджет) */
+.w-rain{position:absolute;width:1.5px;height:14px;
+  background:linear-gradient(to bottom,transparent,var(--rain-color));
+  animation:w-fall linear infinite}
+@keyframes w-fall{to{transform:translateY(220px)}}
+.w-snow{position:absolute;background:var(--snow-color);border-radius:50%;
+  box-shadow:0 0 3px rgba(255,255,255,.5);animation:w-snowfall linear infinite}
+@keyframes w-snowfall{
+  0%{transform:translateY(-10px) translateX(0)}
+  50%{transform:translateY(100px) translateX(10px)}
+  100%{transform:translateY(220px) translateX(-10px)}
+}
+.w-cloud{position:absolute;background:var(--cloud-color);border-radius:50%;
+  filter:blur(12px);animation:w-drift linear infinite}
+@keyframes w-drift{from{transform:translateX(-60px)}to{transform:translateX(260px)}}
+.w-sun{position:absolute;background:radial-gradient(circle,var(--sun-color) 0%,transparent 70%);
+  border-radius:50%;animation:w-pulse 6s ease-in-out infinite alternate}
+@keyframes w-pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.4);opacity:1}}
+.w-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:w-flash 4s infinite}
+@keyframes w-flash{0%,92%,95%,100%{opacity:0}93%{opacity:.2}94%{opacity:0}96%{opacity:.12}}
+
 .ubars{display:flex;flex-direction:column;gap:clamp(5px,.6vw,10px);overflow-y:auto;flex:1}
 .ubrow{display:grid;grid-template-columns:clamp(70px,7vw,130px) 1fr clamp(45px,4.5vw,65px);gap:10px;align-items:center}
 .ubrow .nm{font-size:clamp(.65rem,.75vw,.85rem);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -144,7 +185,18 @@ body{background:var(--bg);color:var(--text);
 .ubrow .pct.ok{color:var(--ok)}
 .ubrow .pct.err{color:var(--err)}
 
-/* ===== SITES TAB ===== */
+.logs-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;
+  padding:clamp(10px,1vw,18px);display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
+.logs-list{overflow-y:auto;flex:1;font-size:clamp(.7rem,.8vw,.9rem);font-family:ui-monospace,monospace}
+.log-item{padding:6px 10px;border-left:3px solid var(--border);margin-bottom:6px;background:var(--input);border-radius:4px}
+.log-item.success{border-left-color:var(--ok)}
+.log-item.error{border-left-color:var(--err)}
+.log-item.warning{border-left-color:var(--warn)}
+.log-item.info{border-left-color:var(--info)}
+.log-time{color:var(--muted);font-size:.75em;margin-right:8px}
+.log-site{font-weight:700;color:var(--accent);margin-right:8px}
+.log-action{color:var(--text)}
+
 .sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;overflow-y:auto;flex:1;padding-right:4px}
 .site{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:.2s}
 .site:hover{border-color:var(--accent);transform:translateY(-1px)}
@@ -161,7 +213,6 @@ body{background:var(--bg);color:var(--text);
 .mini i.down{background:var(--err)}
 .mini i.na{background:var(--grid)}
 
-/* ===== FEED (changes) ===== */
 .feed{max-height:100%;overflow-y:auto;flex:1;padding-right:4px}
 .fi{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--grid)}
 .fi:last-child{border:none}
@@ -170,10 +221,9 @@ body{background:var(--bg);color:var(--text);
 .fi .t1{font-size:.82rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fi .t2{font-size:.7rem;color:var(--muted);margin-top:2px}
 
-/* ===== TABLES ===== */
 .tbl-wrap{overflow:auto;flex:1}
 table{width:100%;border-collapse:collapse;font-size:.8rem}
-th{text-align:left;color:var(--muted);font-size:.65rem;text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;border-bottom:1px solid var(--grid);position:sticky;top:0;background:var(--panel)}
+th{text-align:left;color:var(--muted);font-size:.65rem;text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;border-bottom:1px solid var(--grid);position:sticky;top:0;background:var(--panel);z-index:1}
 td{padding:8px 10px;border-bottom:1px solid var(--grid);vertical-align:top}
 tr:hover td{background:var(--input)}
 .tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.65rem;font-weight:800}
@@ -182,11 +232,9 @@ tr:hover td{background:var(--input)}
 .tag.warn{background:rgba(245,158,11,.15);color:var(--warn)}
 .mono{font-family:ui-monospace,monospace;font-size:.75rem;color:var(--muted)}
 
-/* ===== ARCHIVE ===== */
 .archive-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,.9vw,14px);flex:1;min-height:0}
 @media(max-width:1100px){.archive-grid{grid-template-columns:1fr}}
 
-/* ===== MODAL ===== */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
   display:none;align-items:center;justify-content:center;z-index:999}
 .modal.on{display:flex}
@@ -201,7 +249,8 @@ tr:hover td{background:var(--input)}
   padding:11px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:12px}
 .mv .btn:hover{border-color:var(--accent)}
 
-/* ===== RESPONSIVE ===== */
+.empty-msg{text-align:center;color:var(--muted);padding:40px 20px;font-size:.9rem}
+
 @media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:900px){
   .kpis{grid-template-columns:repeat(2,1fr)}
@@ -216,10 +265,9 @@ tr:hover td{background:var(--input)}
 <body data-theme="dark">
 <div class="wrap">
 
-  <!-- HEADER -->
   <div class="hdr">
     <div class="hdr-left">
-      <div class="logo">📡 TroubleTab Monitor <span class="live" id="liveBadge"><i></i>LIVE</span></div>
+      <div class="logo">📡 TroubleTab Monitor <span class="live" id="liveBadge"><i></i>В ЭФИРЕ</span></div>
       <div class="clockbox">
         <div class="clock" id="clock">--:--<span class="sec">:--</span></div>
         <div class="date" id="date">—</div>
@@ -234,7 +282,6 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- TABS -->
   <div class="tabs" id="tabs">
     <button data-t="ov" class="on">Обзор</button>
     <button data-t="sites">Сайты</button>
@@ -243,7 +290,6 @@ tr:hover td{background:var(--input)}
     <button data-t="arch">Архив</button>
   </div>
 
-  <!-- TAB: OVERVIEW -->
   <div class="tab on" id="t-ov">
     <div class="kpis" id="kpis"></div>
     <div class="critical" id="critical" onclick="openCritical()">
@@ -251,28 +297,38 @@ tr:hover td{background:var(--input)}
       <div class="clist" id="clist"><div class="okmsg">✓ Все системы работают штатно</div></div>
     </div>
     <div class="main-grid">
-      <div class="panel main-full">
+      <div class="panel main-half">
         <div class="panel-h">
-          <div class="panel-t">Uptime & Latency · последние 24 часа</div>
+          <div class="panel-t">Доступность и отклик · последние 24 часа</div>
           <div class="chart-legend">
-            <span><i style="background:var(--ok)"></i>Uptime, %</span>
-            <span><i style="background:var(--accent)"></i>Latency, мс</span>
+            <span><i style="background:var(--ok)"></i>Доступность, %</span>
+            <span><i style="background:var(--accent)"></i>Отклик, мс</span>
           </div>
         </div>
         <div class="chartbox" style="height:clamp(180px,22vh,300px)"><canvas id="chMain"></canvas></div>
       </div>
-      <div class="panel">
-        <div class="panel-h"><div class="panel-t">Uptime по сервисам · 24ч</div></div>
-        <div class="ubars" id="ubars"></div>
+      <div class="weather-widget" id="weatherWidget">
+        <div class="weather-bg" id="weatherBg"></div>
+        <div class="panel-h" style="position:relative;z-index:1">
+          <div class="panel-t">🌤 Погода сейчас</div>
+        </div>
+        <div class="weather-content" id="weatherContent">
+          <div style="text-align:center;color:var(--muted);padding:20px 0">
+            <div style="font-size:1.5rem;margin-bottom:8px">⏳</div>
+            <div style="font-size:.8rem">Загрузка погоды...</div>
+          </div>
+        </div>
       </div>
-      <div class="panel">
-        <div class="panel-h"><div class="panel-t">Отклик по сервисам, мс</div></div>
-        <div class="chartbox"><canvas id="chLat"></canvas></div>
+    </div>
+    <div class="logs-panel">
+      <div class="panel-h">
+        <div class="panel-t">Журнал действий</div>
+        <div class="panel-sub">последние 50 записей</div>
       </div>
+      <div class="logs-list" id="logsList"></div>
     </div>
   </div>
 
-  <!-- TAB: SITES -->
   <div class="tab" id="t-sites">
     <div class="panel" style="flex:1">
       <div class="panel-h"><div class="panel-t">Все сервисы</div><div class="panel-sub" id="sitesMeta"></div></div>
@@ -280,7 +336,6 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- TAB: CHANGES -->
   <div class="tab" id="t-chg">
     <div class="panel" style="flex:1">
       <div class="panel-h"><div class="panel-t">Лента изменений</div><div class="panel-sub">коммиты · деплои · запуски</div></div>
@@ -288,7 +343,6 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- TAB: INCIDENTS -->
   <div class="tab" id="t-inc">
     <div class="panel" style="flex:1">
       <div class="panel-h"><div class="panel-t">Реестр инцидентов</div><div class="panel-sub" id="incMeta"></div></div>
@@ -296,11 +350,10 @@ tr:hover td{background:var(--input)}
     </div>
   </div>
 
-  <!-- TAB: ARCHIVE -->
   <div class="tab" id="t-arch">
     <div class="archive-grid">
       <div class="panel">
-        <div class="panel-h"><div class="panel-t">Uptime по месяцам, %</div></div>
+        <div class="panel-h"><div class="panel-t">Доступность по месяцам, %</div></div>
         <div class="chartbox"><canvas id="chMonth"></canvas></div>
       </div>
       <div class="panel">
@@ -312,7 +365,6 @@ tr:hover td{background:var(--input)}
 
 </div>
 
-<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="mv">
     <h3>⚠ Критические ошибки</h3>
@@ -329,6 +381,15 @@ const SIM_BASE = {Root:110, KFWR:145, 'Kizamia Notes':130, 'Upscale Image':175, 
 const COLORS = ['#10b981','#f59e0b','#3b82f6','#a78bfa','#fb923c','#ef4444','#06b6d4'];
 
 const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function fmtDur(s){if(s==null||isNaN(s))return'—';if(s<60)return s+'с';if(s<3600)return (s/60).toFixed(1)+'м';if(s<86400)return (s/3600).toFixed(1)+'ч';return (s/86400).toFixed(1)+'д';}
+function timeAgo(iso){
+  if(!iso)return'—';
+  const d=(Date.now()-new Date(iso))/1000;
+  if(d<60)return Math.floor(d)+'с';if(d<3600)return Math.floor(d/60)+'м';
+  if(d<86400)return Math.floor(d/3600)+'ч';return Math.floor(d/86400)+'д';
+}
+function css(v){return getComputedStyle(document.body).getPropertyValue(v).trim();}
 
 /* ===== ЧАСЫ МСК ===== */
 function tickClock(){
@@ -341,13 +402,21 @@ function tickClock(){
 }
 setInterval(tickClock,1000); tickClock();
 
-/* ===== ТАЙМЕР ===== */
+/* ===== ТАЙМЕР С АВТОСБРОСОМ ===== */
 function tickCountdown(){
   const el=$('#countdown');
-  let lastTs = D?.last_updated ? new Date(D.last_updated).getTime() : Date.now();
-  if(!isReal) lastTs = Date.now() - ((Date.now()/1000|0) % CHECK_INTERVAL)*1000;
+  let lastTs = null;
+  if(D && D.last_updated){
+    const parsed = new Date(D.last_updated).getTime();
+    if(!isNaN(parsed)) lastTs = parsed;
+  }
+  if(!lastTs){
+    if(isReal) lastTs = Date.now();
+    else { const now = Date.now(); lastTs = now - (now % CHECK_INTERVAL); }
+  }
   const next = lastTs + CHECK_INTERVAL;
   let rem = Math.max(0, next - Date.now());
+  if(rem <= 0){ lastTs = Date.now(); rem = CHECK_INTERVAL; }
   const m=Math.floor(rem/60000), s=Math.floor((rem%60000)/1000);
   el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
   el.className='val '+(rem<60000?'ok':rem<180000?'warn':'');
@@ -372,7 +441,155 @@ $('#tabs').onclick=e=>{
   if(D)render();
 };
 
-/* ===== ЗАГРУЗКА ===== */
+/* ===== ПОГОДА (Open-Meteo) ===== */
+const WEATHER_CODES = {
+  0:{desc:'Ясно',emoji:'☀️'},1:{desc:'Преимущ. ясно',emoji:'🌤️'},2:{desc:'Переменная облачность',emoji:'⛅'},
+  3:{desc:'Пасмурно',emoji:'☁️'},45:{desc:'Туман',emoji:'🌫️'},48:{desc:'Изморозь',emoji:'🌫️'},
+  51:{desc:'Лёгкая морось',emoji:'🌦️'},53:{desc:'Морось',emoji:'🌦️'},55:{desc:'Сильная морось',emoji:'🌦️'},
+  56:{desc:'Ледяная морось',emoji:'🌧️'},57:{desc:'Сильная ледяная морось',emoji:'🌧️'},
+  61:{desc:'Небольшой дождь',emoji:'🌦️'},63:{desc:'Дождь',emoji:'🌧️'},65:{desc:'Сильный дождь',emoji:'🌧️'},
+  66:{desc:'Ледяной дождь',emoji:'🌧️'},67:{desc:'Сильный ледяной дождь',emoji:'🌧️'},
+  71:{desc:'Небольшой снег',emoji:'🌨️'},73:{desc:'Снег',emoji:'❄️'},75:{desc:'Сильный снег',emoji:'❄️'},
+  77:{desc:'Снежные зёрна',emoji:'🌨️'},80:{desc:'Ливень',emoji:'🌦️'},81:{desc:'Сильный ливень',emoji:'🌧️'},
+  82:{desc:'Очень сильный ливень',emoji:'⛈️'},85:{desc:'Снегопад',emoji:'🌨️'},86:{desc:'Сильный снегопад',emoji:'❄️'},
+  95:{desc:'Гроза',emoji:'⛈️'},96:{desc:'Гроза с градом',emoji:'⛈️'},99:{desc:'Сильная гроза с градом',emoji:'⛈️'}
+};
+function getWeatherInfo(code){return WEATHER_CODES[code]||{desc:'Нет данных',emoji:'🌡️'};}
+
+let weatherCity = localStorage.getItem('ttWeatherCity') || '';
+
+async function fetchJSON(url, timeoutMs=8000){
+  const ctrl = new AbortController();
+  const timer = setTimeout(()=>ctrl.abort(), timeoutMs);
+  try{
+    const r = await fetch(url,{signal:ctrl.signal,cache:'no-store'});
+    clearTimeout(timer);
+    if(!r.ok) return null;
+    return await r.json();
+  }catch(e){clearTimeout(timer);return null;}
+}
+
+async function geocodeCity(name){
+  const data = await fetchJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=ru&format=json`);
+  if(data?.results?.length) return data.results[0];
+  return null;
+}
+
+async function fetchWeather(lat, lon){
+  return await fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
+    +`&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code`
+    +`&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
+}
+
+async function tryGeolocation(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve({lat:pos.coords.latitude,lon:pos.coords.longitude}),
+      ()=>resolve(null),
+      {enableHighAccuracy:true,timeout:5000,maximumAge:600000}
+    );
+  });
+}
+
+async function reverseGeocode(lat,lon){
+  const data = await fetchJSON(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ru&zoom=10`);
+  if(data?.address){
+    const a=data.address;
+    return a.city||a.town||a.village||a.state||'Моё местоположение';
+  }
+  return 'Моё местоположение';
+}
+
+function getCityFromTimezone(){
+  try{
+    const tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'';
+    return tz.split('/').pop()?.replace(/_/g,' ').trim()||'Москва';
+  }catch(e){return 'Москва';}
+}
+
+/* Фоновые анимации погоды (адаптированы под виджет) */
+function updateWeatherBackground(code){
+  const bg=$('#weatherBg');
+  bg.innerHTML='';
+  const add=(cls,count,fn)=>{for(let i=0;i<count;i++){const e=document.createElement('div');e.className=cls;fn(e);bg.appendChild(e);}};
+  
+  if([0,1].includes(code)){
+    add('w-sun',3,e=>{e.style.cssText=`width:${80+Math.random()*100}px;height:${80+Math.random()*100}px;top:${Math.random()*60}%;left:${Math.random()*60}%;animation-delay:${Math.random()*3}s;`;});
+  }else if([2,3,45,48].includes(code)){
+    add('w-cloud',4,e=>{e.style.cssText=`width:${60+Math.random()*80}px;height:${30+Math.random()*50}px;top:${Math.random()*50}%;left:${Math.random()*80}%;animation-duration:${20+Math.random()*20}s;animation-delay:-${Math.random()*15}s;`;});
+  }else if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)){
+    const heavy=[63,65,66,67,80,81,82].includes(code);
+    add('w-rain',heavy?60:35,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-15px;animation-duration:${.3+Math.random()*.3}s;animation-delay:${Math.random()*1}s;opacity:${.4+Math.random()*.5};`;});
+  }else if([71,73,75,77,85,86].includes(code)){
+    const heavy=[75,86].includes(code);
+    add('w-snow',heavy?40:20,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-8px;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;animation-duration:${3+Math.random()*4}s;animation-delay:${Math.random()*3}s;opacity:${.5+Math.random()*.5};`;});
+  }else if([95,96,99].includes(code)){
+    add('w-rain',60,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-15px;animation-duration:${.25+Math.random()*.25}s;animation-delay:${Math.random()*1}s;opacity:${.5+Math.random()*.5};`;});
+    const flash=document.createElement('div');flash.className='w-flash';bg.appendChild(flash);
+  }
+}
+
+async function loadWeather(){
+  let cityName=weatherCity, lat, lon;
+  
+  if(cityName){
+    const geo=await geocodeCity(cityName);
+    if(geo){lat=geo.latitude;lon=geo.longitude;cityName=geo.name;}
+    else{
+      // Если город не найден — пробуем геолокацию
+      const geoPos=await tryGeolocation();
+      if(geoPos){lat=geoPos.lat;lon=geoPos.lon;cityName=await reverseGeocode(lat,lon);}
+      else{cityName=getCityFromTimezone();const geo2=await geocodeCity(cityName);if(geo2){lat=geo2.latitude;lon=geo2.longitude;cityName=geo2.name;}}
+    }
+  }else{
+    const geoPos=await tryGeolocation();
+    if(geoPos){lat=geoPos.lat;lon=geoPos.lon;cityName=await reverseGeocode(lat,lon);}
+    else{cityName=getCityFromTimezone();const geo=await geocodeCity(cityName);if(geo){lat=geo.latitude;lon=geo.longitude;cityName=geo.name;}}
+  }
+  
+  if(!lat||!lon){
+    $('#weatherContent').innerHTML=`<div style="text-align:center;color:var(--muted);padding:10px 0"><div style="font-size:1.3rem;margin-bottom:4px">⚠️</div><div style="font-size:.75rem">Не удалось определить местоположение</div></div>`;
+    return;
+  }
+  
+  const data=await fetchWeather(lat,lon);
+  if(!data?.current){
+    $('#weatherContent').innerHTML=`<div style="text-align:center;color:var(--muted);padding:10px 0"><div style="font-size:1.3rem;margin-bottom:4px">⚠️</div><div style="font-size:.75rem">Сервер погоды недоступен</div></div>`;
+    return;
+  }
+  
+  const cur=data.current;
+  const daily=data.daily;
+  const info=getWeatherInfo(cur.weather_code);
+  
+  updateWeatherBackground(cur.weather_code);
+  
+  const maxT=daily?.temperature_2m_max?.[0]!=null?Math.round(daily.temperature_2m_max[0]):'—';
+  const minT=daily?.temperature_2m_min?.[0]!=null?Math.round(daily.temperature_2m_min[0]):'—';
+  const humidity=cur.relative_humidity_2m!=null?`${Math.round(cur.relative_humidity_2m)}%`:'—';
+  const wind=cur.wind_speed_10m!=null?`${Math.round(cur.wind_speed_10m)} км/ч`:'—';
+  const feels=cur.apparent_temperature!=null?`${Math.round(cur.apparent_temperature)}°`:'—';
+  
+  $('#weatherContent').innerHTML=`
+    <div class="weather-top">
+      <div class="weather-icon">${info.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div class="weather-temp">${Math.round(cur.temperature_2m)}°</div>
+        <div class="weather-desc">${info.desc}</div>
+      </div>
+    </div>
+    <div class="weather-location">📍 ${cityName}</div>
+    <div class="weather-details">
+      <span>💧 ${humidity}</span>
+      <span>💨 ${wind}</span>
+      <span>🌡 Ощущ. ${feels}</span>
+      <span style="color:var(--accent)">↑${maxT}° ↓${minT}°</span>
+    </div>
+  `;
+}
+
+/* ===== ЗАГРУЗКА ДАННЫХ ===== */
 async function load(){
   try{
     const r=await fetch('uptime-data.json?t='+Date.now());
@@ -389,13 +606,13 @@ async function load(){
 
 function updateLiveBadge(){
   const b=$('#liveBadge');
-  if(isReal){b.className='live';b.innerHTML='<i></i>LIVE';}
+  if(isReal){b.className='live';b.innerHTML='<i></i>В ЭФИРЕ';}
   else{b.className='live sim';b.innerHTML='<i></i>СИМУЛЯЦИЯ';}
 }
 
 /* ===== СИМУЛЯЦИЯ ===== */
 function initSim(){
-  D={sites:{},critical_issues:[],last_updated:new Date().toISOString()};
+  D={sites:{},critical_issues:[],last_updated:new Date().toISOString(),logs:[]};
   SIM_SITES.forEach(n=>{
     D.sites[n]={current_status:'up',current_code:200,current_ms:SIM_BASE[n],
       is_functional:true,errors:[],history:[],daily:[],incidents:[],
@@ -409,6 +626,7 @@ function initSim(){
     }
     D.sites[n].history=arr;
   });
+  D.logs=[{time:new Date().toISOString(),site:'Дашборд',action:'Запуск симуляции',status:'info'}];
 }
 
 function jitterSim(){
@@ -425,30 +643,32 @@ function jitterSim(){
     s.current_ms=newMs; s.current_status=down?'down':'up';
   });
   D.last_updated=new Date().toISOString();
+  D.logs.push({time:new Date().toISOString(),site:'Дашборд',action:'Симуляция обновлена',status:'info'});
+  if(D.logs.length>50)D.logs.shift();
   render();
 }
 setInterval(jitterSim,10000);
 
 /* ===== РЕНДЕР ===== */
 function render(){
-  if(!D||!D.sites)return;
-  renderKPIs(); renderCritical(); renderMainChart(); renderUBars(); renderLatChart();
+  if(!D||!D.sites||Object.keys(D.sites).length===0){
+    $('#kpis').innerHTML='<div class="empty-msg">Нет данных для отображения</div>';
+    $('#clist').innerHTML='<div class="okmsg">✓ Нет данных</div>';
+    $('#logsList').innerHTML='<div class="empty-msg">Нет логов</div>';
+    $('#sitesGrid').innerHTML='<div class="empty-msg">Нет сервисов</div>';
+    $('#chgFeed').innerHTML='<div class="empty-msg">Нет изменений</div>';
+    $('#incTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Нет инцидентов</td></tr>';
+    return;
+  }
+  renderKPIs(); renderCritical(); renderMainChart(); renderLogs();
   renderSites(); renderChanges(); renderIncidents(); renderArchive();
 }
 
-function timeAgo(iso){
-  if(!iso)return'—';
-  const d=(Date.now()-new Date(iso))/1000;
-  if(d<60)return Math.floor(d)+'с'; if(d<3600)return Math.floor(d/60)+'м';
-  if(d<86400)return Math.floor(d/3600)+'ч'; return Math.floor(d/86400)+'д';
-}
-
-function css(v){return getComputedStyle(document.body).getPropertyValue(v).trim();}
-
 function renderKPIs(){
   const sites=Object.values(D.sites), n=sites.length;
+  if(n===0){$('#kpis').innerHTML='<div class="empty-msg">Нет сервисов</div>';return;}
   const upCount=sites.filter(s=>s.current_status==='up').length;
-  const avgMs=Math.round(sites.reduce((a,s)=>a+(s.current_ms||0),0)/n);
+  const avgMs=n?Math.round(sites.reduce((a,s)=>a+(s.current_ms||0),0)/n):0;
   const downCount=sites.filter(s=>s.current_status==='down').length;
   let totalChecks=0, totalUp=0;
   sites.forEach(s=>{
@@ -456,10 +676,11 @@ function renderKPIs(){
     totalChecks+=h.length; totalUp+=h.filter(x=>x.status==='up').length;
   });
   const uptime24=totalChecks?(totalUp/totalChecks*100):100;
+  const inc24=sites.reduce((a,s)=>a+(s.history||[]).filter(h=>h.status==='down'&&new Date(h.time)>Date.now()-86400000).length,0);
   const badge=isReal?'<span class="badge real">✓ реальные</span>':'<span class="badge sim">⚠ приблизительные</span>';
   $('#kpis').innerHTML=[
     {l:'Сервисов онлайн',v:`${upCount}/${n}`,d:`${Math.round(upCount/n*100)}% доступных`,c:upCount===n?'ok':'err'},
-    {l:'Uptime 24ч',v:uptime24.toFixed(2)+'%',d:`${sites.reduce((a,s)=>a+(s.history||[]).filter(h=>h.status==='down'&&new Date(h.time)>Date.now()-86400000).length,0)} сбоев за сутки`,c:uptime24>99?'ok':'err'},
+    {l:'Доступность 24ч',v:uptime24.toFixed(2)+'%',d:`${inc24} сбоев за сутки`,c:uptime24>99?'ok':'err'},
     {l:'Средний отклик',v:avgMs+' мс',d:'по всем сервисам',c:avgMs<300?'ok':'warn'},
     {l:'Активных инцидентов',v:downCount,d:downCount?'требуют внимания':'стабильно',c:downCount?'err':'ok'},
     {l:'Последняя проверка',v:timeAgo(D.last_updated),d:isReal?'данные получены':'данные имитируются',c:''},
@@ -473,8 +694,18 @@ function renderCritical(){
   else{el.classList.add('alert');list.innerHTML=issues.map(i=>`<div class="item">${i.site}: ${i.errors[0]||'ошибка'}</div>`).join('');}
 }
 
+function renderLogs(){
+  const logs=(D.logs||[]).slice(-15).reverse();
+  if(logs.length===0){$('#logsList').innerHTML='<div class="empty-msg">Нет логов</div>';return;}
+  $('#logsList').innerHTML=logs.map(l=>{
+    const time=new Date(l.time).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    return `<div class="log-item ${l.status}"><span class="log-time">${time}</span><span class="log-site">${l.site}:</span><span class="log-action">${l.action}</span></div>`;
+  }).join('');
+}
+
 function renderMainChart(){
   const names=Object.keys(D.sites);
+  if(names.length===0)return;
   const points=288, now=Date.now();
   const labels=[], uptimeData=[], latData=[];
   for(let i=points-1;i>=0;i--){
@@ -483,7 +714,8 @@ function renderMainChart(){
     let upSum=0,latSum=0,cnt=0;
     names.forEach(n=>{
       const h=D.sites[n].history||[];
-      const pt=h[Math.floor(i*h.length/points)];
+      const idx=Math.floor(i*h.length/points);
+      const pt=h[idx];
       if(pt){upSum+=pt.status==='up'?100:0;latSum+=pt.ms||0;cnt++;}
     });
     uptimeData.push(cnt?+(upSum/cnt).toFixed(2):100);
@@ -493,9 +725,9 @@ function renderMainChart(){
   charts.main=new Chart($('#chMain'),{
     type:'line',
     data:{labels,datasets:[
-      {label:'Uptime %',data:uptimeData,borderColor:css('--ok'),backgroundColor:css('--ok')+'22',
+      {label:'Доступность %',data:uptimeData,borderColor:css('--ok'),backgroundColor:css('--ok')+'22',
         borderWidth:2,tension:.4,fill:true,pointRadius:0,pointHoverRadius:5,yAxisID:'y'},
-      {label:'Latency мс',data:latData,borderColor:css('--accent'),backgroundColor:'transparent',
+      {label:'Отклик мс',data:latData,borderColor:css('--accent'),backgroundColor:'transparent',
         borderWidth:2,tension:.4,fill:false,pointRadius:0,pointHoverRadius:5,yAxisID:'y1'}
     ]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
@@ -511,51 +743,17 @@ function renderMainChart(){
   });
 }
 
-function renderUBars(){
-  const names=Object.keys(D.sites);
-  $('#ubars').innerHTML=names.map(n=>{
-    const s=D.sites[n], h=(s.history||[]).slice(-60);
-    const cells=h.map(x=>`<i class="${x.status}"></i>`).join('');
-    const pad='<i class="na"></i>'.repeat(Math.max(0,60-h.length));
-    const pct=h.length?(h.filter(x=>x.status==='up').length/h.length*100):100;
-    const cls=pct>99?'ok':'err';
-    return `<div class="ubrow"><div class="nm">${n}</div><div class="bar">${pad}${cells}</div><div class="pct ${cls}">${pct.toFixed(1)}%</div></div>`;
-  }).join('');
-}
-
-function renderLatChart(){
-  const names=Object.keys(D.sites);
-  const datasets=names.map((n,i)=>{
-    const h=(D.sites[n].history||[]).slice(-48);
-    return {label:n,data:h.map(x=>x.ms),borderColor:COLORS[i%COLORS.length],
-      backgroundColor:COLORS[i%COLORS.length]+'15',borderWidth:2,tension:.4,fill:false,pointRadius:0,pointHoverRadius:4};
-  });
-  const labels=datasets[0]?.data.map((_,i)=>{
-    const h=(D.sites[names[0]].history||[]).slice(-48);
-    return h[i]?new Date(h[i].time).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}):'';
-  })||[];
-  if(charts.lat)charts.lat.destroy();
-  charts.lat=new Chart($('#chLat'),{
-    type:'line',data:{labels,datasets},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:true,position:'bottom',labels:{color:css('--muted'),font:{size:10},boxWidth:10,padding:8}},
-        tooltip:{backgroundColor:css('--panel2'),titleColor:css('--text'),bodyColor:css('--text'),borderColor:css('--border'),borderWidth:1,padding:10}},
-      scales:{x:{grid:{color:css('--grid'),drawBorder:false},ticks:{color:css('--muted'),font:{size:9},maxTicksLimit:5}},
-        y:{beginAtZero:true,grid:{color:css('--grid'),drawBorder:false},ticks:{color:css('--muted'),font:{size:10},callback:v=>v+'мс'}}}
-    }
-  });
-}
-
 function renderSites(){
   const names=Object.keys(D.sites);
   $('#sitesMeta').textContent=`${names.length} сервисов`;
+  if(names.length===0){$('#sitesGrid').innerHTML='<div class="empty-msg">Нет сервисов</div>';return;}
   $('#sitesGrid').innerHTML=names.map(n=>{
     const s=D.sites[n], h=(s.history||[]).slice(-60);
     const pct=h.length?(h.filter(x=>x.status==='up').length/h.length*100):100;
     const cells=h.map(x=>`<i class="${x.status}"></i>`).join('');
     const pad='<i class="na"></i>'.repeat(Math.max(0,60-h.length));
     return `<div class="site"><div class="r1"><span class="nm">${n}</span><span class="st ${s.current_status}"></span></div>
-      <div class="nums"><div>отклик <b>${s.current_ms}мс</b></div><div>код <b>${s.current_code}</b></div><div>uptime <b>${pct.toFixed(1)}%</b></div></div>
+      <div class="nums"><div>отклик <b>${s.current_ms}мс</b></div><div>код <b>${s.current_code}</b></div><div>доступность <b>${pct.toFixed(1)}%</b></div></div>
       <div class="mini">${pad}${cells}</div></div>`;
   }).join('');
 }
@@ -570,27 +768,33 @@ function renderChanges(){
   all.sort((a,b)=>new Date(b.t)-new Date(a.t));
   const ic={commit:'✏️',deploy:'🚀',run:'⚙️'};
   $('#chgFeed').innerHTML=all.slice(0,60).map(x=>`<div class="fi"><div class="ic">${ic[x.k]}</div><div class="bd">
-    <div class="t1">${esc(x.txt)}</div><div class="t2"><b>${x.site}</b> · ${esc(x.who)} · ${timeAgo(x.t)} · <span class="mono">${new Date(x.t).toLocaleString('ru-RU')}</span></div></div></div>`).join('')||'<div class="panel-sub">Нет данных</div>';
+    <div class="t1">${esc(x.txt)}</div><div class="t2"><b>${x.site}</b> · ${esc(x.who)} · ${timeAgo(x.t)} · <span class="mono">${new Date(x.t).toLocaleString('ru-RU')}</span></div></div></div>`).join('')||'<div class="empty-msg">Нет изменений</div>';
 }
 
 function renderIncidents(){
   const all=Object.entries(D.sites).flatMap(([n,s])=>(s.incidents||[]).map(i=>({...i,site:n}))).sort((a,b)=>new Date(b.start)-new Date(a.start));
   $('#incMeta').textContent=`всего: ${all.length}`;
   $('#incTable').innerHTML=`<tr><th>Сервис</th><th>Начало</th><th>Конец</th><th>Длит.</th><th>Код</th><th>Статус</th></tr>`+
+    (all.length===0?'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Инцидентов не было</td></tr>':
     all.slice(0,50).map(i=>{const dur=i.minutes!=null?i.minutes.toFixed(1)+' мин':'идёт сейчас';
     return `<tr><td><b>${i.site}</b></td><td class="mono">${new Date(i.start).toLocaleString('ru-RU')}</td>
     <td class="mono">${i.end?new Date(i.end).toLocaleString('ru-RU'):'—'}</td><td>${dur}</td>
     <td><span class="tag err">${i.code}</span></td>
-    <td>${i.end?'<span class="tag ok">закрыт</span>':'<span class="tag warn">активен</span>'}</td></tr>`;}).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Инцидентов не было</td></tr>';
+    <td>${i.end?'<span class="tag ok">закрыт</span>':'<span class="tag warn">активен</span>'}</td></tr>`;}).join(''));
 }
 
 function renderArchive(){
-  const months={}, mresp={};
+  const months={};
   Object.values(D.sites).forEach(s=>(s.daily||[]).forEach(d=>{
-    const m=d.date.slice(0,7);(months[m]=months[m]||{up:0,c:0});(mresp[m]=mresp[m]||{s:0,c:0});
-    months[m].up+=d.up;months[m].c+=d.checks;mresp[m].s+=d.sum_ms;mresp[m].c+=d.checks;}));
+    const m=d.date.slice(0,7);(months[m]=months[m]||{up:0,c:0});
+    months[m].up+=d.up;months[m].c+=d.checks;}));
   const keys=Object.keys(months).sort();
   if(charts.month)charts.month.destroy();
+  if(keys.length===0){
+    $('#chMonth').getContext('2d').clearRect(0,0,$('#chMonth').width,$('#chMonth').height);
+    $('#yearTable').innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">Нет архивных данных</td></tr>';
+    return;
+  }
   charts.month=new Chart($('#chMonth'),{
     type:'bar',data:{labels:keys.map(k=>{const[y,m]=k.split('-');return new Date(y,m-1).toLocaleDateString('ru-RU',{month:'long',year:'2-digit'});}),
       datasets:[{data:keys.map(k=>+(months[k].up/months[k].c*100).toFixed(2)),backgroundColor:css('--ok')+'cc',borderRadius:4,barThickness:18}]},
@@ -599,13 +803,10 @@ function renderArchive(){
   });
   const years={};keys.forEach(k=>{const y=k.slice(0,4);(years[y]=years[y]||{up:0,c:0,inc:0});years[y].up+=months[k].up;years[y].c+=months[k].c;});
   Object.values(D.sites).forEach(s=>(s.incidents||[]).forEach(i=>{const y=i.start.slice(0,4);years[y]=years[y]||{up:0,c:0,inc:0};years[y].inc++;}));
-  $('#yearTable').innerHTML=`<tr><th>Год</th><th>Uptime</th><th>Инцидентов</th><th>Проверок</th></tr>`+
+  $('#yearTable').innerHTML=`<tr><th>Год</th><th>Доступность</th><th>Инцидентов</th><th>Проверок</th></tr>`+
     Object.keys(years).sort().reverse().map(y=>{const v=years[y];
     return `<tr><td><b>${y}</b></td><td style="color:${v.up/v.c>.99?'var(--ok)':'var(--err)'}">${(v.up/v.c*100).toFixed(2)}%</td><td>${v.inc||0}</td><td class="mono">${v.c}</td></tr>`;}).join('');
 }
-
-function fmtDur(s){if(s==null)return'—';if(s<60)return s+'с';if(s<3600)return (s/60).toFixed(1)+'м';if(s<86400)return (s/3600).toFixed(1)+'ч';return (s/86400).toFixed(1)+'д';}
-function esc(s){return String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 
 /* ===== МОДАЛКА ===== */
 function openCritical(){
@@ -619,7 +820,9 @@ $('#modal').onclick=e=>{if(e.target.id==='modal')closeCritical();};
 
 /* ===== СТАРТ ===== */
 load();
+loadWeather();
 setInterval(load,60000);
+setInterval(loadWeather,30*60*1000); // Погода обновляется каждые 30 минут
 </script>
 </body>
 </html>
