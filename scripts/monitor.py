@@ -13,7 +13,8 @@ SITES = [
         "repo": "zloba010.github.io",
         "checks": [
             {"type": "http", "expected": 200},
-            {"type": "contains", "text": "Kizamia", "description": "Главная страница содержит 'Kizamia'"}
+            {"type": "contains", "text": "Kizamia", "description": "Главная страница содержит 'Kizamia'"},
+            {"type": "contains", "text": "<script", "description": "JavaScript загружается"}
         ]
     },
     {
@@ -22,7 +23,8 @@ SITES = [
         "repo": "KFWR---Kizami-Free-Web-Reader",
         "checks": [
             {"type": "http", "expected": 200},
-            {"type": "contains", "text": "reader", "description": "Читалка загружается"}
+            {"type": "contains", "text": "reader", "description": "Читалка загружается"},
+            {"type": "contains", "text": "<canvas", "description": "Canvas для читалки присутствует"}
         ]
     },
     {
@@ -31,7 +33,8 @@ SITES = [
         "repo": "kizamianotes",
         "checks": [
             {"type": "http", "expected": 200},
-            {"type": "contains", "text": "note", "description": "Заметки загружаются"}
+            {"type": "contains", "text": "note", "description": "Заметки загружаются"},
+            {"type": "contains", "text": "<textarea", "description": "Форма для заметок присутствует"}
         ]
     },
     {
@@ -40,7 +43,8 @@ SITES = [
         "repo": "KizamiaUpscaleImage",
         "checks": [
             {"type": "http", "expected": 200},
-            {"type": "contains", "text": "upscale", "description": "Апскейлер загружается"}
+            {"type": "contains", "text": "upscale", "description": "Апскейлер загружается"},
+            {"type": "contains", "text": "input", "description": "Input для загрузки файлов присутствует"}
         ]
     },
     {
@@ -49,7 +53,8 @@ SITES = [
         "repo": "Kizamia-Weather",
         "checks": [
             {"type": "http", "expected": 200},
-            {"type": "contains", "text": "weather", "description": "Погода загружается"}
+            {"type": "contains", "text": "weather", "description": "Погода загружается"},
+            {"type": "contains", "text": "temp", "description": "Блок с температурой присутствует"}
         ]
     },
 ]
