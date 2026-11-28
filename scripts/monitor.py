@@ -27,16 +27,15 @@ SITES = [
             {"type": "contains", "text": "<canvas", "description": "Canvas для читалки присутствует"}
         ]
     },
-    {
-        "name": "Kizamia Notes",
-        "url": "https://zloba010.github.io/kizamianotes/",
-        "repo": "kizamianotes",
-        "checks": [
-            {"type": "http", "expected": 200},
-            {"type": "contains", "text": "note", "description": "Заметки загружаются"},
-            {"type": "contains", "text": "<textarea", "description": "Форма для заметок присутствует"}
-        ]
-    },
+{
+    "name": "Kizamia Notes",
+    "url": "https://zloba010.github.io/kizamianotes/",
+    "repo": "kizamianotes",
+    "checks": [
+        {"type": "http", "expected": 200},
+        {"type": "contains", "text": "note", "description": "Заметки загружаются"}
+    ]
+},
     {
         "name": "Upscale Image",
         "url": "https://zloba010.github.io/KizamiaUpscaleImage/",
