@@ -7,60 +7,124 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{
-  --bg:#f5f5f5;--text:#1a1a1a;--accent:#0066cc;--panel:#ffffff;
-  --input:#f0f0f0;--border:#d0d0d0;--shadow:rgba(0,0,0,.1);--muted:#666;
-  --ok:#00a86b;--warn:#ff9500;--err:#dc3545;--info:#17a2b8;
-  --grid:#e0e0e0;
+  --bg:#f4ebd9;--text:#3e2723;--accent:#ff1744;--panel:rgba(244,235,217,.95);
+  --input:rgba(255,255,255,.5);--border:#3e2723;--blur:none;--glass-border:2px solid transparent;
+  --shadow:rgba(0,0,0,.1);--muted:rgba(62,39,35,.55);
+  --ok:#10b981;--warn:#f59e0b;--err:#ef4444;--info:#3b82f6;
+  --grid:rgba(62,39,35,.12);
 }
 [data-theme="dark"]{
-  --bg:#0d1117;--text:#c9d1d9;--accent:#58a6ff;--panel:#161b22;
-  --input:#21262d;--border:#30363d;--shadow:rgba(0,0,0,.5);
-  --muted:#8b949e;--grid:#21262d;
+  --bg:#1a1a1a;--text:#e0e0e0;--accent:#ff1744;--panel:rgba(40,40,40,.95);
+  --input:rgba(255,255,255,.08);--border:#444;--shadow:rgba(0,0,0,.5);
+  --muted:rgba(224,224,224,.5);--grid:rgba(255,255,255,.08);
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;transition:background .3s,color .3s}
-.wrap{height:100vh;display:flex;flex-direction:column;padding:12px}
+body{background:var(--bg);color:var(--text);min-height:100vh;padding:18px;transition:background .3s,color .3s;overflow:hidden}
+.wrap{max-width:1440px;margin:0 auto;height:calc(100vh - 36px);display:flex;flex-direction:column}
 
-.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-shrink:0}
+.hdr{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;flex-shrink:0}
+.hdr h1{font-size:1.25rem;font-weight:900;display:flex;align-items:center;gap:10px;letter-spacing:-.3px}
 .hdr-left{display:flex;align-items:center;gap:16px}
-.logo{font-size:1.3rem;font-weight:900;letter-spacing:-.5px}
 .clock{font-family:ui-monospace,monospace;font-size:1.1rem;font-weight:700;color:var(--accent)}
-.date{font-size:.85rem;color:var(--muted);margin-top:2px}
-.hdr-right{display:flex;gap:8px;align-items:center}
-.theme-btn{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:.85rem;font-weight:700}
-.theme-btn:hover{border-color:var(--accent)}
+.date{font-size:.75rem;color:var(--muted);margin-top:2px}
+.live{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted);font-weight:600}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:blink 2s infinite}
+@keyframes blink{50%{opacity:.3}}
+.ranges{display:flex;gap:4px;background:var(--panel);border:var(--glass-border);border-radius:12px;padding:4px;backdrop-filter:var(--blur)}
+.ranges button{border:none;background:transparent;color:var(--muted);font-weight:700;font-size:.75rem;padding:6px 11px;border-radius:8px;cursor:pointer}
+.ranges button.on{background:var(--accent);color:#fff}
+.hbtn{background:var(--panel);border:var(--glass-border);color:var(--text);border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:1.05rem;backdrop-filter:var(--blur);box-shadow:0 3px 12px var(--shadow)}
+.hbtn:hover{border-color:var(--accent)}
 
-.tabs{display:flex;gap:6px;margin-bottom:12px;flex-shrink:0}
-.tab-btn{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:.85rem}
-.tab-btn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.panel{background:var(--panel);border:var(--glass-border);border-radius:14px;padding:16px 18px;backdrop-filter:var(--blur);box-shadow:0 6px 24px var(--shadow);margin-bottom:14px}
+.panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:10px}
+.panel-t{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.panel-sub{font-size:.72rem;color:var(--muted)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px;flex-shrink:0}
+.kpi{background:var(--panel);border:var(--glass-border);border-radius:14px;padding:16px;backdrop-filter:var(--blur);box-shadow:0 6px 24px var(--shadow)}
+.kpi .v{font-size:1.7rem;font-weight:900;line-height:1.1;letter-spacing:-1px}
+.kpi .l{font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-top:4px}
+.kpi .d{font-size:.7rem;margin-top:6px;color:var(--muted)}
+.kpi .approx{font-size:.65rem;color:var(--warn);margin-top:4px;display:flex;align-items:center;gap:3px}
+.kpi .approx::before{content:'⚠';font-size:.7rem}
+.kpi .real{font-size:.7rem;color:var(--ok);margin-top:4px;display:flex;align-items:center;gap:3px}
+.kpi .real::before{content:'✓';font-size:.8rem;font-weight:900}
+
+.critical-panel{background:var(--err);color:#fff;border-radius:14px;padding:16px;margin-bottom:14px;cursor:pointer;flex-shrink:0}
+.critical-panel:hover{opacity:.9}
+.critical-panel .panel-t{color:rgba(255,255,255,.8)}
+.critical-list{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.critical-item{background:rgba(255,255,255,.2);padding:8px 12px;border-radius:6px;font-size:.85rem;font-weight:700}
+.critical-empty{color:#fff;font-weight:700;font-size:.9rem}
+
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;flex-shrink:0}
+.tabs button{background:var(--panel);border:var(--glass-border);color:var(--muted);padding:9px 18px;border-radius:10px;font-weight:700;font-size:.82rem;cursor:pointer;backdrop-filter:var(--blur)}
+.tabs button.on{color:#fff;background:var(--accent);border-color:var(--accent)}
 .tab{display:none;flex:1;overflow:hidden}.tab.on{display:flex;flex-direction:column}
 
-/* Главный экран */
-.main-grid{display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:10px;flex:1;min-height:0}
-.panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px;box-shadow:0 2px 8px var(--shadow);display:flex;flex-direction:column;min-height:0}
-.panel-title{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:8px;flex-shrink:0}
+.chartbox{position:relative;flex:1;min-height:0}
+.chartbox.tall{height:340px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
+.legend span{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted);font-weight:600}
+.legend i{width:10px;height:10px;border-radius:3px}
 
-/* KPI */
-.kpi{display:flex;flex-direction:column;justify-content:center}
-.kpi .value{font-size:2rem;font-weight:900;color:var(--accent);line-height:1}
-.kpi .label{font-size:.75rem;color:var(--muted);margin-top:4px}
-.kpi .approx{font-size:.7rem;color:var(--warn);margin-top:4px;display:flex;align-items:center;gap:4px}
-.kpi .approx::before{content:'⚠';font-size:.8rem}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0}
+@media(max-width:900px){.g2{grid-template-columns:1fr}}
 
-/* Критично */
-.critical{grid-column:1 / -1;background:var(--err);color:#fff}
-.critical .panel-title{color:rgba(255,255,255,.8)}
-.critical-list{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.critical-item{background:rgba(255,255,255,.2);padding:8px 12px;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:700}
-.critical-item:hover{background:rgba(255,255,255,.3)}
-.critical-empty{color:var(--ok);font-weight:700;font-size:.9rem}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{text-align:left;color:var(--muted);font-size:.68rem;text-transform:uppercase;letter-spacing:.8px;padding:8px 10px;border-bottom:1px solid var(--grid)}
+td{padding:9px 10px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--input)}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:.68rem;font-weight:800}
+.tag.ok{background:rgba(16,185,129,.15);color:var(--ok)}
+.tag.err{background:rgba(239,68,68,.15);color:var(--err)}
+.tag.warn{background:rgba(245,158,11,.15);color:var(--warn)}
+.sha{font-family:ui-monospace,monospace;font-size:.75rem;color:var(--accent)}
+.mono{font-family:ui-monospace,monospace;font-size:.78rem;color:var(--muted)}
 
-/* Графики */
-.chart-container{position:relative;flex:1;min-height:0}
-.chart-container canvas{width:100%!important;height:100%!important}
+.sites{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;overflow-y:auto;flex:1}
+.site{background:var(--panel);border:1.5px solid var(--glass-border);border-radius:14px;padding:16px;cursor:pointer;transition:.2s;backdrop-filter:var(--blur);box-shadow:0 6px 24px var(--shadow)}
+.site:hover{border-color:var(--accent);transform:translateY(-2px)}
+.site.on{border-color:var(--accent)}
+.site .r1{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.site .nm{font-weight:800;font-size:.95rem}
+.site .st{width:9px;height:9px;border-radius:50%}
+.site .st.up{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.site .st.down{background:var(--err);box-shadow:0 0 8px var(--err)}
+.site .nums{display:flex;gap:16px;font-size:.75rem;color:var(--muted);margin-bottom:10px}
+.site .nums b{color:var(--text);font-size:.85rem}
+.mini{height:22px;display:flex;gap:1.5px;border-radius:3px;overflow:hidden}
+.mini i{flex:1;min-width:1.5px}
+.mini i.up{background:var(--ok)}.mini i.down{background:var(--err)}.mini i.na{background:var(--grid)}
 
-/* Uptime bars */
-.uptime-bars{display:flex;flex-direction:column;gap:6px;overflow-y:auto}
+.feed{max-height:420px;overflow-y:auto;flex:1}
+.fi{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--grid)}
+.fi:last-child{border:none}
+.fi .ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;background:var(--input)}
+.fi .bd{flex:1;min-width:0}
+.fi .t1{font-size:.85rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi .t2{font-size:.72rem;color:var(--muted);margin-top:2px}
+
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:99}
+.ov.on{display:flex}
+.mv{background:var(--panel);border:var(--glass-border);border-radius:18px;padding:26px;max-width:440px;width:92%;backdrop-filter:var(--blur)}
+.mv h3{margin-bottom:8px}
+.mv p{font-size:.82rem;color:var(--muted);margin-bottom:14px;line-height:1.5}
+.inp{width:100%;background:var(--input);border:1.5px solid var(--border);border-radius:10px;padding:11px;color:var(--text);font-size:.9rem;outline:none;margin-bottom:12px}
+.btn{width:100%;border:none;border-radius:10px;padding:12px;font-weight:800;cursor:pointer;margin-bottom:8px;font-size:.88rem}
+.btn.p{background:var(--accent);color:#fff}
+.btn.s{background:var(--input);color:var(--text);border:1.5px solid var(--border)}
+.err-box{background:rgba(239,68,68,.1);border:1px solid var(--err);color:var(--err);border-radius:10px;padding:14px;font-size:.85rem;margin-bottom:14px;display:none}
+.foot{text-align:center;font-size:.8rem;color:var(--muted);margin-top:26px;display:flex;justify-content:center;gap:8px;align-items:center;flex-shrink:0}
+.foot a{color:var(--text);font-weight:700;text-decoration:none}
+.gear{cursor:pointer;opacity:.4;transition:.2s}
+.gear:hover{opacity:1;transform:rotate(90deg)}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:var(--grid);border-radius:4px}
+.empty-msg{text-align:center;color:var(--muted);padding:40px 20px;font-size:.9rem}
+
+.uptime-bars{display:flex;flex-direction:column;gap:6px;overflow-y:auto;flex:1}
 .uptime-site{display:flex;flex-direction:column;gap:4px}
 .uptime-site .name{font-size:.75rem;font-weight:700;display:flex;justify-content:space-between}
 .uptime-site .bars{display:flex;gap:1px;height:20px}
@@ -68,46 +132,6 @@ body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;transit
 .uptime-site .bar.up{background:var(--ok)}
 .uptime-site .bar.down{background:var(--err)}
 .uptime-site .bar.na{background:var(--grid)}
-
-/* Sites grid */
-.sites-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;overflow-y:auto}
-.site-card{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px}
-.site-card .name{font-weight:700;font-size:.9rem;margin-bottom:4px}
-.site-card .status{display:flex;align-items:center;gap:6px;font-size:.8rem}
-.site-card .status .dot{width:8px;height:8px;border-radius:50%}
-.site-card .status .dot.up{background:var(--ok)}
-.site-card .status .dot.down{background:var(--err)}
-.site-card .meta{font-size:.75rem;color:var(--muted);margin-top:4px}
-
-/* Changes */
-.changes-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto}
-.change-item{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.85rem}
-.change-item .header{display:flex;justify-content:space-between;margin-bottom:4px}
-.change-item .type{font-weight:700;color:var(--accent)}
-.change-item .time{font-size:.75rem;color:var(--muted)}
-.change-item .desc{color:var(--muted);font-size:.8rem}
-
-/* Incidents */
-.incidents-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto}
-.incident-item{background:var(--input);border-left:3px solid var(--err);border-radius:6px;padding:10px}
-.incident-item .site{font-weight:700;font-size:.9rem}
-.incident-item .time{font-size:.75rem;color:var(--muted);margin-top:4px}
-.incident-item .duration{font-size:.8rem;color:var(--err);margin-top:4px}
-
-/* Archive */
-.archive-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;overflow-y:auto}
-
-/* Modal */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:999}
-.modal.on{display:flex}
-.modal-content{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto}
-.modal-content h3{margin-bottom:12px}
-.modal-content .close{float:right;cursor:pointer;font-size:1.2rem;color:var(--muted)}
-.modal-content .close:hover{color:var(--err)}
-.issue-list{display:flex;flex-direction:column;gap:8px}
-.issue-item{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:12px}
-.issue-item .site{font-weight:700;color:var(--err);margin-bottom:4px}
-.issue-item .errors{font-size:.85rem;color:var(--muted)}
 </style>
 </head>
 <body data-theme="dark">
@@ -116,501 +140,353 @@ body{background:var(--bg);color:var(--text);height:100vh;overflow:hidden;transit
   <div class="hdr">
     <div class="hdr-left">
       <div>
-        <div class="logo">📡 TroubleTab Monitor</div>
+        <h1>📡 TroubleTab Monitor <span class="live"><i></i><span id="liveTxt">LIVE</span></span></h1>
         <div class="date" id="dateDisplay">—</div>
       </div>
       <div class="clock" id="clockDisplay">--:--:--</div>
     </div>
-    <div class="hdr-right">
-      <button class="theme-btn" id="themeBtn">🌙</button>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="hbtn" id="themeBtn" title="Тема">☀️</button>
     </div>
   </div>
 
-  <div class="tabs">
-    <button class="tab-btn on" data-tab="main">Главный</button>
-    <button class="tab-btn" data-tab="sites">Сайты</button>
-    <button class="tab-btn" data-tab="changes">Изменения</button>
-    <button class="tab-btn" data-tab="incidents">Инциденты</button>
-    <button class="tab-btn" data-tab="archive">Архив</button>
+  <div class="err-box" id="errBox"></div>
+
+  <div class="tabs" id="tabs">
+    <button data-t="ov" class="on">Обзор</button>
+    <button data-t="sites">Сайты</button>
+    <button data-t="chg">Изменения</button>
+    <button data-t="inc">Инциденты</button>
+    <button data-t="arch">Архив</button>
   </div>
 
-  <!-- ГЛАВНЫЙ ЭКРАН -->
-  <div class="tab on" id="tab-main">
-    <div class="main-grid">
-      <div class="panel kpi">
-        <div class="panel-title">Uptime 24ч</div>
-        <div class="value" id="kpiUptime">—</div>
-        <div class="label">средний по всем сайтам</div>
-        <div class="approx" id="kpiUptimeApprox" style="display:none">приблизительные данные</div>
+  <div class="tab on" id="t-ov">
+    <div class="critical-panel" id="criticalPanel" onclick="showCriticalModal()">
+      <div class="panel-t">⚠ Критично</div>
+      <div class="critical-list" id="criticalList">
+        <div class="critical-empty">✓ Все системы работают нормально</div>
       </div>
-      <div class="panel kpi">
-        <div class="panel-title">Средний отклик</div>
-        <div class="value" id="kpiResponse">—</div>
-        <div class="label">мс</div>
-        <div class="approx" id="kpiResponseApprox" style="display:none">приблизительные данные</div>
-      </div>
-      <div class="panel kpi">
-        <div class="panel-title">Активных инцидентов</div>
-        <div class="value" id="kpiIncidents">—</div>
-        <div class="label">требуют внимания</div>
-        <div class="approx" id="kpiIncidentsApprox" style="display:none">приблизительные данные</div>
-      </div>
+    </div>
 
-      <div class="panel critical" id="criticalPanel">
-        <div class="panel-title">⚠ Критично</div>
-        <div class="critical-list" id="criticalList">
-          <div class="critical-empty">✓ Все системы работают нормально</div>
-        </div>
-      </div>
+    <div class="kpis" id="kpis"></div>
 
-      <div class="panel" style="grid-column:1 / 3">
-        <div class="panel-title">Доступность за 24 часа</div>
-        <div class="uptime-bars" id="uptimeBars"></div>
+    <div class="panel" style="flex:1;min-height:0">
+      <div class="panel-h"><div class="panel-t">Доступность сервисов · последние 24 часа</div><div class="panel-sub" id="barsMeta"></div></div>
+      <div class="uptime-bars" id="uptimeBars"></div>
+    </div>
+
+    <div class="g2">
+      <div class="panel">
+        <div class="panel-h"><div class="panel-t">Uptime по сайтам, %</div></div>
+        <div class="chartbox"><canvas id="chAvail"></canvas></div>
       </div>
       <div class="panel">
-        <div class="panel-title">Отклик по сайтам</div>
-        <div class="chart-container">
-          <canvas id="chartResponse"></canvas>
-        </div>
-      </div>
-
-      <div class="panel" style="grid-column:1 / -1">
-        <div class="panel-title">Uptime по дням (последние 7 дней)</div>
-        <div class="chart-container">
-          <canvas id="chartUptime"></canvas>
-        </div>
+        <div class="panel-h"><div class="panel-t">Длительность деплоев, сек</div></div>
+        <div class="chartbox"><canvas id="chDeploy"></canvas></div>
       </div>
     </div>
   </div>
 
-  <!-- САЙТЫ -->
-  <div class="tab" id="tab-sites">
+  <div class="tab" id="t-sites">
+    <div class="sites" id="siteCards"></div>
+  </div>
+
+  <div class="tab" id="t-chg">
     <div class="panel" style="flex:1">
-      <div class="panel-title">Все сайты</div>
-      <div class="sites-grid" id="sitesGrid"></div>
+      <div class="panel-h"><div class="panel-t">Лента изменений по всем репозиториям</div><div class="panel-sub">коммиты + деплои + запуски</div></div>
+      <div class="feed" id="chgFeed"></div>
     </div>
   </div>
 
-  <!-- ИЗМЕНЕНИЯ -->
-  <div class="tab" id="tab-changes">
+  <div class="tab" id="t-inc">
     <div class="panel" style="flex:1">
-      <div class="panel-title">Последние изменения</div>
-      <div class="changes-list" id="changesList"></div>
+      <div class="panel-h"><div class="panel-t">Реестр инцидентов</div><div class="panel-sub" id="incMeta"></div></div>
+      <div style="overflow-x:auto"><table id="incTable"></table></div>
     </div>
   </div>
 
-  <!-- ИНЦИДЕНТЫ -->
-  <div class="tab" id="tab-incidents">
-    <div class="panel" style="flex:1">
-      <div class="panel-title">Инциденты</div>
-      <div class="incidents-list" id="incidentsList"></div>
-    </div>
-  </div>
-
-  <!-- АРХИВ -->
-  <div class="tab" id="tab-archive">
-    <div class="archive-grid">
+  <div class="tab" id="t-arch">
+    <div class="g2" style="flex:1">
       <div class="panel">
-        <div class="panel-title">Uptime по месяцам</div>
-        <div class="chart-container">
-          <canvas id="chartArchive"></canvas>
-        </div>
+        <div class="panel-h"><div class="panel-t">Uptime по месяцам, %</div></div>
+        <div class="chartbox"><canvas id="chMonth"></canvas></div>
       </div>
       <div class="panel">
-        <div class="panel-title">Годовые сводки</div>
-        <div id="yearlyStats" style="overflow-y:auto"></div>
+        <div class="panel-h"><div class="panel-t">Годовые сводки</div></div>
+        <div style="overflow-x:auto"><table id="yearTable"></table></div>
       </div>
     </div>
   </div>
 
+  <div class="foot">
+    <span>проект был написан <a href="https://github.com/zloba010" target="_blank" rel="noopener">kizamia</a></span>
+  </div>
 </div>
 
-<!-- Модальное окно для критических ошибок -->
-<div class="modal" id="criticalModal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">✕</span>
-    <h3>Критические ошибки</h3>
-    <div class="issue-list" id="issueList"></div>
+<div class="ov" id="modal">
+  <div class="mv">
+    <h3>⚠ Критические ошибки</h3>
+    <div id="criticalModalContent"></div>
+    <button class="btn s" onclick="closeModal()">Закрыть</button>
   </div>
 </div>
 
 <script>
-/* ===== ДАННЫЕ ===== */
-let D = null;
-let isRealData = false;
-let simulatedData = null;
+const OWNER='zloba010', REPO='zloba010.github.io';
+const PALETTE=['#ff1744','#ffeb3b','#4299e1','#10b981','#f59e0b','#a78bfa','#fb923c'];
+let D=null, RANGE='24h', TAB='ov', SEL=null, charts={};
+let isRealData=false;
+
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function ago(iso){const d=(Date.now()-new Date(iso))/1000;
+  if(d<60)return 'только что';if(d<3600)return Math.floor(d/60)+' мин назад';
+  if(d<86400)return Math.floor(d/3600)+' ч назад';return Math.floor(d/86400)+' дн назад';}
+function fmtDur(s){if(s==null)return'—';if(s<60)return s+'с';if(s<3600)return (s/60).toFixed(1)+'м';
+  if(s<86400)return (s/3600).toFixed(1)+'ч';return (s/86400).toFixed(1)+'д';}
+function fmtT(iso,r){const d=new Date(iso);
+  if(r==='15m'||r==='1h'||r==='6h'||r==='24h')return d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  if(r==='7d'||r==='30d')return d.toLocaleDateString('ru-RU',{day:'numeric',month:'short'});
+  return d.toLocaleDateString('ru-RU',{month:'short',year:'2-digit'});}
+function css(v){return getComputedStyle(document.body).getPropertyValue(v).trim();}
+function siteColor(i){return PALETTE[i%PALETTE.length];}
 
 /* ===== ЧАСЫ И ДАТА ===== */
 function updateClock(){
-  const now = new Date();
-  const msk = new Date(now.getTime() + (now.getTimezoneOffset() + 180) * 60000); // МСК = UTC+3
-  
-  const time = msk.toTimeString().split(' ')[0];
-  document.getElementById('clockDisplay').textContent = time;
-  
-  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
-  const day = msk.getDate().toString().padStart(2,'0');
-  const month = months[msk.getMonth()];
-  const year = msk.getFullYear();
-  const monthNum = (msk.getMonth()+1).toString().padStart(2,'0');
-  
-  document.getElementById('dateDisplay').textContent = `${day} ${month} ${year} г. · ${day}.${monthNum}.${year}`;
+  const now=new Date();
+  const msk=new Date(now.getTime()+(now.getTimezoneOffset()+180)*60000);
+  const time=msk.toTimeString().split(' ')[0];
+  document.getElementById('clockDisplay').textContent=time;
+  const months=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  const day=msk.getDate().toString().padStart(2,'0');
+  const month=months[msk.getMonth()];
+  const year=msk.getFullYear();
+  const monthNum=(msk.getMonth()+1).toString().padStart(2,'0');
+  document.getElementById('dateDisplay').textContent=`${day} ${month} ${year} г. · ${day}.${monthNum}.${year}`;
 }
-setInterval(updateClock, 1000);
+setInterval(updateClock,1000);
 updateClock();
 
 /* ===== ТЕМЫ ===== */
-const themes = ['light','dark'];
-let currentTheme = localStorage.getItem('troubleTabTheme') || 'dark';
-document.body.dataset.theme = currentTheme;
-document.getElementById('themeBtn').textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-
-document.getElementById('themeBtn').onclick = () => {
-  currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  document.body.dataset.theme = currentTheme;
-  localStorage.setItem('troubleTabTheme', currentTheme);
-  document.getElementById('themeBtn').textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-};
+const TH=['light','dark'],TI=['☀️','🌙'];
+let ti=TH.indexOf(localStorage.getItem('troubleTabTheme')||'dark');
+if(ti<0)ti=1;
+function applyTheme(){document.body.dataset.theme=TH[ti];$('#themeBtn').textContent=TI[ti];localStorage.setItem('troubleTabTheme',TH[ti]);}
+$('#themeBtn').onclick=()=>{ti=(ti+1)%2;applyTheme();if(D)render();};
+applyTheme();
 
 /* ===== ТАБЫ ===== */
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.onclick = () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('on'));
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
-    btn.classList.add('on');
-    document.getElementById('tab-'+btn.dataset.tab).classList.add('on');
-  };
-});
+$('#tabs').onclick=e=>{if(e.target.tagName!=='BUTTON')return;
+  $$('#tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');
+  TAB=e.target.dataset.t;$$('.tab').forEach(t=>t.classList.remove('on'));$('#t-'+TAB).classList.add('on');
+  if(D)render();};
 
 /* ===== ЗАГРУЗКА ДАННЫХ ===== */
-async function loadData(){
+async function load(){
   try{
-    const r = await fetch('uptime-data.json?t='+Date.now());
-    if(!r.ok) throw new Error('Не удалось загрузить данные');
-    D = await r.json();
-    isRealData = true;
+    const r=await fetch('uptime-data.json?t='+Date.now());
+    if(!r.ok)throw new Error('uptime-data.json не найден');
+    D=await r.json();
+    if(!D||!D.sites||Object.keys(D.sites).length===0)throw new Error('Данные пусты');
+    isRealData=true;
+    $('#errBox').style.display='none';
     render();
   }catch(e){
-    console.error('Load error:', e);
-    isRealData = false;
-    if(!simulatedData) generateSimulatedData();
+    $('#errBox').textContent='⚠️ '+e.message;
+    $('#errBox').style.display='block';
+    isRealData=false;
+    if(!D)generateSimulatedData();
     render();
   }
 }
 
-/* ===== ГЕНЕРАЦИЯ СИМУЛИРОВАННЫХ ДАННЫХ ===== */
+/* ===== СИМУЛЯЦИЯ ===== */
 function generateSimulatedData(){
-  const sites = Object.keys(D?.sites || {
-    'Root': {current_status:'up', current_ms:120, is_functional:true},
-    'KFWR': {current_status:'up', current_ms:150, is_functional:true},
-    'Kizamia Notes': {current_status:'up', current_ms:130, is_functional:true},
-    'Upscale Image': {current_status:'up', current_ms:180, is_functional:true},
-    'Kizamia Weather': {current_status:'up', current_ms:140, is_functional:true}
-  });
-  
-  simulatedData = {
-    sites: {},
-    critical_issues: []
-  };
-  
-  sites.forEach(name => {
-    const base = D?.sites[name] || {current_ms: 150, current_status: 'up', is_functional: true};
-    const variation = (Math.random() - 0.5) * 20; // ±10мс
-    simulatedData.sites[name] = {
-      ...base,
-      current_ms: Math.max(50, base.current_ms + variation),
-      history: (base.history || []).slice(-288)
+  if(!D)D={sites:{},critical_issues:[]};
+  const sites=Object.keys(D.sites);
+  if(sites.length===0){
+    D.sites={
+      'Root':{current_status:'up',current_ms:120,is_functional:true,history:[]},
+      'KFWR':{current_status:'up',current_ms:150,is_functional:true,history:[]},
+      'Kizamia Notes':{current_status:'up',current_ms:130,is_functional:true,history:[]},
+      'Upscale Image':{current_status:'up',current_ms:180,is_functional:true,history:[]},
+      'Kizamia Weather':{current_status:'up',current_ms:140,is_functional:true,history:[]}
     };
+  }
+  sites.forEach(name=>{
+    const s=D.sites[name];
+    const variation=(Math.random()-.5)*20;
+    s.current_ms=Math.max(50,s.current_ms+variation);
   });
 }
 
 /* ===== РЕНДЕР ===== */
 function render(){
-  const data = isRealData ? D : simulatedData;
-  if(!data || !data.sites) return;
-  
-  renderKPIs(data);
-  renderCritical(data);
-  renderUptimeBars(data);
-  renderCharts(data);
-  renderSites(data);
-  renderChanges(data);
-  renderIncidents(data);
-  renderArchive(data);
+  if(!D||!D.sites||Object.keys(D.sites).length===0){
+    $('#errBox').textContent='⚠️ Данные мониторинга пусты';
+    $('#errBox').style.display='block';
+    return;
+  }
+  $('#errBox').style.display='none';
+  renderKPIs();
+  renderCritical();
+  renderBars();
+  renderCharts();
+  renderSites();
+  renderChanges();
+  renderIncidents();
+  renderArchive();
 }
 
-function renderKPIs(data){
-  const sites = Object.values(data.sites);
-  const avgUptime = sites.reduce((a,s) => {
-    const h = (s.history || []).slice(-288);
-    const up = h.filter(x => x.status === 'up').length;
-    return a + (h.length ? up/h.length*100 : 100);
-  }, 0) / sites.length;
-  
-  const avgResponse = sites.reduce((a,s) => a + (s.current_ms || 0), 0) / sites.length;
-  const incidents = sites.filter(s => s.current_status === 'down').length;
-  
-  document.getElementById('kpiUptime').textContent = avgUptime.toFixed(2) + '%';
-  document.getElementById('kpiResponse').textContent = Math.round(avgResponse);
-  document.getElementById('kpiIncidents').textContent = incidents;
-  
-  // Показываем "приблизительные данные" если нет реальных
-  const approxElements = ['kpiUptimeApprox','kpiResponseApprox','kpiIncidentsApprox'];
-  approxElements.forEach(id => {
-    document.getElementById(id).style.display = isRealData ? 'none' : 'flex';
+function renderKPIs(){
+  const sites=Object.values(D.sites),n=sites.length;
+  const up=sites.filter(s=>s.current_status==='up').length;
+  const avg=Math.round(sites.reduce((a,s)=>a+(s.current_ms||0),0)/n);
+  const day30=sites.map(s=>{
+    const d=(s.daily||[]).filter(x=>new Date(x.date)>Date.now()-30*864e5);
+    const c=d.reduce((a,x)=>a+x.checks,0);
+    return c?d.reduce((a,x)=>a+x.up,0)/c*100:100;
   });
+  const up30=(day30.reduce((a,b)=>a+b,0)/n).toFixed(2);
+  const inc24=sites.reduce((a,s)=>a+(s.history||[]).filter(h=>h.status==='down'&&new Date(h.time)>Date.now()-864e5).length,0);
+  const dep24=sites.reduce((a,s)=>a+(s.deploys||[]).filter(d=>new Date(d.created_at)>Date.now()-864e5).length,0);
+  const lastDep=sites.flatMap(s=>s.deploys||[]).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0];
+  const approxMark=isRealData?'<div class="real">реальные данные</div>':'<div class="approx">приблизительные данные</div>';
+  $('#kpis').innerHTML=[
+    ['Сервисов',n,'онлайн: '+up,''],
+    ['Uptime 30д',up30+'%',inc24?'⚠ '+inc24+' сбоев за 24ч':'стабильно',up30>99.5?'var(--ok)':'var(--err)'],
+    ['Ср. отклик',avg+' мс','p95: —',''],
+    ['Деплоев 24ч',dep24,lastDep?fmtDur(lastDep.duration_s)+' послед.':'нет',''],
+    ['Активных инцидентов',sites.filter(s=>s.current_status==='down').length,'',''],
+  ].map(([l,v,d,c])=>`<div class="kpi"><div class="v" style="${c?'color:'+c:''}">${v}</div><div class="l">${l}</div><div class="d">${d}</div>${approxMark}</div>`).join('');
 }
 
-function renderCritical(data){
-  const list = document.getElementById('criticalList');
-  const issues = data.critical_issues || [];
-  
-  if(issues.length === 0){
-    list.innerHTML = '<div class="critical-empty">✓ Все системы работают нормально</div>';
+function renderCritical(){
+  const issues=D.critical_issues||[];
+  const list=$('#criticalList');
+  if(issues.length===0){
+    list.innerHTML='<div class="critical-empty">✓ Все системы работают нормально</div>';
   }else{
-    list.innerHTML = issues.map(issue => `
-      <div class="critical-item" onclick="showCriticalModal()">
-        ${issue.site}: ${issue.errors.join(', ')}
-      </div>
-    `).join('');
+    list.innerHTML=issues.map(i=>`<div class="critical-item">${i.site}: ${i.errors.join(', ')}</div>`).join('');
   }
 }
 
-function renderUptimeBars(data){
-  const container = document.getElementById('uptimeBars');
-  container.innerHTML = Object.entries(data.sites).map(([name, s]) => {
-    const history = (s.history || []).slice(-288);
-    const bars = history.map(h => `<div class="bar ${h.status}"></div>`).join('');
-    const padding = '<div class="bar na"></div>'.repeat(Math.max(0, 288 - history.length));
-    const uptime = history.length ? (history.filter(h => h.status === 'up').length / history.length * 100).toFixed(1) : '100.0';
-    return `
-      <div class="uptime-site">
-        <div class="name">
-          <span>${name}</span>
-          <span style="color:${uptime > 99 ? 'var(--ok)' : 'var(--err)'}">${uptime}%</span>
-        </div>
-        <div class="bars">${padding}${bars}</div>
-      </div>
-    `;
+function renderBars(){
+  $('#barsMeta').textContent='1 сегмент = 5 минут';
+  $('#uptimeBars').innerHTML=Object.entries(D.sites).map(([name,s])=>{
+    const h=(s.history||[]).slice(-288);
+    const cells=h.map(x=>`<div class="bar ${x.status}"></div>`).join('');
+    const pad='<div class="bar na"></div>'.repeat(Math.max(0,288-h.length));
+    const pct=(h.filter(x=>x.status==='up').length/Math.max(1,h.length)*100).toFixed(2);
+    return `<div class="uptime-site"><div class="name"><span>${name}</span><span style="color:${pct>99?'var(--ok)':'var(--err)'}">${pct}%</span></div><div class="bars">${pad}${cells}</div></div>`;
   }).join('');
 }
 
-function renderCharts(data){
-  const sites = Object.keys(data.sites);
-  const labels = sites;
-  const responseData = sites.map(name => data.sites[name].current_ms || 0);
-  
-  // График отклика
-  const ctxResponse = document.getElementById('chartResponse').getContext('2d');
-  if(window.chartResponse) window.chartResponse.destroy();
-  window.chartResponse = new Chart(ctxResponse, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data: responseData,
-        backgroundColor: 'var(--accent)',
-        borderRadius: 4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {legend: {display: false}},
-      scales: {
-        y: {beginAtZero: true, grid: {color: 'var(--grid)'}, ticks: {color: 'var(--muted)'}},
-        x: {grid: {display: false}, ticks: {color: 'var(--muted)', font: {size: 10}}}
-      }
-    }
-  });
-  
-  // График uptime по дням
-  const days = [];
-  const uptimeData = [];
-  for(let i = 6; i >= 0; i--){
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
-    days.push(d.toLocaleDateString('ru-RU', {day:'numeric', month:'short'}));
-    
-    const dayUptime = Object.values(data.sites).reduce((a, s) => {
-      const dayData = (s.daily || []).find(x => x.date === dateStr);
-      return a + (dayData ? dayData.up/dayData.checks*100 : 100);
-    }, 0) / Object.keys(data.sites).length;
-    uptimeData.push(dayUptime);
-  }
-  
-  const ctxUptime = document.getElementById('chartUptime').getContext('2d');
-  if(window.chartUptime) window.chartUptime.destroy();
-  window.chartUptime = new Chart(ctxUptime, {
-    type: 'line',
-    data: {
-      labels: days,
-      datasets: [{
-        data: uptimeData,
-        borderColor: 'var(--ok)',
-        backgroundColor: 'rgba(0,168,107,.1)',
-        fill: true,
-        tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {legend: {display: false}},
-      scales: {
-        y: {min: 90, max: 100, grid: {color: 'var(--grid)'}, ticks: {color: 'var(--muted)'}},
-        x: {grid: {display: false}, ticks: {color: 'var(--muted)'}}
-      }
-    }
-  });
+function mkChart(id,cfg){if(charts[id])charts[id].destroy();
+  const el=document.getElementById(id);if(!el)return null;
+  charts[id]=new Chart(el.getContext('2d'),cfg);return charts[id];}
+function baseOpts(yTitle){return{responsive:true,maintainAspectRatio:false,
+  interaction:{mode:'index',intersect:false},
+  plugins:{legend:{display:false},tooltip:{backgroundColor:css('--panel'),titleColor:css('--text'),
+    bodyColor:css('--text'),borderColor:css('--border'),borderWidth:1,padding:10,displayColors:true}},
+  scales:{x:{grid:{color:css('--grid')},ticks:{color:css('--muted'),maxTicksLimit:10,font:{size:10}}},
+    y:{title:{display:!!yTitle,text:yTitle,color:css('--muted'),font:{size:10}},
+      grid:{color:css('--grid')},ticks:{color:css('--muted'),font:{size:10}}}}};}
+
+function renderCharts(){
+  const names=Object.keys(D.sites);
+  mkChart('chAvail',{type:'bar',data:{labels:names,datasets:[{data:names.map(n=>{
+    const h=(D.sites[n].history||[]).filter(x=>new Date(x.time)>Date.now()-864e5);
+    return h.length?+(h.filter(x=>x.status==='up').length/h.length*100).toFixed(2):100;}),
+    backgroundColor:css('--ok')+'cc',borderRadius:4,barThickness:16}]},
+    options:{...baseOpts(''),indexAxis:'y',scales:{x:{min:95,max:100,grid:{color:css('--grid')},ticks:{color:css('--muted')}},
+      y:{grid:{display:false},ticks:{color:css('--text'),font:{size:11,weight:'700'}}}}}});
+
+  const deps=names.flatMap(n=>(D.sites[n].deploys||[]).map(d=>({...d,site:n}))).slice(0,12);
+  mkChart('chDeploy',{type:'bar',data:{labels:deps.map(d=>d.site+' · '+(d.sha||'')),
+    datasets:[{data:deps.map(d=>d.duration_s),backgroundColor:deps.map(d=>d.status==='succeeded'?css('--ok')+'cc':css('--err')+'cc'),borderRadius:4,barThickness:14}]},
+    options:{...baseOpts('сек'),indexAxis:'y',scales:{x:{grid:{color:css('--grid')},ticks:{color:css('--muted')}},
+      y:{grid:{display:false},ticks:{color:css('--text'),font:{size:10}}}}}});
 }
 
-function renderSites(data){
-  const grid = document.getElementById('sitesGrid');
-  grid.innerHTML = Object.entries(data.sites).map(([name, s]) => `
-    <div class="site-card">
-      <div class="name">${name}</div>
-      <div class="status">
-        <div class="dot ${s.current_status}"></div>
-        <span>${s.current_status === 'up' ? 'Работает' : 'Недоступен'}</span>
-        ${!s.is_functional ? '<span style="color:var(--warn);margin-left:4px">⚠</span>' : ''}
-      </div>
-      <div class="meta">
-        ${s.current_code} · ${s.current_ms}мс
-        ${isRealData ? '✓' : ''}
-      </div>
-    </div>
-  `).join('');
+function renderSites(){
+  $('#siteCards').innerHTML=Object.entries(D.sites).map(([n,s])=>{
+    const h=(s.history||[]).slice(-60);const pct=(h.filter(x=>x.status==='up').length/Math.max(1,h.length)*100).toFixed(1);
+    return `<div class="site ${SEL===n?'on':''}" data-s="${esc(n)}">
+      <div class="r1"><span class="nm">${esc(n)}</span><span class="st ${s.current_status}"></span></div>
+      <div class="nums"><div>отклик <b>${s.current_ms}мс</b></div><div>код <b>${s.current_code}</b></div><div>uptime <b>${pct}%</b></div></div>
+      <div class="mini">${h.map(x=>`<i class="${x.status}"></i>`).join('')}</div></div>`;}).join('');
+  $$('.site').forEach(c=>c.onclick=()=>{SEL=c.dataset.s;renderSites();});
 }
 
-function renderChanges(data){
-  const list = document.getElementById('changesList');
-  const allChanges = [];
-  
-  Object.entries(data.sites).forEach(([name, s]) => {
-    (s.commits || []).forEach(c => allChanges.push({type:'commit', site:name, desc:c.msg, time:c.date}));
-    (s.deploys || []).forEach(d => allChanges.push({type:'deploy', site:name, desc:`${d.status} · ${d.duration_s}с`, time:d.created_at}));
+function renderChanges(){
+  const all=[];
+  Object.entries(D.sites).forEach(([n,s])=>{
+    (s.commits||[]).forEach(c=>all.push({t:c.date,k:'commit',site:n,txt:c.msg,who:c.author,sha:c.sha}));
+    (s.deploys||[]).forEach(d=>all.push({t:d.created_at,k:'deploy',site:n,txt:`${d.status} · ${fmtDur(d.duration_s)}`,who:d.sha||'',sha:d.sha}));
+    (s.runs||[]).forEach(r=>all.push({t:r.created_at,k:'run',site:n,txt:`${r.name} · ${r.conclusion||r.status} · ${fmtDur(r.duration_s)}`,who:r.event,sha:''}));
   });
-  
-  allChanges.sort((a,b) => new Date(b.time) - new Date(a.time));
-  
-  list.innerHTML = allChanges.slice(0, 20).map(c => `
-    <div class="change-item">
-      <div class="header">
-        <span class="type">${c.type === 'commit' ? '✏️' : '🚀'} ${c.site}</span>
-        <span class="time">${new Date(c.time).toLocaleString('ru-RU')}</span>
-      </div>
-      <div class="desc">${c.desc}</div>
-    </div>
-  `).join('') || '<div style="color:var(--muted);text-align:center;padding:20px">Нет изменений</div>';
+  all.sort((a,b)=>new Date(b.t)-new Date(a.t));
+  const ic={commit:'✏️',deploy:'🚀',run:'⚙️'};
+  $('#chgFeed').innerHTML=all.slice(0,40).map(x=>`<div class="fi"><div class="ic">${ic[x.k]}</div><div class="bd">
+    <div class="t1">${esc(x.txt)}</div><div class="t2"><b>${x.site}</b> · ${esc(x.who)} · ${ago(x.t)} · <span class="mono">${new Date(x.t).toLocaleString('ru-RU')}</span></div></div></div>`).join('')||'<div class="panel-sub">Нет данных.</div>';
 }
 
-function renderIncidents(data){
-  const list = document.getElementById('incidentsList');
-  const allIncidents = [];
-  
-  Object.entries(data.sites).forEach(([name, s]) => {
-    (s.incidents || []).forEach(i => allIncidents.push({...i, site: name}));
-  });
-  
-  allIncidents.sort((a,b) => new Date(b.start) - new Date(a.start));
-  
-  list.innerHTML = allIncidents.slice(0, 20).map(i => `
-    <div class="incident-item">
-      <div class="site">${i.site}</div>
-      <div class="time">${new Date(i.start).toLocaleString('ru-RU')} — ${i.end ? new Date(i.end).toLocaleString('ru-RU') : 'сейчас'}</div>
-      <div class="duration">${i.minutes ? i.minutes.toFixed(1) + ' мин' : 'активен'}</div>
-    </div>
-  `).join('') || '<div style="color:var(--muted);text-align:center;padding:20px">Нет инцидентов</div>';
+function renderIncidents(){
+  const all=Object.entries(D.sites).flatMap(([n,s])=>(s.incidents||[]).map(i=>({...i,site:n})))
+    .sort((a,b)=>new Date(b.start)-new Date(a.start));
+  $('#incMeta').textContent='всего записей: '+all.length;
+  const rows=all.slice(0,12).reverse();
+  $('#incTable').innerHTML=`<tr><th>Сервис</th><th>Начало</th><th>Конец</th><th>Длит.</th><th>Код</th><th>Статус</th></tr>`+
+    all.slice(0,25).map(i=>{const dur=i.minutes!=null?i.minutes.toFixed(1)+' мин':'идёт сейчас';
+    return `<tr><td><b>${i.site}</b></td><td class="mono">${new Date(i.start).toLocaleString('ru-RU')}</td>
+    <td class="mono">${i.end?new Date(i.end).toLocaleString('ru-RU'):'—'}</td><td>${dur}</td>
+    <td><span class="tag err">${i.code}</span></td>
+    <td>${i.end?'<span class="tag ok">закрыт</span>':'<span class="tag warn">активен</span>'}</td></tr>`;}).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Инцидентов не было</td></tr>';
 }
 
-function renderArchive(data){
-  const months = {};
-  Object.values(data.sites).forEach(s => {
-    (s.daily || []).forEach(d => {
-      const m = d.date.slice(0,7);
-      if(!months[m]) months[m] = {up:0, c:0};
-      months[m].up += d.up;
-      months[m].c += d.checks;
-    });
-  });
-  
-  const keys = Object.keys(months).sort();
-  const labels = keys.map(k => {
-    const [y,m] = k.split('-');
-    return new Date(y,m-1).toLocaleDateString('ru-RU', {month:'short', year:'2-digit'});
-  });
-  const uptimeData = keys.map(k => months[k].up/months[k].c*100);
-  
-  const ctx = document.getElementById('chartArchive').getContext('2d');
-  if(window.chartArchive) window.chartArchive.destroy();
-  window.chartArchive = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [{
-        data: uptimeData,
-        backgroundColor: 'var(--ok)',
-        borderRadius: 4
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {legend: {display: false}},
-      scales: {
-        y: {min: 90, max: 100, grid: {color: 'var(--grid)'}, ticks: {color: 'var(--muted)'}},
-        x: {grid: {display: false}, ticks: {color: 'var(--muted)'}}
-      }
-    }
-  });
-  
-  // Годовые сводки
-  const years = {};
-  keys.forEach(k => {
-    const y = k.slice(0,4);
-    if(!years[y]) years[y] = {up:0, c:0};
-    years[y].up += months[k].up;
-    years[y].c += months[k].c;
-  });
-  
-  document.getElementById('yearlyStats').innerHTML = Object.entries(years).map(([y, v]) => `
-    <div style="background:var(--input);padding:10px;border-radius:6px;margin-bottom:8px">
-      <div style="font-weight:700">${y}</div>
-      <div style="font-size:.85rem;color:var(--muted)">Uptime: ${(v.up/v.c*100).toFixed(2)}%</div>
-    </div>
-  `).join('') || '<div style="color:var(--muted);text-align:center">Нет данных</div>';
+function renderArchive(){
+  const months={},mresp={};
+  Object.values(D.sites).forEach(s=>(s.daily||[]).forEach(d=>{
+    const m=d.date.slice(0,7);(months[m]=months[m]||{up:0,c:0});(mresp[m]=mresp[m]||{s:0,c:0});
+    months[m].up+=d.up;months[m].c+=d.checks;mresp[m].s+=d.sum_ms;mresp[m].c+=d.checks;}));
+  const keys=Object.keys(months).sort();
+  mkChart('chMonth',{type:'bar',data:{labels:keys.map(k=>{const[y,m]=k.split('-');
+    return new Date(y,m-1).toLocaleDateString('ru-RU',{month:'long',year:'2-digit'});}),
+    datasets:[{data:keys.map(k=>+(months[k].up/months[k].c*100).toFixed(2)),
+      backgroundColor:css('--ok')+'cc',borderRadius:4,barThickness:18}]},
+    options:{...baseOpts('%'),indexAxis:'y',scales:{x:{min:90,max:100,grid:{color:css('--grid')},ticks:{color:css('--muted')}},
+      y:{grid:{display:false},ticks:{color:css('--text'),font:{size:11,weight:'700'}}}}}});
+  const years={};keys.forEach(k=>{const y=k.slice(0,4);(years[y]=years[y]||{up:0,c:0,inc:0});
+    years[y].up+=months[k].up;years[y].c+=months[k].c;});
+  Object.values(D.sites).forEach(s=>(s.incidents||[]).forEach(i=>{const y=i.start.slice(0,4);
+    years[y]=years[y]||{up:0,c:0,inc:0};years[y].inc++;}));
+  $('#yearTable').innerHTML=`<tr><th>Год</th><th>Uptime</th><th>Инцидентов</th><th>Проверок</th></tr>`+
+    Object.keys(years).sort().reverse().map(y=>{const v=years[y];
+    return `<tr><td><b>${y}</b></td><td style="color:${v.up/v.c>.99?'var(--ok)':'var(--err)'}">${(v.up/v.c*100).toFixed(2)}%</td>
+    <td>${v.inc||0}</td><td class="mono">${v.c}</td></tr>`;}).join('');
 }
 
 /* ===== МОДАЛЬНОЕ ОКНО ===== */
 function showCriticalModal(){
-  if(!D || !D.critical_issues) return;
-  const list = document.getElementById('issueList');
-  list.innerHTML = D.critical_issues.map(i => `
-    <div class="issue-item">
-      <div class="site">${i.site} (${i.repo})</div>
-      <div class="errors">${i.errors.join('<br>')}</div>
+  if(!D||!D.critical_issues||D.critical_issues.length===0)return;
+  const content=$('#criticalModalContent');
+  content.innerHTML=D.critical_issues.map(i=>`
+    <div style="background:var(--input);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px">
+      <div style="font-weight:700;color:var(--err)">${i.site} (${i.repo})</div>
+      <div style="font-size:.85rem;color:var(--muted);margin-top:4px">${i.errors.join('<br>')}</div>
       <div style="font-size:.75rem;color:var(--muted);margin-top:4px">${new Date(i.time).toLocaleString('ru-RU')}</div>
     </div>
   `).join('');
-  document.getElementById('criticalModal').classList.add('on');
+  $('#modal').classList.add('on');
 }
-
-function closeModal(){
-  document.getElementById('criticalModal').classList.remove('on');
-}
+function closeModal(){$('#modal').classList.remove('on');}
+$('#modal').onclick=e=>{if(e.target===$('#modal'))closeModal();};
 
 /* ===== АВТООБНОВЛЕНИЕ ===== */
-setInterval(loadData, 60000); // Реальные данные каждую минуту
-setInterval(() => {
-  if(!isRealData){
-    generateSimulatedData();
-    render();
-  }
-}, 10000); // Симуляция каждые 10 секунд
-
-loadData();
+load();
+setInterval(load,60000);
+setInterval(()=>{if(!isRealData){generateSimulatedData();render();}},10000);
 </script>
 </body>
 </html>
