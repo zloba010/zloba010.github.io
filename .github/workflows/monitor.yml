@@ -41,6 +41,6 @@ jobs:
             echo "Нет изменений"
             exit 0
           fi
-          git commit -m "chore(monitor): update metrics $(date +%Y-%m-%d_%H:%M)"
+          git commit -m "chore(monitor): обновление метрик $(date +%Y-%m-%d_%H:%M)"
           git pull --rebase origin main || true
           git push || (git pull --rebase origin main && git push) || true
