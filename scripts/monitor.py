@@ -27,15 +27,15 @@ SITES = [
             {"type": "contains", "text": "<canvas", "description": "Canvas для читалки присутствует"}
         ]
     },
-{
-    "name": "Kizamia Notes",
-    "url": "https://zloba010.github.io/kizamianotes/",
-    "repo": "kizamianotes",
-    "checks": [
-        {"type": "http", "expected": 200},
-        {"type": "contains", "text": "note", "description": "Заметки загружаются"}
-    ]
-},
+    {
+        "name": "Kizamia Notes",
+        "url": "https://zloba010.github.io/kizamianotes/",
+        "repo": "kizamianotes",
+        "checks": [
+            {"type": "http", "expected": 200},
+            {"type": "contains", "text": "note", "description": "Заметки загружаются"}
+        ]
+    },
     {
         "name": "Upscale Image",
         "url": "https://zloba010.github.io/KizamiaUpscaleImage/",
@@ -61,6 +61,7 @@ SITES = [
 HISTORY_KEEP = 288
 DAILY_KEEP = 400
 INC_KEEP = 80
+LOGS_KEEP = 50
 NOW = datetime.datetime.now(datetime.timezone.utc)
 NOW_ISO = NOW.isoformat()
 
@@ -124,6 +125,7 @@ def parse_dt(s):
     except Exception:
         return NOW
 
+# Загружаем существующие данные
 if os.path.exists(DATA_FILE):
     try:
         data = json.load(open(DATA_FILE, encoding="utf-8"))
@@ -135,16 +137,27 @@ else:
 data.setdefault("last_updated", "")
 data.setdefault("sites", {})
 data.setdefault("critical_issues", [])
+data.setdefault("logs", [])
 
 critical_issues = []
+new_logs = []
+
+new_logs.append({"time": NOW_ISO, "site": "Монитор", "action": f"Запуск проверки {len(SITES)} сервисов", "status": "info"})
 
 for site in SITES:
     name = site["name"]
     url = site["url"]
     repo = site["repo"]
     
+    new_logs.append({"time": NOW_ISO, "site": name, "action": "Начало проверки", "status": "info"})
+    
     result = ping(site)
     status = "up" if result["ok"] else "down"
+    
+    if not result["ok"]:
+        new_logs.append({"time": NOW_ISO, "site": name, "action": f"Ошибка: {', '.join(result['errors'])}", "status": "error"})
+    else:
+        new_logs.append({"time": NOW_ISO, "site": name, "action": f"Проверка завершена: {result['code']}, {result['ms']}мс", "status": "success"})
     
     if name not in data["sites"]:
         data["sites"][name] = {
@@ -216,6 +229,7 @@ for site in SITES:
     prev = s["history"][-2]["status"] if len(s["history"]) > 1 else status
     if prev == "up" and status == "down":
         s["incidents"].append({"start": NOW_ISO, "end": None, "code": result["code"], "site": name})
+        new_logs.append({"time": NOW_ISO, "site": name, "action": "Зафиксирован инцидент", "status": "warning"})
     
     for inc in s["incidents"]:
         if inc["end"] is None:
@@ -277,8 +291,11 @@ for site in SITES:
         except Exception as e:
             print(f"Error fetching runs for {name}: {e}")
 
+new_logs.append({"time": NOW_ISO, "site": "Монитор", "action": f"Проверка завершена: {len(critical_issues)} критических ошибок", "status": "success" if not critical_issues else "error"})
+
 data["last_updated"] = NOW_ISO
 data["critical_issues"] = critical_issues
+data["logs"] = (data.get("logs", []) + new_logs)[-LOGS_KEEP:]
 
 with open(DATA_FILE, "w", encoding="utf-8") as f:
     json.dump(data, f, ensure_ascii=False, indent=2)
