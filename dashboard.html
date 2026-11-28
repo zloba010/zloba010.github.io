@@ -11,7 +11,6 @@
   --panel2:#1c1c22;--input:#222228;--border:#2a2a32;--muted:#8b8b95;
   --ok:#10b981;--warn:#f59e0b;--err:#ef4444;--info:#3b82f6;
   --grid:#222228;--shadow:rgba(0,0,0,.5);
-  /* Цвета погодных частиц для тёмной темы */
   --rain-color:rgba(160,190,230,.65);
   --snow-color:rgba(255,255,255,.9);
   --cloud-color:rgba(130,140,150,.55);
@@ -129,73 +128,80 @@ body{background:var(--bg);color:var(--text);
 .chart-legend span{display:flex;align-items:center;gap:6px;color:var(--muted);font-weight:600}
 .chart-legend i{width:12px;height:3px;border-radius:2px}
 
-.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,.9vw,14px);flex:1;min-height:0}
-.main-half{grid-column:1 / 2}
+/* ===== ОСНОВНАЯ СЕТКА 2×2 ===== */
+.main-grid{display:grid;grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;gap:clamp(8px,.9vw,14px);flex:1;min-height:0}
 
 /* ===== ПОГОДНЫЙ ВИДЖЕТ ===== */
 .weather-widget{background:var(--panel);border:1px solid var(--border);border-radius:10px;
-  padding:clamp(10px,1vw,18px);display:flex;flex-direction:column;gap:8px;min-height:0;
-  position:relative;overflow:hidden}
+  padding:clamp(10px,1vw,16px);display:flex;flex-direction:column;gap:clamp(6px,.6vw,10px);
+  min-height:0;position:relative;overflow:hidden}
 .weather-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
-.weather-content{position:relative;z-index:1;display:flex;flex-direction:column;gap:6px;flex:1;justify-content:center}
-.weather-top{display:flex;align-items:center;gap:clamp(10px,1.2vw,16px)}
-.weather-icon{font-size:clamp(2.2rem,3.5vw,4rem);line-height:1;
+.weather-content{position:relative;z-index:1;display:flex;flex-direction:column;gap:clamp(6px,.7vw,10px);flex:1;min-height:0}
+.weather-top{display:flex;align-items:center;gap:clamp(10px,1.2vw,16px);flex-shrink:0}
+.weather-icon{font-size:clamp(2rem,3.2vw,3.6rem);line-height:1;
   filter:drop-shadow(0 2px 8px var(--shadow));
   animation:weatherBounce 3s ease-in-out infinite}
 @keyframes weatherBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-.weather-temp{font-size:clamp(1.8rem,3vw,3.2rem);font-weight:900;color:var(--accent);
+.weather-temp{font-size:clamp(1.6rem,2.6vw,2.8rem);font-weight:900;color:var(--accent);
   letter-spacing:-2px;line-height:1}
-.weather-desc{font-size:clamp(.72rem,.85vw,.95rem);color:var(--text);font-weight:600}
+.weather-desc{font-size:clamp(.7rem,.82vw,.92rem);color:var(--text);font-weight:600}
 .weather-location{font-size:clamp(.62rem,.72vw,.82rem);color:var(--muted);
-  display:flex;align-items:center;gap:4px}
+  display:flex;align-items:center;gap:4px;flex-shrink:0}
 .weather-details{display:flex;gap:clamp(8px,1vw,14px);flex-wrap:wrap;
-  font-size:clamp(.62rem,.72vw,.8rem);color:var(--muted)}
+  font-size:clamp(.62rem,.72vw,.8rem);color:var(--muted);flex-shrink:0}
 .weather-details span{display:flex;align-items:center;gap:4px}
 
-/* Частицы погоды (адаптированы под маленький виджет) */
+/* Прогноз на 5 дней */
+.weather-forecast{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(4px,.5vw,8px);
+  margin-top:auto;flex-shrink:0;padding-top:clamp(6px,.7vw,10px);
+  border-top:1px solid var(--border)}
+.wf-day{background:var(--input);border:1px solid var(--border);border-radius:8px;
+  padding:clamp(5px,.6vw,9px) clamp(3px,.4vw,6px);text-align:center;
+  display:flex;flex-direction:column;gap:2px;transition:.2s}
+.wf-day:hover{border-color:var(--accent);transform:translateY(-2px)}
+.wf-day.today{background:var(--accent);border-color:var(--accent)}
+.wf-day.today .wf-name,.wf-day.today .wf-temp{color:#fff}
+.wf-name{font-size:clamp(.55rem,.65vw,.75rem);font-weight:800;text-transform:uppercase;color:var(--muted);letter-spacing:.5px}
+.wf-icon{font-size:clamp(1rem,1.4vw,1.6rem);line-height:1}
+.wf-temp{font-size:clamp(.6rem,.72vw,.82rem);font-weight:800;color:var(--text)}
+
+/* Частицы погоды */
 .w-rain{position:absolute;width:1.5px;height:14px;
   background:linear-gradient(to bottom,transparent,var(--rain-color));
   animation:w-fall linear infinite}
-@keyframes w-fall{to{transform:translateY(220px)}}
+@keyframes w-fall{to{transform:translateY(320px)}}
 .w-snow{position:absolute;background:var(--snow-color);border-radius:50%;
   box-shadow:0 0 3px rgba(255,255,255,.5);animation:w-snowfall linear infinite}
 @keyframes w-snowfall{
   0%{transform:translateY(-10px) translateX(0)}
-  50%{transform:translateY(100px) translateX(10px)}
-  100%{transform:translateY(220px) translateX(-10px)}
+  50%{transform:translateY(150px) translateX(10px)}
+  100%{transform:translateY(320px) translateX(-10px)}
 }
 .w-cloud{position:absolute;background:var(--cloud-color);border-radius:50%;
   filter:blur(12px);animation:w-drift linear infinite}
-@keyframes w-drift{from{transform:translateX(-60px)}to{transform:translateX(260px)}}
+@keyframes w-drift{from{transform:translateX(-60px)}to{transform:translateX(320px)}}
 .w-sun{position:absolute;background:radial-gradient(circle,var(--sun-color) 0%,transparent 70%);
   border-radius:50%;animation:w-pulse 6s ease-in-out infinite alternate}
 @keyframes w-pulse{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.4);opacity:1}}
 .w-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:w-flash 4s infinite}
 @keyframes w-flash{0%,92%,95%,100%{opacity:0}93%{opacity:.2}94%{opacity:0}96%{opacity:.12}}
 
-.ubars{display:flex;flex-direction:column;gap:clamp(5px,.6vw,10px);overflow-y:auto;flex:1}
-.ubrow{display:grid;grid-template-columns:clamp(70px,7vw,130px) 1fr clamp(45px,4.5vw,65px);gap:10px;align-items:center}
-.ubrow .nm{font-size:clamp(.65rem,.75vw,.85rem);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ubrow .bar{height:clamp(8px,.9vw,14px);background:var(--input);border-radius:3px;overflow:hidden;display:flex;gap:1px}
-.ubrow .bar i{flex:1;min-width:1.5px}
-.ubrow .bar i.up{background:var(--ok)}
-.ubrow .bar i.down{background:var(--err)}
-.ubrow .bar i.na{background:var(--grid)}
-.ubrow .pct{font-size:clamp(.65rem,.75vw,.85rem);font-weight:800;text-align:right;font-variant-numeric:tabular-nums}
-.ubrow .pct.ok{color:var(--ok)}
-.ubrow .pct.err{color:var(--err)}
-
+/* ===== ЖУРНАЛ ДЕЙСТВИЙ (КОМПАКТНЫЙ) ===== */
 .logs-panel{background:var(--panel);border:1px solid var(--border);border-radius:10px;
-  padding:clamp(10px,1vw,18px);display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
-.logs-list{overflow-y:auto;flex:1;font-size:clamp(.7rem,.8vw,.9rem);font-family:ui-monospace,monospace}
-.log-item{padding:6px 10px;border-left:3px solid var(--border);margin-bottom:6px;background:var(--input);border-radius:4px}
+  padding:clamp(10px,1vw,16px);display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden}
+.logs-list{overflow-y:auto;flex:1;min-height:0;
+  font-size:clamp(.62rem,.72vw,.8rem);font-family:ui-monospace,monospace;
+  display:flex;flex-direction:column;gap:4px}
+.log-item{padding:clamp(4px,.5vw,7px) clamp(6px,.7vw,10px);
+  border-left:3px solid var(--border);background:var(--input);border-radius:4px;
+  display:flex;gap:6px;align-items:baseline;flex-shrink:0}
 .log-item.success{border-left-color:var(--ok)}
 .log-item.error{border-left-color:var(--err)}
 .log-item.warning{border-left-color:var(--warn)}
 .log-item.info{border-left-color:var(--info)}
-.log-time{color:var(--muted);font-size:.75em;margin-right:8px}
-.log-site{font-weight:700;color:var(--accent);margin-right:8px}
-.log-action{color:var(--text)}
+.log-time{color:var(--muted);font-size:.85em;flex-shrink:0}
+.log-site{font-weight:700;color:var(--accent);flex-shrink:0}
+.log-action{color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 
 .sites-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;overflow-y:auto;flex:1;padding-right:4px}
 .site{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:.2s}
@@ -249,12 +255,12 @@ tr:hover td{background:var(--input)}
   padding:11px;border-radius:8px;font-weight:700;cursor:pointer;margin-top:12px}
 .mv .btn:hover{border-color:var(--accent)}
 
-.empty-msg{text-align:center;color:var(--muted);padding:40px 20px;font-size:.9rem}
+.empty-msg{text-align:center;color:var(--muted);padding:20px 10px;font-size:.85rem}
 
 @media(max-width:1200px){.kpis{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:900px){
   .kpis{grid-template-columns:repeat(2,1fr)}
-  .main-grid{grid-template-columns:1fr}
+  .main-grid{grid-template-columns:1fr;grid-template-rows:1fr 1fr 1fr 1fr}
   .hdr{flex-wrap:wrap}
 }
 ::-webkit-scrollbar{width:8px;height:8px}
@@ -297,15 +303,16 @@ tr:hover td{background:var(--input)}
       <div class="clist" id="clist"><div class="okmsg">✓ Все системы работают штатно</div></div>
     </div>
     <div class="main-grid">
-      <div class="panel main-half">
+      <!-- Строка 1: график 24ч + погода -->
+      <div class="panel">
         <div class="panel-h">
-          <div class="panel-t">Доступность и отклик · последние 24 часа</div>
+          <div class="panel-t">Доступность и отклик · 24 часа</div>
           <div class="chart-legend">
             <span><i style="background:var(--ok)"></i>Доступность, %</span>
             <span><i style="background:var(--accent)"></i>Отклик, мс</span>
           </div>
         </div>
-        <div class="chartbox" style="height:clamp(180px,22vh,300px)"><canvas id="chMain"></canvas></div>
+        <div class="chartbox"><canvas id="chMain"></canvas></div>
       </div>
       <div class="weather-widget" id="weatherWidget">
         <div class="weather-bg" id="weatherBg"></div>
@@ -319,13 +326,19 @@ tr:hover td{background:var(--input)}
           </div>
         </div>
       </div>
-    </div>
-    <div class="logs-panel">
-      <div class="panel-h">
-        <div class="panel-t">Журнал действий</div>
-        <div class="panel-sub">последние 50 записей</div>
+
+      <!-- Строка 2: отклик по сервисам + журнал -->
+      <div class="panel">
+        <div class="panel-h"><div class="panel-t">Отклик по сервисам, мс · 4 часа</div></div>
+        <div class="chartbox"><canvas id="chLat"></canvas></div>
       </div>
-      <div class="logs-list" id="logsList"></div>
+      <div class="logs-panel">
+        <div class="panel-h">
+          <div class="panel-t">Журнал действий</div>
+          <div class="panel-sub">последние 10</div>
+        </div>
+        <div class="logs-list" id="logsList"></div>
+      </div>
     </div>
   </div>
 
@@ -427,7 +440,7 @@ setInterval(tickCountdown,1000); tickCountdown();
 const TH=['dark','light'], TI=['☀️','🌙'];
 let ti=Math.max(0,TH.indexOf(localStorage.getItem('ttTheme')||'dark'));
 function applyTheme(){document.body.dataset.theme=TH[ti];$('#themeBtn').textContent=TI[ti];localStorage.setItem('ttTheme',TH[ti]);}
-$('#themeBtn').onclick=()=>{ti=(ti+1)%2;applyTheme();render();};
+$('#themeBtn').onclick=()=>{ti=(ti+1)%2;applyTheme();render();loadWeather();};
 applyTheme();
 
 /* ===== ТАБЫ ===== */
@@ -443,20 +456,21 @@ $('#tabs').onclick=e=>{
 
 /* ===== ПОГОДА (Open-Meteo) ===== */
 const WEATHER_CODES = {
-  0:{desc:'Ясно',emoji:'☀️'},1:{desc:'Преимущ. ясно',emoji:'🌤️'},2:{desc:'Переменная облачность',emoji:'⛅'},
+  0:{desc:'Ясно',emoji:'☀️'},1:{desc:'Преимущ. ясно',emoji:'🌤️'},2:{desc:'Облачность',emoji:'⛅'},
   3:{desc:'Пасмурно',emoji:'☁️'},45:{desc:'Туман',emoji:'🌫️'},48:{desc:'Изморозь',emoji:'🌫️'},
   51:{desc:'Лёгкая морось',emoji:'🌦️'},53:{desc:'Морось',emoji:'🌦️'},55:{desc:'Сильная морось',emoji:'🌦️'},
-  56:{desc:'Ледяная морось',emoji:'🌧️'},57:{desc:'Сильная ледяная морось',emoji:'🌧️'},
+  56:{desc:'Ледяная морось',emoji:'🌧️'},57:{desc:'Ледяная морось',emoji:'🌧️'},
   61:{desc:'Небольшой дождь',emoji:'🌦️'},63:{desc:'Дождь',emoji:'🌧️'},65:{desc:'Сильный дождь',emoji:'🌧️'},
-  66:{desc:'Ледяной дождь',emoji:'🌧️'},67:{desc:'Сильный ледяной дождь',emoji:'🌧️'},
+  66:{desc:'Ледяной дождь',emoji:'🌧️'},67:{desc:'Ледяной дождь',emoji:'🌧️'},
   71:{desc:'Небольшой снег',emoji:'🌨️'},73:{desc:'Снег',emoji:'❄️'},75:{desc:'Сильный снег',emoji:'❄️'},
   77:{desc:'Снежные зёрна',emoji:'🌨️'},80:{desc:'Ливень',emoji:'🌦️'},81:{desc:'Сильный ливень',emoji:'🌧️'},
   82:{desc:'Очень сильный ливень',emoji:'⛈️'},85:{desc:'Снегопад',emoji:'🌨️'},86:{desc:'Сильный снегопад',emoji:'❄️'},
-  95:{desc:'Гроза',emoji:'⛈️'},96:{desc:'Гроза с градом',emoji:'⛈️'},99:{desc:'Сильная гроза с градом',emoji:'⛈️'}
+  95:{desc:'Гроза',emoji:'⛈️'},96:{desc:'Гроза с градом',emoji:'⛈️'},99:{desc:'Сильная гроза',emoji:'⛈️'}
 };
 function getWeatherInfo(code){return WEATHER_CODES[code]||{desc:'Нет данных',emoji:'🌡️'};}
 
 let weatherCity = localStorage.getItem('ttWeatherCity') || '';
+const weekDaysShort = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 
 async function fetchJSON(url, timeoutMs=8000){
   const ctrl = new AbortController();
@@ -478,7 +492,7 @@ async function geocodeCity(name){
 async function fetchWeather(lat, lon){
   return await fetchJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`
     +`&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,weather_code`
-    +`&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
+    +`&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
 }
 
 async function tryGeolocation(){
@@ -508,9 +522,9 @@ function getCityFromTimezone(){
   }catch(e){return 'Москва';}
 }
 
-/* Фоновые анимации погоды (адаптированы под виджет) */
 function updateWeatherBackground(code){
   const bg=$('#weatherBg');
+  if(!bg)return;
   bg.innerHTML='';
   const add=(cls,count,fn)=>{for(let i=0;i<count;i++){const e=document.createElement('div');e.className=cls;fn(e);bg.appendChild(e);}};
   
@@ -520,12 +534,12 @@ function updateWeatherBackground(code){
     add('w-cloud',4,e=>{e.style.cssText=`width:${60+Math.random()*80}px;height:${30+Math.random()*50}px;top:${Math.random()*50}%;left:${Math.random()*80}%;animation-duration:${20+Math.random()*20}s;animation-delay:-${Math.random()*15}s;`;});
   }else if([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)){
     const heavy=[63,65,66,67,80,81,82].includes(code);
-    add('w-rain',heavy?60:35,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-15px;animation-duration:${.3+Math.random()*.3}s;animation-delay:${Math.random()*1}s;opacity:${.4+Math.random()*.5};`;});
+    add('w-rain',heavy?50:30,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-15px;animation-duration:${.3+Math.random()*.3}s;animation-delay:${Math.random()*1}s;opacity:${.4+Math.random()*.5};`;});
   }else if([71,73,75,77,85,86].includes(code)){
     const heavy=[75,86].includes(code);
-    add('w-snow',heavy?40:20,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-8px;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;animation-duration:${3+Math.random()*4}s;animation-delay:${Math.random()*3}s;opacity:${.5+Math.random()*.5};`;});
+    add('w-snow',heavy?30:15,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-8px;width:${2+Math.random()*3}px;height:${2+Math.random()*3}px;animation-duration:${3+Math.random()*4}s;animation-delay:${Math.random()*3}s;opacity:${.5+Math.random()*.5};`;});
   }else if([95,96,99].includes(code)){
-    add('w-rain',60,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-15px;animation-duration:${.25+Math.random()*.25}s;animation-delay:${Math.random()*1}s;opacity:${.5+Math.random()*.5};`;});
+    add('w-rain',50,e=>{e.style.cssText=`left:${Math.random()*100}%;top:-15px;animation-duration:${.25+Math.random()*.25}s;animation-delay:${Math.random()*1}s;opacity:${.5+Math.random()*.5};`;});
     const flash=document.createElement('div');flash.className='w-flash';bg.appendChild(flash);
   }
 }
@@ -537,7 +551,6 @@ async function loadWeather(){
     const geo=await geocodeCity(cityName);
     if(geo){lat=geo.latitude;lon=geo.longitude;cityName=geo.name;}
     else{
-      // Если город не найден — пробуем геолокацию
       const geoPos=await tryGeolocation();
       if(geoPos){lat=geoPos.lat;lon=geoPos.lon;cityName=await reverseGeocode(lat,lon);}
       else{cityName=getCityFromTimezone();const geo2=await geocodeCity(cityName);if(geo2){lat=geo2.latitude;lon=geo2.longitude;cityName=geo2.name;}}
@@ -571,6 +584,23 @@ async function loadWeather(){
   const wind=cur.wind_speed_10m!=null?`${Math.round(cur.wind_speed_10m)} км/ч`:'—';
   const feels=cur.apparent_temperature!=null?`${Math.round(cur.apparent_temperature)}°`:'—';
   
+  // Прогноз на 5 дней
+  let forecastHTML='';
+  if(daily?.time){
+    const today=new Date().getDay();
+    for(let i=0;i<Math.min(5,daily.time.length);i++){
+      const d=new Date(daily.time[i]);
+      const dayName=i===0?'Сегодня':weekDaysShort[d.getDay()];
+      const dayInfo=getWeatherInfo(daily.weather_code[i]);
+      const tMax=Math.round(daily.temperature_2m_max[i]);
+      forecastHTML+=`<div class="wf-day ${i===0?'today':''}">
+        <div class="wf-name">${dayName}</div>
+        <div class="wf-icon">${dayInfo.emoji}</div>
+        <div class="wf-temp">${tMax}°</div>
+      </div>`;
+    }
+  }
+  
   $('#weatherContent').innerHTML=`
     <div class="weather-top">
       <div class="weather-icon">${info.emoji}</div>
@@ -586,6 +616,7 @@ async function loadWeather(){
       <span>🌡 Ощущ. ${feels}</span>
       <span style="color:var(--accent)">↑${maxT}° ↓${minT}°</span>
     </div>
+    ${forecastHTML?`<div class="weather-forecast">${forecastHTML}</div>`:''}
   `;
 }
 
@@ -626,7 +657,14 @@ function initSim(){
     }
     D.sites[n].history=arr;
   });
-  D.logs=[{time:new Date().toISOString(),site:'Дашборд',action:'Запуск симуляции',status:'info'}];
+  D.logs=[
+    {time:new Date().toISOString(),site:'Дашборд',action:'Запуск симуляции мониторинга',status:'info'},
+    {time:new Date().toISOString(),site:'Root',action:'Проверка завершена: 200, 110мс',status:'success'},
+    {time:new Date().toISOString(),site:'KFWR',action:'Проверка завершена: 200, 145мс',status:'success'},
+    {time:new Date().toISOString(),site:'Kizamia Notes',action:'Проверка завершена: 200, 130мс',status:'success'},
+    {time:new Date().toISOString(),site:'Upscale Image',action:'Проверка завершена: 200, 175мс',status:'success'},
+    {time:new Date().toISOString(),site:'Kizamia Weather',action:'Проверка завершена: 200, 140мс',status:'success'}
+  ];
 }
 
 function jitterSim(){
@@ -641,9 +679,9 @@ function jitterSim(){
       ms:newMs,code:down?503:200,is_functional:!down});
     if(s.history.length>288)s.history.shift();
     s.current_ms=newMs; s.current_status=down?'down':'up';
+    D.logs.push({time:new Date().toISOString(),site:n,action:down?`Ошибка: HTTP ${down?503:200}`:`Проверка завершена: 200, ${newMs}мс`,status:down?'error':'success'});
   });
   D.last_updated=new Date().toISOString();
-  D.logs.push({time:new Date().toISOString(),site:'Дашборд',action:'Симуляция обновлена',status:'info'});
   if(D.logs.length>50)D.logs.shift();
   render();
 }
@@ -660,7 +698,7 @@ function render(){
     $('#incTable').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Нет инцидентов</td></tr>';
     return;
   }
-  renderKPIs(); renderCritical(); renderMainChart(); renderLogs();
+  renderKPIs(); renderCritical(); renderMainChart(); renderLatChart(); renderLogs();
   renderSites(); renderChanges(); renderIncidents(); renderArchive();
 }
 
@@ -695,7 +733,7 @@ function renderCritical(){
 }
 
 function renderLogs(){
-  const logs=(D.logs||[]).slice(-15).reverse();
+  const logs=(D.logs||[]).slice(-10).reverse();
   if(logs.length===0){$('#logsList').innerHTML='<div class="empty-msg">Нет логов</div>';return;}
   $('#logsList').innerHTML=logs.map(l=>{
     const time=new Date(l.time).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -739,6 +777,42 @@ function renderMainChart(){
         y:{position:'left',min:90,max:100,grid:{color:css('--grid'),drawBorder:false},ticks:{color:css('--ok'),font:{size:11,weight:'600'},callback:v=>v+'%'}},
         y1:{position:'right',min:0,grid:{display:false},ticks:{color:css('--accent'),font:{size:11,weight:'600'},callback:v=>v+'мс'}}
       }
+    }
+  });
+}
+
+function renderLatChart(){
+  const names=Object.keys(D.sites);
+  if(names.length===0)return;
+  
+  let maxLen=0;
+  names.forEach(n=>{
+    const h=(D.sites[n].history||[]).slice(-48);
+    if(h.length>maxLen)maxLen=h.length;
+  });
+  
+  const refSite=names.reduce((best,n)=>{
+    const len=(D.sites[n].history||[]).length;
+    return len>(D.sites[best]?.history||[]).length?n:best;
+  },names[0]);
+  const refHistory=(D.sites[refSite].history||[]).slice(-maxLen);
+  const labels=refHistory.map(x=>new Date(x.time).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'}));
+  
+  const datasets=names.map((n,i)=>{
+    const h=(D.sites[n].history||[]).slice(-maxLen);
+    const data=Array(maxLen).fill(0).map((_,j)=>h[j]?h[j].ms:0);
+    return {label:n,data,borderColor:COLORS[i%COLORS.length],
+      backgroundColor:COLORS[i%COLORS.length]+'15',borderWidth:2,tension:.4,fill:false,pointRadius:0,pointHoverRadius:4};
+  });
+  
+  if(charts.lat)charts.lat.destroy();
+  charts.lat=new Chart($('#chLat'),{
+    type:'line',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:true,position:'bottom',labels:{color:css('--muted'),font:{size:10},boxWidth:10,padding:8}},
+        tooltip:{backgroundColor:css('--panel2'),titleColor:css('--text'),bodyColor:css('--text'),borderColor:css('--border'),borderWidth:1,padding:10}},
+      scales:{x:{grid:{color:css('--grid'),drawBorder:false},ticks:{color:css('--muted'),font:{size:9},maxTicksLimit:6}},
+        y:{beginAtZero:true,grid:{color:css('--grid'),drawBorder:false},ticks:{color:css('--muted'),font:{size:10},callback:v=>v+'мс'}}}
     }
   });
 }
@@ -822,7 +896,7 @@ $('#modal').onclick=e=>{if(e.target.id==='modal')closeCritical();};
 load();
 loadWeather();
 setInterval(load,60000);
-setInterval(loadWeather,30*60*1000); // Погода обновляется каждые 30 минут
+setInterval(loadWeather,30*60*1000);
 </script>
 </body>
 </html>
